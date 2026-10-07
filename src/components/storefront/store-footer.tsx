@@ -1,7 +1,8 @@
+"use client";
+
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Phone, MapPin, Mail, Clock, ShieldCheck } from "lucide-react";
+import { Phone, MapPin, Mail, Clock } from "lucide-react";
 
 export function StoreFooter() {
   const shopLinks = [
@@ -14,13 +15,14 @@ export function StoreFooter() {
   ];
 
   const companyLinks = [
-    { name: "Home", href: "/" },
     { name: "About Us", href: "/about" },
+    { name: "Deals", href: "/deals" },
     { name: "Blog", href: "/blog" },
     { name: "Contact Us", href: "/contact" },
     { name: "FAQ", href: "/faq" },
     { name: "Terms and Conditions", href: "/terms" },
     { name: "Privacy Policy", href: "/privacy" },
+    { name: "Home", href: "/" },
   ];
 
   const deliveryAreas = [
@@ -40,85 +42,77 @@ export function StoreFooter() {
   ];
 
   return (
-    <footer className="bg-[#121813] text-gray-300 pt-14 pb-8 border-t border-gray-800">
+    <footer className="bg-[#557754] text-white pt-12 sm:pt-14 pb-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-12 border-b border-gray-800/80">
-          {/* ================= COL 1: BRAND & CONTACT (4 cols) ================= */}
-          <div className="lg:col-span-4 space-y-4">
-            <Link href="/" className="inline-block bg-white p-2.5 rounded-2xl shadow-xs">
-              <Image
-                src="/images/torch-logo.svg"
-                alt="Torch Logo"
-                width={120}
-                height={40}
-                className="h-8 w-auto object-contain"
-              />
-            </Link>
-
-            <p className="text-xs sm:text-sm text-gray-300 font-medium leading-relaxed">
+        {/* ================= DESKTOP & TABLET LAYOUT ================= */}
+        <div className="hidden md:grid md:grid-cols-12 gap-8 lg:gap-10 pb-10">
+          {/* Col 1: Contact info with orange icon badges (4 cols) */}
+          <div className="md:col-span-4 space-y-5">
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">
               Order online or by phone for free delivery or curbside pickup.
-            </p>
+            </h3>
 
-            <div className="space-y-2.5 text-xs sm:text-[13px] text-gray-400 pt-1">
+            <div className="space-y-3.5 pt-1 text-sm font-medium">
               {/* Phone */}
-              <div className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-[#557754] shrink-0" />
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-6 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Phone className="w-3.5 h-3.5" />
+                </span>
                 <a
                   href="tel:+12024681966"
-                  className="text-white hover:text-emerald-400 font-bold transition-colors"
+                  className="hover:underline text-white font-semibold transition-colors"
                 >
                   (202) 468-1966
                 </a>
               </div>
 
               {/* Address */}
-              <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-[#557754] shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                  <MapPin className="w-3.5 h-3.5" />
+                </span>
                 <a
                   href="https://maps.google.com/?q=1025+F+St+NW,+Washington,+DC+20004"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="hover:underline text-white/95 transition-colors"
                 >
                   1025 F St NW, Washington, DC 20004
                 </a>
               </div>
 
               {/* Email */}
-              <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#557754] shrink-0" />
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-6 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Mail className="w-3.5 h-3.5" />
+                </span>
                 <a
                   href="mailto:info@torchdc.co"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="hover:underline text-white/95 transition-colors"
                 >
                   info@torchdc.co
                 </a>
               </div>
 
               {/* Hours */}
-              <div className="flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-[#557754] shrink-0" />
-                <span className="text-gray-300">Open daily, 7AM to 11PM</span>
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-6 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Clock className="w-3.5 h-3.5" />
+                </span>
+                <span className="text-white/95">Open daily, 7AM to 11PM</span>
               </div>
-            </div>
-
-            <div className="pt-2 flex items-center gap-2 text-xs text-emerald-400 font-semibold">
-              <ShieldCheck className="w-4 h-4" />
-              <span>For adults 21+ only · DC Initiative 71</span>
             </div>
           </div>
 
-          {/* ================= COL 2: SHOP (2 cols) ================= */}
-          <div className="lg:col-span-2">
-            <h4 className="text-sm font-black uppercase tracking-wider text-white mb-4">
-              Shop
-            </h4>
-            <ul className="space-y-2 text-xs sm:text-sm">
+          {/* Col 2: Shop links (2 cols) */}
+          <div className="md:col-span-2 space-y-4">
+            <h4 className="text-base sm:text-lg font-bold text-white">Shop</h4>
+            <ul className="space-y-2.5 text-sm">
               {shopLinks.map((item) => (
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-white/90 hover:text-white hover:underline transition-colors"
                   >
                     {item.name}
                   </Link>
@@ -127,17 +121,15 @@ export function StoreFooter() {
             </ul>
           </div>
 
-          {/* ================= COL 3: COMPANY (3 cols) ================= */}
-          <div className="lg:col-span-3">
-            <h4 className="text-sm font-black uppercase tracking-wider text-white mb-4">
-              Company
-            </h4>
-            <ul className="space-y-2 text-xs sm:text-sm">
-              {companyLinks.map((item) => (
+          {/* Col 3: Company links (2.5 cols) */}
+          <div className="md:col-span-2 lg:col-span-3 space-y-4">
+            <h4 className="text-base sm:text-lg font-bold text-white">Company</h4>
+            <ul className="space-y-2.5 text-sm">
+              {companyLinks.slice(0, 7).map((item) => (
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-white/90 hover:text-white hover:underline transition-colors"
                   >
                     {item.name}
                   </Link>
@@ -146,18 +138,17 @@ export function StoreFooter() {
             </ul>
           </div>
 
-          {/* ================= COL 4: DELIVERY AREAS (3 cols) ================= */}
-          <div className="lg:col-span-3">
-            <h4 className="text-sm font-black uppercase tracking-wider text-white mb-4">
+          {/* Col 4: Delivery Areas Pill Tags (3.5 cols) */}
+          <div className="md:col-span-4 lg:col-span-3 space-y-4">
+            <h4 className="text-base sm:text-lg font-bold text-white">
               Delivery Areas
             </h4>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 text-xs sm:text-sm">
+            <div className="flex flex-wrap gap-2 pt-1">
               {deliveryAreas.map((area) => (
                 <Link
                   key={area.name}
                   href={area.href}
-                  className="text-gray-400 hover:text-white transition-colors truncate"
-                  title={`Cannabis delivery to ${area.name}, DC`}
+                  className="bg-white/20 hover:bg-white/30 text-white text-xs font-medium px-3.5 py-1.5 rounded-full transition-colors backdrop-blur-xs"
                 >
                   {area.name}
                 </Link>
@@ -166,14 +157,171 @@ export function StoreFooter() {
           </div>
         </div>
 
-        {/* ================= BOTTOM BAR ================= */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-          <p className="text-center md:text-left leading-relaxed">
-            © 2026 Torch · 1025 F St NW, Washington, DC 20004 · (202) 468-1966 · For adults 21+ only.
+        {/* ================= MOBILE LAYOUT ================= */}
+        <div className="block md:hidden space-y-6 pb-8">
+          {/* 1. Header & Contact with orange round badges */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold tracking-tight text-white leading-snug">
+              Order online or by phone for free delivery or curbside pickup.
+            </h3>
+
+            <div className="space-y-3 pt-1 text-sm font-medium">
+              <div className="flex items-center gap-3">
+                <span className="w-7 h-7 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Phone className="w-3.5 h-3.5" />
+                </span>
+                <a href="tel:+12024681966" className="text-white font-semibold">
+                  (202) 468-1966
+                </a>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <span className="w-7 h-7 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                  <MapPin className="w-3.5 h-3.5" />
+                </span>
+                <a
+                  href="https://maps.google.com/?q=1025+F+St+NW,+Washington,+DC+20004"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/95"
+                >
+                  1025 F St NW, Washington, DC 20004
+                </a>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="w-7 h-7 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Mail className="w-3.5 h-3.5" />
+                </span>
+                <a href="mailto:info@torchdc.co" className="text-white/95">
+                  info@torchdc.co
+                </a>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="w-7 h-7 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Clock className="w-3.5 h-3.5" />
+                </span>
+                <span className="text-white/95">Open daily, 7AM to 11PM</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-white/20 pt-6"></div>
+
+          {/* 2. Shop & Company in 2 Columns */}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <h4 className="text-base font-bold text-white">Shop</h4>
+              <ul className="space-y-2 text-sm">
+                {shopLinks.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className="text-white/90 hover:text-white"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-base font-bold text-white">Company</h4>
+              <ul className="space-y-2 text-sm">
+                {companyLinks.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className="text-white/90 hover:text-white"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-white/20 pt-6"></div>
+
+          {/* 3. Delivery Areas with Pill Tags */}
+          <div className="space-y-3">
+            <h4 className="text-base font-bold text-white">Delivery Areas</h4>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {deliveryAreas.map((area) => (
+                <Link
+                  key={area.name}
+                  href={area.href}
+                  className="bg-white/20 hover:bg-white/30 text-white text-xs font-medium px-3.5 py-1.5 rounded-full transition-colors backdrop-blur-xs"
+                >
+                  {area.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ================= BOTTOM BAR (BORDER & COPYRIGHT & SOCIALS) ================= */}
+        <div className="border-t border-white/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-white/90">
+          <p className="text-center sm:text-left">
+            © 2026 Torch · 1025 F St NW, Washington, DC 20004 · For adults 21+ only.
           </p>
-          <p className="text-center md:text-right shrink-0 text-[11px] text-gray-600">
-            Initiative 71 Compliant DC Dispensary
-          </p>
+
+          {/* Social circular pill buttons */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            {/* Instagram */}
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="w-3.5 h-3.5 fill-current"
+                aria-hidden="true"
+              >
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+              </svg>
+            </a>
+
+            {/* Facebook */}
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="w-3.5 h-3.5 fill-current"
+                aria-hidden="true"
+              >
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+            </a>
+
+            {/* X / Twitter */}
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X (formerly Twitter)"
+              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="w-3.5 h-3.5 fill-current"
+                aria-hidden="true"
+              >
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
     </footer>
