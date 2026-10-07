@@ -64,7 +64,7 @@ const slides: BannerSlide[] = [
     image:
       "https://res.cloudinary.com/omtao1np/image/upload/v1791362264/torch/products/n8bcomkhkmu2d4aliuei.png",
     imageAlt: "Torch Exotic Indoor Flower Special",
-    bgColor: "bg-[#1e3a2f]",
+    bgColor: "bg-[#557754]",
   },
 ];
 
