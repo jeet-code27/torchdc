@@ -66,15 +66,7 @@ export function StoreNavbar() {
                 width={170}
                 height={48}
                 priority
-                className="h-10 sm:h-12 w-auto max-w-[150px] sm:max-w-[170px] object-contain drop-shadow-xs dark:hidden"
-              />
-              <Image
-                src="/images/torch-logo-white.svg"
-                alt="Torch Dispensary"
-                width={170}
-                height={48}
-                priority
-                className="h-10 sm:h-12 w-auto max-w-[150px] sm:max-w-[170px] object-contain drop-shadow-xs hidden dark:block"
+                className="h-10 sm:h-12 w-auto max-w-[150px] sm:max-w-[170px] object-contain drop-shadow-xs"
               />
             </Link>
           </div>

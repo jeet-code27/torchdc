@@ -32,6 +32,7 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="light"
           enableSystem={false}
+          storageKey="torch-theme-v2"
           disableTransitionOnChange
         >
           {children}
