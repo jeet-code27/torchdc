@@ -89,7 +89,15 @@ export default function AdminLoginPage() {
               width={220}
               height={64}
               priority
-              className="h-16 w-auto max-w-[220px] object-contain drop-shadow-sm"
+              className="h-16 w-auto max-w-[220px] object-contain drop-shadow-sm dark:hidden"
+            />
+            <Image
+              src="/images/torch-logo-white.svg"
+              alt="TORCH"
+              width={220}
+              height={64}
+              priority
+              className="h-16 w-auto max-w-[220px] object-contain drop-shadow-sm hidden dark:block"
             />
           </div>
           <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">

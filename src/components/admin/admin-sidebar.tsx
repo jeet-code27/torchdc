@@ -148,7 +148,15 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: SidebarProps) {
             width={140}
             height={36}
             priority
-            className="h-9 w-auto max-w-[140px] object-contain drop-shadow-xs"
+            className="h-9 w-auto max-w-[140px] object-contain drop-shadow-xs dark:hidden"
+          />
+          <Image
+            src="/images/torch-logo-white.svg"
+            alt="TORCH"
+            width={140}
+            height={36}
+            priority
+            className="h-9 w-auto max-w-[140px] object-contain drop-shadow-xs hidden dark:block"
           />
         </Link>
         <button
