@@ -12,7 +12,6 @@ import {
   Edit,
   Trash2,
   Globe,
-  UploadCloud,
   CheckCircle2,
   AlertTriangle,
   Layers,
@@ -107,22 +106,6 @@ export default function ProductsPage() {
     fetchProducts();
   }, [fetchProducts]);
 
-  // WooCommerce CSV Sync
-  const handleImportWooCommerce = async () => {
-    const toastId = toast.loading("Syncing products from WooCommerce CSV...");
-    try {
-      const res = await fetch("/api/admin/products/import-csv", { method: "POST" });
-      const json = await res.json();
-      if (json.success) {
-        toast.success(json.message || "Products synced successfully!", { id: toastId });
-        fetchProducts();
-      } else {
-        toast.error(json.error || "Failed to sync products from CSV", { id: toastId });
-      }
-    } catch {
-      toast.error("Unexpected error during CSV import", { id: toastId });
-    }
-  };
 
   // Delete product
   const handleConfirmDelete = async () => {
@@ -470,15 +453,6 @@ export default function ProductsPage() {
             <div className="flex items-center gap-2">
               <Can permission="products.create">
                 <Button
-                  variant="outline"
-                  onClick={handleImportWooCommerce}
-                  className="text-xs"
-                >
-                  <UploadCloud className="w-4 h-4 mr-1 text-primary" />
-                  <span>Sync WooCommerce CSV</span>
-                </Button>
-
-                <Button
                   onClick={() => router.push("/admin/products/new")}
                   className="text-xs"
                 >
@@ -543,7 +517,7 @@ export default function ProductsPage() {
           searchKey="name"
           searchPlaceholder="Search products by title..."
           isLoading={isLoading}
-          emptyMessage="No products found. Click 'Sync WooCommerce CSV' or 'Add Product'."
+          emptyMessage="No products found. Click 'Add Product' to create one."
         />
 
         {/* Confirm Delete Dialog */}

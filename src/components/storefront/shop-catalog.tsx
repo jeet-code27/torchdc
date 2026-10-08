@@ -10,263 +10,100 @@ import {
   ShoppingBag,
   Flame,
   Sparkles,
+  ChevronLeft,
   ChevronRight,
   Phone,
+  Menu,
+  X,
+  Tag,
+  Filter,
+  Home,
+  Info,
+  HelpCircle,
+  ArrowRight,
 } from "lucide-react";
 import { useCart, FulfillmentType } from "@/context/cart-context";
 import { ShopSidebar, STORE_CATEGORIES } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopFlowerTiers } from "./shop-flower-tiers";
-import { ShopStrainFilters } from "./shop-strain-filters";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { ShopProductCard, ShopProduct } from "./shop-product-card";
+import { StoreHeroCarousel } from "./store-hero-carousel";
 
-// Comprehensive catalog items from the store inventory
-const INITIAL_PRODUCTS: ShopProduct[] = [
-  // --- BEST SELLERS ---
-  {
-    id: "bs-1",
-    name: "Gelato (Hybrid)",
-    slug: "gelato-hybrid",
-    subtitle: "Topshelf · Hybrid · 3.5g",
-    price: 40,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png",
-    category: "flowers",
-    tier: "topshelf",
-    strain: "hybrid",
-    weight: "3.5g",
-    isBestSeller: true,
-  },
-  {
-    id: "bs-2",
-    name: "2G Plume Sweet Pop",
-    slug: "2g-plume-sweet-pop",
-    subtitle: "Berry Runtz x Fruit Tart",
-    price: 60,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349258/torch/categories/lf2ds9mohuoixwdrl4ri.jpg",
-    category: "disposables",
-    weight: "2g",
-    isBestSeller: true,
-  },
-  {
-    id: "bs-3",
-    name: "Rocket Bites Orange Sun",
-    slug: "rocket-bites-orange-sun",
-    subtitle: "200mg · 10 ct Artisanal",
-    price: 60,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349263/torch/categories/xmal5v2rlltdqdopq4o4.jpg",
-    category: "edibles",
-    weight: "200mg",
-    isBestSeller: true,
-  },
-  {
-    id: "bs-4",
-    name: "Exotic 1G Pre-Roll",
-    slug: "exotic-1g-pre-roll",
-    subtitle: "Pre-roll · 1g Artisanal",
-    price: 15,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349257/torch/categories/klbrtn83a7r3duyyv2o3.jpg",
-    category: "pre-rolls",
-    weight: "1g",
-    isBestSeller: true,
-  },
+const ITEMS_PER_PAGE = 12;
 
-  // --- NEW ARRIVALS ---
-  {
-    id: "na-1",
-    name: "Jeeter Bananaconda",
-    slug: "jeeter-bananaconda",
-    subtitle: "Indica · enhanced 1g",
-    price: 50,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349257/torch/categories/klbrtn83a7r3duyyv2o3.jpg",
-    category: "pre-rolls",
-    strain: "indica",
-    weight: "1g",
-    isNewArrival: true,
-  },
-  {
-    id: "na-2",
-    name: "2G Plume Cherry Kamikaze",
-    slug: "2g-plume-cherry-kamikaze",
-    subtitle: "Tokyo Sunset x Cherry Soda",
-    price: 60,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349258/torch/categories/lf2ds9mohuoixwdrl4ri.jpg",
-    category: "disposables",
-    weight: "2g",
-    isNewArrival: true,
-  },
-  {
-    id: "na-3",
-    name: "WM Zayaya + Key Lime Cake",
-    slug: "wm-zayaya-key-lime-cake",
-    subtitle: "Indica / Sativa dual pack",
-    price: 60,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349258/torch/categories/lf2ds9mohuoixwdrl4ri.jpg",
-    category: "disposables",
-    strain: "hybrid",
-    weight: "2g",
-    isNewArrival: true,
-  },
-
-  // --- FLOWERS: TOPSHELF ($40) ---
-  {
-    id: "fl-1",
-    name: "Blue Dream",
-    slug: "blue-dream",
-    subtitle: "Topshelf · Sativa · 3.5g",
-    price: 40,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png",
-    category: "flowers",
-    tier: "topshelf",
-    strain: "sativa",
-    weight: "3.5g",
-  },
-  {
-    id: "fl-2",
-    name: "Wedding Cake",
-    slug: "wedding-cake",
-    subtitle: "Topshelf · Indica · 3.5g",
-    price: 40,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png",
-    category: "flowers",
-    tier: "topshelf",
-    strain: "indica",
-    weight: "3.5g",
-  },
-  {
-    id: "fl-3",
-    name: "Super Silver Haze",
-    slug: "super-silver-haze",
-    subtitle: "Topshelf · Sativa · 3.5g",
-    price: 40,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png",
-    category: "flowers",
-    tier: "topshelf",
-    strain: "sativa",
-    weight: "3.5g",
-  },
-
-  // --- FLOWERS: PRIVATE RESERVE / EXOTIC ($60) ---
-  {
-    id: "fl-4",
-    name: "Lemon Cherry Gelato",
-    slug: "lemon-cherry-gelato",
-    subtitle: "Private Reserve · Hybrid · 3.5g",
-    price: 60,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png",
-    category: "flowers",
-    tier: "exotic",
-    strain: "hybrid",
-    weight: "3.5g",
-    badge: "EXOTIC",
-  },
-  {
-    id: "fl-5",
-    name: "Runtz Muffin",
-    slug: "runtz-muffin",
-    subtitle: "Private Reserve · Indica · 3.5g",
-    price: 60,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png",
-    category: "flowers",
-    tier: "exotic",
-    strain: "indica",
-    weight: "3.5g",
-    badge: "EXOTIC",
-  },
-
-  // --- FLOWERS: MIDSHELF ($70) ---
-  {
-    id: "fl-6",
-    name: "OG Kush",
-    slug: "og-kush",
-    subtitle: "Midshelf · Indica · 14g Half Oz",
-    price: 70,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png",
-    category: "flowers",
-    tier: "midshelf",
-    strain: "indica",
-    weight: "14g",
-  },
-  {
-    id: "fl-7",
-    name: "Sour Diesel",
-    slug: "sour-diesel",
-    subtitle: "Midshelf · Sativa · 14g Half Oz",
-    price: 70,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png",
-    category: "flowers",
-    tier: "midshelf",
-    strain: "sativa",
-    weight: "14g",
-  },
-
-  // --- CONCENTRATES ---
-  {
-    id: "cc-1",
-    name: "Torch Live Rosin Badder",
-    slug: "torch-live-rosin-badder",
-    subtitle: "Solventless 1g Artisanal",
-    price: 75,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349262/torch/categories/j3j548jks994jfk2k1a0.jpg",
-    category: "concentrates",
-    weight: "1g",
-  },
-
-  // --- EDIBLES ---
-  {
-    id: "ed-1",
-    name: "Gummy Bears 500mg Mega Pack",
-    slug: "gummy-bears-500mg-mega-pack",
-    subtitle: "Full Spectrum · 20 ct",
-    price: 45,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349263/torch/categories/xmal5v2rlltdqdopq4o4.jpg",
-    category: "edibles",
-    weight: "500mg",
-  },
-
-  // --- MUSHROOMS ---
-  {
-    id: "mu-1",
-    name: "PolkaDot Magic Chocolate Bar",
-    slug: "polkadot-magic-chocolate-bar",
-    subtitle: "4g Premium Belgian Chocolate",
-    price: 55,
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349263/torch/categories/xmal5v2rlltdqdopq4o4.jpg",
-    category: "mushrooms",
-    weight: "4g",
-  },
+const CATEGORY_PILLS = [
+  { slug: "all", label: "All" },
+  { slug: "flowers", label: "Flower" },
+  { slug: "pre-rolls", label: "Pre-rolls" },
+  { slug: "disposables", label: "Disposables" },
+  { slug: "cartridges", label: "Cartridges" },
+  { slug: "concentrates", label: "Concentrates" },
+  { slug: "edibles", label: "Edibles" },
+  { slug: "mushrooms", label: "Mushrooms" },
+  { slug: "best-sellers", label: "Best Sellers" },
+  { slug: "new-arrivals", label: "New Arrivals" },
 ];
 
-export function ShopCatalog() {
-  const { fulfillment, setFulfillment, totalCount } = useCart();
+function getPageNumbers(currentPage: number, totalPages: number): (number | string)[] {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
 
-  const [activeCategory, setActiveCategory] = React.useState("best-sellers");
+  if (currentPage <= 4) {
+    return [1, 2, 3, 4, 5, "...", totalPages];
+  }
+
+  if (currentPage >= totalPages - 3) {
+    return [
+      1,
+      "...",
+      totalPages - 4,
+      totalPages - 3,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    ];
+  }
+
+  return [
+    1,
+    "...",
+    currentPage - 1,
+    currentPage,
+    currentPage + 1,
+    "...",
+    totalPages,
+  ];
+}
+
+interface ShopCatalogProps {
+  initialProducts?: ShopProduct[];
+}
+
+export function ShopCatalog({ initialProducts = [] }: ShopCatalogProps) {
+  const { fulfillment, setFulfillment, totalCount } = useCart();
+  const [products, setProducts] = React.useState<ShopProduct[]>(initialProducts);
+
+  React.useEffect(() => {
+    if (initialProducts && initialProducts.length > 0) {
+      setProducts(initialProducts);
+    }
+  }, [initialProducts]);
+
+  // By default, Shop page shows ALL products
+  const [activeCategory, setActiveCategory] = React.useState("all");
   const [activeTier, setActiveTier] = React.useState("all");
   const [activeStrain, setActiveStrain] = React.useState("all");
   const [searchQuery, setSearchQuery] = React.useState("");
   const [sortBy, setSortBy] = React.useState("popular");
   const [showTierModal, setShowTierModal] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [currentPage, setCurrentPage] = React.useState(1);
 
   // Filter products
   const filteredProducts = React.useMemo(() => {
-    return INITIAL_PRODUCTS.filter((product) => {
+    return products.filter((product) => {
       // 1. Search Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -301,14 +138,27 @@ export function ShopCatalog() {
       if (sortBy === "latest") return a.isNewArrival ? -1 : 1;
       return 0; // default popular
     });
+  }, [products, activeCategory, activeTier, activeStrain, searchQuery, sortBy]);
+
+  // Reset page when any filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
   }, [activeCategory, activeTier, activeStrain, searchQuery, sortBy]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
+  const paginatedProducts = React.useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
 
   const categoryTitle = React.useMemo(() => {
     if (activeCategory === "all") return "Shop All";
+    if (activeCategory === "flowers") return "Flower";
     if (activeCategory === "best-sellers") return "Best Sellers";
     if (activeCategory === "new-arrivals") return "New Arrivals";
-    const found = STORE_CATEGORIES.find((c) => c.slug === activeCategory);
-    return found ? found.name : "Products";
+    const found = CATEGORY_PILLS.find((c) => c.slug === activeCategory);
+    return found ? found.label : "Products";
   }, [activeCategory]);
 
   return (
@@ -352,6 +202,12 @@ export function ShopCatalog() {
 
           {/* Links & Phone */}
           <div className="flex items-center gap-6 text-sm font-bold text-neutral-700">
+            <Link href="/" className="hover:text-[#557754] transition-colors">
+              Home
+            </Link>
+            <Link href="/shop" className="text-[#557754] font-black transition-colors">
+              Shop All
+            </Link>
             <Link href="/deals" className="hover:text-[#557754] transition-colors">
               Deals
             </Link>
@@ -384,19 +240,22 @@ export function ShopCatalog() {
         </div>
       </div>
 
-      {/* ================= MOBILE HEADER (Screenshot 3 & 4) ================= */}
+      {/* ================= MOBILE HEADER (Matching Home page header layout) ================= */}
       <div className="lg:hidden bg-white border-b border-neutral-100 sticky top-0 z-30">
         <div className="px-4 py-3 flex items-center justify-between">
-          {/* Back button */}
-          <Link
-            href="/"
-            className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-700 hover:bg-neutral-200 transition-colors"
-            aria-label="Back to home"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
+          {/* Left: Phone Call button */}
+          <div className="flex items-center">
+            <a
+              href="tel:+12024681966"
+              className="w-10 h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-700 flex items-center justify-center transition-colors"
+              aria-label="Call Torch DC"
+              title="Call (202) 468-1966"
+            >
+              <Phone className="w-4 h-4 text-[#557754]" />
+            </a>
+          </div>
 
-          {/* Centered Logo */}
+          {/* Centered Logo (links to Home) */}
           <Link href="/" className="relative w-32 h-10">
             <Image
               src="/images/torch-logo.svg"
@@ -407,20 +266,233 @@ export function ShopCatalog() {
             />
           </Link>
 
-          {/* Cart Icon Circle */}
-          <Link
-            href="/cart"
-            className="relative w-10 h-10 rounded-full bg-[#557754] text-white flex items-center justify-center shadow-xs"
-            aria-label="Cart"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            {totalCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#E8561E] text-white text-[11px] font-black flex items-center justify-center shadow-xs">
-                {totalCount}
-              </span>
-            )}
-          </Link>
+          {/* Right: Cart Icon Circle + Hamburger Menu (Matching Home page!) */}
+          <div className="flex items-center gap-2">
+            <Link
+              href="/cart"
+              className="relative w-10 h-10 rounded-full bg-[#557754] text-white flex items-center justify-center shadow-xs"
+              aria-label="Cart"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              {totalCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#E8561E] text-white text-[11px] font-black flex items-center justify-center shadow-xs">
+                  {totalCount}
+                </span>
+              )}
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="w-10 h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 flex items-center justify-center transition-all cursor-pointer shadow-2xs"
+              aria-label="Open navigation menu"
+              title="Menu"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* ================= MOBILE SLIDE-OVER SIDEBAR DRAWER (Slides from LEFT) ================= */}
+        {isMobileMenuOpen && (
+          <div className="fixed inset-0 z-50 flex justify-start">
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            {/* Drawer Panel (Slides from LEFT) */}
+            <div className="relative w-[85%] max-w-sm bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-left duration-300">
+              {/* Top Bar */}
+              <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
+                <div className="relative w-32 h-10">
+                  <Image
+                    src="/images/torch-logo.svg"
+                    alt="Torch Dispensary"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center justify-center cursor-pointer transition-colors"
+                  aria-label="Close menu"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-5">
+                {/* 1. PRIMARY SITE NAVIGATION (Home, Shop, Deals, About, Contact) */}
+                <div>
+                  <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-1">
+                    Navigation
+                  </span>
+                  <nav className="space-y-1">
+                    <Link
+                      href="/"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-neutral-800 hover:bg-neutral-50 transition-all"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Home className="w-4 h-4 text-[#557754]" />
+                        <span>Home</span>
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-neutral-300" />
+                    </Link>
+
+                    <Link
+                      href="/shop"
+                      onClick={() => {
+                        setActiveCategory("all");
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-neutral-800 hover:bg-neutral-50 transition-all"
+                    >
+                      <span className="flex items-center gap-3">
+                        <ShoppingBag className="w-4 h-4 text-[#557754]" />
+                        <span>Shop All</span>
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-neutral-300" />
+                    </Link>
+
+                    <Link
+                      href="/deals"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-[#2F4F30] bg-[#edf4ed] hover:bg-[#e4ede4] transition-all"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Flame className="w-4 h-4 text-[#E8561E]" />
+                        <span>Today&apos;s Deals</span>
+                      </span>
+                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#E8561E] text-white">
+                        HOT
+                      </span>
+                    </Link>
+
+                    <Link
+                      href="/about"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-neutral-800 hover:bg-neutral-50 transition-all"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Info className="w-4 h-4 text-[#557754]" />
+                        <span>About Us</span>
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-neutral-300" />
+                    </Link>
+
+                    <Link
+                      href="/contact"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-neutral-800 hover:bg-neutral-50 transition-all"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Phone className="w-4 h-4 text-[#557754]" />
+                        <span>Contact</span>
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-neutral-300" />
+                    </Link>
+
+                    <Link
+                      href="/#faq"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-neutral-800 hover:bg-neutral-50 transition-all"
+                    >
+                      <span className="flex items-center gap-3">
+                        <HelpCircle className="w-4 h-4 text-[#557754]" />
+                        <span>FAQs & Help</span>
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-neutral-300" />
+                    </Link>
+                  </nav>
+                </div>
+
+                {/* 2. DISPENSARY MENU CATEGORIES */}
+                <div className="pt-3 border-t border-neutral-100">
+                  <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-1">
+                    Shop Categories
+                  </span>
+                  <nav className="space-y-1">
+                    {STORE_CATEGORIES.map((cat) => {
+                      const isActive = activeCategory === cat.slug;
+                      return (
+                        <button
+                          key={cat.slug}
+                          type="button"
+                          onClick={() => {
+                            setActiveCategory(cat.slug);
+                            if (cat.slug !== "flowers") setActiveTier("all");
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
+                            isActive
+                              ? "bg-[#edf4ed] text-[#2F4F30] font-black"
+                              : "text-neutral-800 hover:bg-neutral-50"
+                          }`}
+                        >
+                          <span className="flex items-center gap-2.5">
+                            {cat.icon}
+                            <span>{cat.name}</span>
+                          </span>
+                          <ChevronRight className="w-4 h-4 text-neutral-400" />
+                        </button>
+                      );
+                    })}
+                  </nav>
+                </div>
+
+                {/* 3. ORDER MODE SWITCH */}
+                <div className="pt-3 border-t border-neutral-100">
+                  <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-1">
+                    Order Mode
+                  </span>
+                  <div className="bg-neutral-100 p-1 rounded-full flex text-xs font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setFulfillment("delivery")}
+                      className={`flex-1 py-2 text-center rounded-full transition-all ${
+                        fulfillment === "delivery"
+                          ? "bg-[#557754] text-white font-black shadow-xs"
+                          : "text-neutral-600"
+                      }`}
+                    >
+                      Delivery
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFulfillment("pickup")}
+                      className={`flex-1 py-2 text-center rounded-full transition-all ${
+                        fulfillment === "pickup"
+                          ? "bg-[#557754] text-white font-black shadow-xs"
+                          : "text-neutral-600"
+                      }`}
+                    >
+                      Pickup
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4. CALL SUPPORT BUTTON & INFO */}
+                <div className="pt-3 border-t border-neutral-100 space-y-2">
+                  <a
+                    href="tel:+12024681966"
+                    className="w-full bg-[#557754] hover:bg-[#466645] text-white font-bold text-xs py-3 rounded-full flex items-center justify-center gap-2 transition-all shadow-xs"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>Call (202) 468-1966</span>
+                  </a>
+                  <p className="text-[11px] text-neutral-400 text-center leading-normal">
+                    1025 F St NW, Washington, DC · Open daily 7AM - 11PM
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Mobile Fulfillment Segmented Switch */}
         <div className="px-4 pb-2.5 pt-1">
@@ -454,41 +526,6 @@ export function ShopCatalog() {
               : "Curbside pickup at 1025 F St NW, Washington, DC"}
           </p>
         </div>
-
-        {/* Horizontal Category Rail */}
-        <div className="px-4 py-2 border-t border-neutral-100 overflow-x-auto scrollbar-none flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveCategory("all");
-              setActiveTier("all");
-            }}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
-              activeCategory === "all"
-                ? "bg-neutral-900 text-white"
-                : "bg-white text-neutral-700 border border-neutral-200"
-            }`}
-          >
-            All
-          </button>
-          {STORE_CATEGORIES.map((cat) => (
-            <button
-              key={cat.slug}
-              type="button"
-              onClick={() => {
-                setActiveCategory(cat.slug);
-                if (cat.slug !== "flowers") setActiveTier("all");
-              }}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
-                activeCategory === cat.slug
-                  ? "bg-neutral-900 text-white"
-                  : "bg-white text-neutral-700 border border-neutral-200"
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* ================= MAIN CONTAINER ================= */}
@@ -507,229 +544,277 @@ export function ShopCatalog() {
 
           {/* ================= 2. CENTER PRODUCT FEED ================= */}
           <main className="flex-1 min-w-0">
-            {/* Desktop Hero Wake & Bake Banner (Screenshot 1) */}
-            <div className="relative rounded-3xl bg-[#557754] text-white p-6 sm:p-8 overflow-hidden shadow-sm mb-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="relative z-10 max-w-sm space-y-2 text-center sm:text-left">
-                <span className="inline-block bg-[#E8561E] text-white text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-xs">
-                  9AM TO 12PM DAILY
-                </span>
-                <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-none text-white">
-                  WAKE & BAKE
-                </h2>
-                <p className="text-white/85 text-sm sm:text-base leading-snug">
-                  Half ounce from <strong className="text-white">$50</strong>. Limit 1 per customer daily.
-                </p>
-                <div className="pt-2">
+            {/* Hero Slider Carousel */}
+            <StoreHeroCarousel compact={true} />
+
+            {/* Category Filter Pills (Matching Client Reference) */}
+            <div className="mb-4 flex items-center gap-2 overflow-x-auto scrollbar-none py-1.5 -mx-4 px-4 sm:mx-0 sm:px-0">
+              {CATEGORY_PILLS.map((cat) => {
+                const isActive = activeCategory === cat.slug;
+                return (
+                  <button
+                    key={cat.slug}
+                    type="button"
+                    onClick={() => {
+                      setActiveCategory(cat.slug);
+                      if (cat.slug !== "flowers") setActiveTier("all");
+                    }}
+                    className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex-shrink-0 ${
+                      isActive
+                        ? "bg-neutral-900 text-white shadow-xs font-black"
+                        : "bg-white text-neutral-800 border border-neutral-200/90 hover:border-neutral-300 hover:bg-neutral-50 shadow-2xs"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Catalog Grid Section with Pagination */}
+            <div id="catalog-top">
+              {/* Header Bar: Title, Count & Sort (Responsive Single-Line Layout) */}
+              <div className="flex items-center justify-between gap-3 sm:gap-4 pb-2 mb-3">
+                {/* Left: Section Title & Count */}
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-neutral-900 leading-tight truncate">
+                    {categoryTitle}
+                  </h2>
+                  <p className="text-xs text-neutral-500 font-medium mt-0.5 truncate">
+                    {filteredProducts.length === 0
+                      ? "0 products"
+                      : `${filteredProducts.length} products`}
+                  </p>
+                </div>
+
+                {/* Right: Sort Button (Compact on mobile, full on desktop, never wraps) */}
+                <div className="relative shrink-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 bg-white border border-neutral-200/90 rounded-full px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs font-bold text-neutral-800 shadow-2xs hover:border-neutral-300 transition-colors pointer-events-none whitespace-nowrap">
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 shrink-0" />
+                    {/* Full label on tablet/desktop */}
+                    <span className="hidden sm:inline">
+                      {sortBy === "popular"
+                        ? "Popular"
+                        : sortBy === "price-asc"
+                        ? "Price: Low to High"
+                        : sortBy === "price-desc"
+                        ? "Price: High to Low"
+                        : "New Arrivals"}
+                    </span>
+                    {/* Compact label on mobile to fit nicely in 1 line */}
+                    <span className="sm:hidden">
+                      {sortBy === "popular"
+                        ? "Popular"
+                        : sortBy === "price-asc"
+                        ? "Price: Low"
+                        : sortBy === "price-desc"
+                        ? "Price: High"
+                        : "New"}
+                    </span>
+                    <ChevronRight className="w-3 h-3 text-neutral-400 rotate-90 shrink-0" />
+                  </div>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    aria-label="Sort products"
+                  >
+                    <option value="popular">Popular</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="latest">New Arrivals</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Mobile Flower Tier Shortcut Banner (Screenshot 2 / Client reference position) */}
+              <div className="mb-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory("flowers");
+                    setShowTierModal(!showTierModal);
+                  }}
+                  className="w-full bg-[#edf4ed] border border-emerald-100 rounded-2xl p-3.5 flex items-center justify-between text-left cursor-pointer hover:bg-[#e4eee4] transition-colors"
+                >
+                  <div>
+                    <h4 className="font-extrabold text-[14px] text-[#2F4F30]">
+                      Shop flower by tier
+                    </h4>
+                    <p className="text-[12px] text-neutral-600">
+                      Midshelf · Topshelf · Private Reserve
+                    </p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-[#557754]" />
+                </button>
+              </div>
+
+              {/* Flower Tiers Section (STRICTLY ONLY WHEN FLOWERS CATEGORY IS SELECTED) */}
+              {activeCategory === "flowers" && (
+                <div className="mb-6 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-[#E8561E]">
+                      Lab-Tested · Same-Day Delivery
+                    </span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-neutral-900">
+                    Flowers
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-500 mb-3">
+                    Three tiers, one standard of quality.
+                  </p>
+
+                  {/* 3 Tier Cards */}
+                  <ShopFlowerTiers
+                    activeTier={activeTier}
+                    onSelectTier={(tier) => setActiveTier(tier)}
+                  />
+                </div>
+              )}
+
+              {/* Products Grid */}
+              {filteredProducts.length === 0 ? (
+                <div className="bg-white rounded-3xl p-12 text-center border border-neutral-200/80 my-6 shadow-2xs">
+                  <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400 mx-auto mb-3">
+                    <Search className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-black text-lg text-neutral-900">
+                    No products found
+                  </h3>
+                  <p className="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
+                    Try adjusting your search query, flower tier, or strain filter to see available DC menu items.
+                  </p>
                   <button
                     type="button"
                     onClick={() => {
-                      setActiveCategory("flowers");
-                      setActiveTier("midshelf");
+                      setActiveCategory("all");
+                      setActiveTier("all");
+                      setActiveStrain("all");
+                      setSearchQuery("");
                     }}
-                    className="inline-flex items-center gap-2 bg-white text-neutral-900 hover:bg-neutral-100 font-extrabold text-sm px-6 py-2.5 rounded-full transition-all shadow-sm cursor-pointer"
+                    className="mt-4 bg-[#557754] text-white font-bold text-xs px-5 py-2.5 rounded-full hover:bg-[#466645] transition-all cursor-pointer shadow-xs"
                   >
-                    <span>Grab it</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#E8561E]" />
+                    Reset all filters
                   </button>
                 </div>
-              </div>
-
-              {/* Graphic side */}
-              <div className="relative w-48 sm:w-64 h-36 sm:h-44 flex-shrink-0">
-                <Image
-                  src="https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png"
-                  alt="Wake and Bake flower jar"
-                  fill
-                  className="object-contain drop-shadow-xl"
-                  priority
-                />
-              </div>
-            </div>
-
-            {/* Mobile Flower Tier Shortcut Banner (Screenshot 4) */}
-            <div className="lg:hidden mb-4">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveCategory("flowers");
-                  setShowTierModal(!showTierModal);
-                }}
-                className="w-full bg-[#edf4ed] border border-emerald-100 rounded-2xl p-3.5 flex items-center justify-between text-left cursor-pointer"
-              >
-                <div>
-                  <h4 className="font-extrabold text-[14px] text-[#2F4F30]">
-                    Shop flower by tier
-                  </h4>
-                  <p className="text-[12px] text-neutral-600">
-                    Midshelf · Topshelf · Private Reserve
-                  </p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-[#557754]" />
-              </button>
-            </div>
-
-            {/* Flower Tiers Section (STRICTLY ONLY WHEN FLOWERS CATEGORY IS SELECTED) */}
-            {activeCategory === "flowers" && (
-              <div className="mb-6 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-[#E8561E]">
-                    Lab-Tested · Same-Day Delivery
-                  </span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black text-neutral-900">
-                  Flowers
-                </h3>
-                <p className="text-xs sm:text-sm text-neutral-500 mb-3">
-                  Three tiers, one standard of quality.
-                </p>
-
-                {/* 3 Tier Cards */}
-                <ShopFlowerTiers
-                  activeTier={activeTier}
-                  onSelectTier={(tier) => setActiveTier(tier)}
-                />
-              </div>
-            )}
-
-            {/* When "best-sellers" is selected, render the multi-section showcase matching Screenshot 1 & 2 */}
-            {activeCategory === "best-sellers" && !searchQuery.trim() ? (
-              <div className="space-y-10">
-                {/* 1. Best Sellers Section */}
-                <section>
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-neutral-100">
-                    <h3 className="text-xl font-black text-neutral-900 flex items-center gap-2">
-                      <span>Best Sellers</span>
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => setActiveCategory("all")}
-                      className="text-xs font-bold text-neutral-500 hover:text-neutral-900 underline underline-offset-4 cursor-pointer"
-                    >
-                      See all
-                    </button>
-                  </div>
+              ) : (
+                <>
                   <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-                    {INITIAL_PRODUCTS.filter((p) => p.isBestSeller).map((product) => (
+                    {paginatedProducts.map((product) => (
                       <ShopProductCard key={product.id} product={product} />
                     ))}
                   </div>
-                </section>
 
-                {/* 2. New Arrivals Section */}
-                <section>
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-neutral-100">
-                    <h3 className="text-xl font-black text-neutral-900 flex items-center gap-2">
-                      <span>New Arrivals</span>
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => setActiveCategory("new-arrivals")}
-                      className="text-xs font-bold text-neutral-500 hover:text-neutral-900 underline underline-offset-4 cursor-pointer"
-                    >
-                      See all
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-                    {INITIAL_PRODUCTS.filter((p) => p.isNewArrival).map((product) => (
-                      <ShopProductCard key={product.id} product={product} />
-                    ))}
-                  </div>
-                </section>
+                  {/* Modern Smart Pagination Bar */}
+                  {totalPages > 1 && (
+                    <div className="mt-12 pt-6 border-t border-neutral-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      {/* Left: Product count stats */}
+                      <p className="text-xs text-neutral-500 font-medium">
+                        Showing{" "}
+                        <span className="font-bold text-neutral-900">
+                          {(currentPage - 1) * ITEMS_PER_PAGE + 1}
+                        </span>{" "}
+                        to{" "}
+                        <span className="font-bold text-neutral-900">
+                          {Math.min(
+                            currentPage * ITEMS_PER_PAGE,
+                            filteredProducts.length
+                          )}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-bold text-neutral-900">
+                          {filteredProducts.length}
+                        </span>{" "}
+                        products
+                      </p>
 
-                {/* 3. Flowers Preview Section */}
-                <section>
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-neutral-100">
-                    <h3 className="text-xl font-black text-neutral-900 flex items-center gap-2">
-                      <span>Flowers</span>
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => setActiveCategory("flowers")}
-                      className="text-xs font-bold text-neutral-500 hover:text-neutral-900 underline underline-offset-4 cursor-pointer"
-                    >
-                      See all
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-                    {INITIAL_PRODUCTS.filter((p) => p.category === "flowers").slice(0, 3).map((product) => (
-                      <ShopProductCard key={product.id} product={product} />
-                    ))}
-                  </div>
-                </section>
-              </div>
-            ) : (
-              /* Specific Category View or Search Results */
-              <div>
-                {/* Filters & Header Bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-neutral-200/80">
-                  {/* Left: Section Title & Count */}
-                  <div>
-                    <h2 className="text-2xl font-black text-neutral-900 leading-tight">
-                      {categoryTitle}
-                    </h2>
-                    <p className="text-xs text-neutral-500">
-                      {filteredProducts.length}{" "}
-                      {filteredProducts.length === 1 ? "product" : "products"} available
-                    </p>
-                  </div>
+                      {/* Right: Modern Compact Pagination Controls */}
+                      <div className="flex items-center gap-1.5 select-none">
+                        {/* Previous Button */}
+                        <button
+                          type="button"
+                          disabled={currentPage === 1}
+                          onClick={() => {
+                            setCurrentPage((prev) => Math.max(prev - 1, 1));
+                            document
+                              .getElementById("catalog-top")
+                              ?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                          className="h-9 px-3.5 rounded-xl text-xs font-bold border border-neutral-200/90 bg-white text-neutral-700 hover:bg-[#557754]/5 hover:border-[#557754]/40 hover:text-[#557754] disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                          aria-label="Previous page"
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                          <span>Previous</span>
+                        </button>
 
-                  {/* Right: Strain Filters & Sort */}
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <ShopStrainFilters
-                      activeStrain={activeStrain}
-                      onSelectStrain={(strain) => setActiveStrain(strain)}
-                    />
+                        {/* Mobile indicator (Page X of Y) */}
+                        <div className="flex sm:hidden items-center px-3 text-xs font-bold text-neutral-700 bg-neutral-100 rounded-xl h-9">
+                          Page {currentPage} of {totalPages}
+                        </div>
 
-                    {/* Sort Dropdown */}
-                    <div className="relative">
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="bg-white border border-neutral-200 text-xs font-bold text-neutral-800 rounded-full px-3.5 py-1.5 outline-none hover:border-neutral-300 cursor-pointer"
-                      >
-                        <option value="popular">Popular</option>
-                        <option value="price-asc">Price: Low to High</option>
-                        <option value="price-desc">Price: High to Low</option>
-                        <option value="latest">New Arrivals</option>
-                      </select>
+                        {/* Desktop / Tablet Number Pills with Smart Truncation */}
+                        <div className="hidden sm:flex items-center gap-1">
+                          {getPageNumbers(currentPage, totalPages).map((item, idx) => {
+                            if (typeof item === "string") {
+                              return (
+                                <span
+                                  key={`ellipsis-${idx}`}
+                                  className="w-8 h-9 flex items-center justify-center text-xs font-black text-neutral-400"
+                                >
+                                  …
+                                </span>
+                              );
+                            }
+
+                            const isActive = currentPage === item;
+                            return (
+                              <button
+                                key={item}
+                                type="button"
+                                onClick={() => {
+                                  setCurrentPage(item);
+                                  document
+                                    .getElementById("catalog-top")
+                                    ?.scrollIntoView({ behavior: "smooth" });
+                                }}
+                                className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
+                                  isActive
+                                    ? "bg-[#557754] text-white font-black shadow-xs ring-2 ring-[#557754]/25 scale-105"
+                                    : "bg-white text-neutral-700 border border-neutral-200/90 hover:border-neutral-300 hover:bg-neutral-50 shadow-2xs"
+                                }`}
+                                aria-label={`Page ${item}`}
+                                aria-current={isActive ? "page" : undefined}
+                              >
+                                {item}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Next Button */}
+                        <button
+                          type="button"
+                          disabled={currentPage === totalPages}
+                          onClick={() => {
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            );
+                            document
+                              .getElementById("catalog-top")
+                              ?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                          className="h-9 px-3.5 rounded-xl text-xs font-bold border border-neutral-200/90 bg-white text-neutral-700 hover:bg-[#557754]/5 hover:border-[#557754]/40 hover:text-[#557754] disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                          aria-label="Next page"
+                        >
+                          <span>Next</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* Products Grid */}
-                {filteredProducts.length === 0 ? (
-                  <div className="bg-white rounded-3xl p-12 text-center border border-neutral-200/80 my-6">
-                    <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400 mx-auto mb-3">
-                      <Search className="w-5 h-5" />
-                    </div>
-                    <h3 className="font-black text-lg text-neutral-900">
-                      No products found
-                    </h3>
-                    <p className="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
-                      Try adjusting your search query, flower tier, or strain filter to see available DC menu items.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveCategory("best-sellers");
-                        setActiveTier("all");
-                        setActiveStrain("all");
-                        setSearchQuery("");
-                      }}
-                      className="mt-4 bg-[#557754] text-white font-bold text-xs px-5 py-2.5 rounded-full hover:bg-[#466645] transition-all cursor-pointer"
-                    >
-                      Reset all filters
-                    </button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-                    {filteredProducts.map((product) => (
-                      <ShopProductCard key={product.id} product={product} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                  )}
+                </>
+              )}
+            </div>
           </main>
 
           {/* ================= 3. DESKTOP RIGHT ORDER DRAWER (Screenshot 1) ================= */}

@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/permissions";
 import { Product } from "@/models/Product";
 import { Category } from "@/models/Category";
 import { productSchema } from "@/lib/validations/product";
+import { importProductsFromCsv } from "@/lib/product-importer";
 
 // GET /api/admin/products - List products with filters and search
 export async function GET(req: NextRequest) {
@@ -29,6 +30,16 @@ export async function GET(req: NextRequest) {
 
   try {
     await connectToDatabase();
+
+    // Auto-seed from WooCommerce CSV if database is empty
+    const currentTotal = await Product.countDocuments();
+    if (currentTotal === 0) {
+      try {
+        await importProductsFromCsv();
+      } catch (autoSyncErr) {
+        console.error("Auto-sync products from CSV on first load error:", autoSyncErr);
+      }
+    }
 
     const { searchParams } = new URL(req.url);
     const q = searchParams.get("q")?.trim();

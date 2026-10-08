@@ -241,7 +241,7 @@ export function StoreBestSellers() {
                   alt={item.name}
                   fill
                   sizes="(max-width: 640px) 45vw, (max-width: 1024px) 25vw, 220px"
-                  className="object-contain p-1 group-hover:scale-108 transition-transform duration-300"
+                  className="object-contain p-1 mix-blend-multiply group-hover:scale-108 transition-transform duration-300"
                 />
               </div>
             </Link>

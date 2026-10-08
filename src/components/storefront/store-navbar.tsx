@@ -28,6 +28,12 @@ export function StoreNavbar() {
 
             <nav className="flex items-center gap-6 lg:gap-8 text-[15px] font-semibold text-gray-800">
               <Link
+                href="/"
+                className="hover:text-[#557954] transition-colors"
+              >
+                Home
+              </Link>
+              <Link
                 href="/shop"
                 className="hover:text-[#557954] transition-colors"
               >
@@ -133,6 +139,14 @@ export function StoreNavbar() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-5 py-4 space-y-3 animate-in slide-in-from-top-2 duration-200 shadow-lg">
           <nav className="flex flex-col gap-2.5 text-base font-semibold text-gray-800">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 px-3 rounded-lg hover:bg-gray-50 flex items-center justify-between"
+            >
+              <span>Home</span>
+              <ArrowRight className="w-4 h-4 text-gray-400" />
+            </Link>
             <Link
               href="/shop"
               onClick={() => setMobileMenuOpen(false)}

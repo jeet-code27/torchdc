@@ -68,7 +68,15 @@ const slides: BannerSlide[] = [
   },
 ];
 
-export function StoreHeroCarousel() {
+interface StoreHeroCarouselProps {
+  className?: string;
+  compact?: boolean;
+}
+
+export function StoreHeroCarousel({
+  className = "",
+  compact = false,
+}: StoreHeroCarouselProps = {}) {
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const [isPaused, setIsPaused] = React.useState(false);
 
@@ -112,11 +120,23 @@ export function StoreHeroCarousel() {
     touchEndX.current = null;
   };
 
+  const heightClass = compact
+    ? "h-[220px] sm:h-[260px] lg:h-[285px]"
+    : "h-[260px] sm:h-[340px] lg:h-[390px]";
+
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2">
+    <div
+      className={
+        compact
+          ? `w-full mb-6 ${className}`
+          : `max-w-6xl mx-auto px-4 sm:px-6 py-2 ${className}`
+      }
+    >
       {/* ================= HERO SLIDER CONTAINER ================= */}
       <div
-        className="relative overflow-hidden rounded-[22px] sm:rounded-[32px] lg:rounded-[36px] bg-[#557754] shadow-md group select-none"
+        className={`relative overflow-hidden ${
+          compact ? "rounded-3xl" : "rounded-[22px] sm:rounded-[32px] lg:rounded-[36px]"
+        } bg-[#557754] shadow-md group select-none`}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={handleTouchStart}
@@ -133,7 +153,7 @@ export function StoreHeroCarousel() {
               return (
                 <div
                   key={slide.id}
-                  className="min-w-full w-full h-[260px] sm:h-[340px] lg:h-[390px] relative bg-white flex items-center justify-center overflow-hidden"
+                  className={`min-w-full w-full ${heightClass} relative bg-white flex items-center justify-center overflow-hidden`}
                 >
                   {slide.link ? (
                     <Link
@@ -171,42 +191,48 @@ export function StoreHeroCarousel() {
             return (
               <div
                 key={slide.id}
-                className={`min-w-full w-full h-[260px] sm:h-[340px] lg:h-[390px] relative ${
+                className={`min-w-full w-full ${heightClass} relative ${
                   slide.bgColor || "bg-[#557754]"
-                } text-white flex items-center px-6 sm:px-12 lg:px-16 overflow-hidden`}
+                } text-white flex items-center px-6 sm:px-10 lg:px-12 overflow-hidden`}
               >
                 {/* Left / Text Side */}
-                <div className="z-10 max-w-xs sm:max-w-md flex flex-col items-start space-y-2 sm:space-y-4">
+                <div className="z-10 max-w-xs sm:max-w-md flex flex-col items-start space-y-1.5 sm:space-y-3">
                   <span
                     className={`${
-                      slide.badgeColor || "bg-[#f95721]"
+                      slide.badgeColor || "bg-[#E8561E]"
                     } text-white text-[10px] sm:text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-xs`}
                   >
                     {slide.badge}
                   </span>
 
-                  <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] whitespace-pre-line uppercase drop-shadow-xs">
+                  <h2
+                    className={`${
+                      compact
+                        ? "text-2xl sm:text-3xl lg:text-4xl"
+                        : "text-3xl sm:text-5xl lg:text-6xl"
+                    } font-black tracking-tight leading-[1.05] whitespace-pre-line uppercase drop-shadow-xs`}
+                  >
                     {slide.title}
                   </h2>
 
                   <div className="flex flex-col space-y-0.5 sm:space-y-1 text-white">
-                    <p className="text-xs sm:text-base font-semibold leading-normal">
+                    <p className="text-xs sm:text-sm font-semibold leading-normal">
                       {slide.subtitle}
                     </p>
                     {slide.secondaryText && (
-                      <p className="text-[11px] sm:text-sm font-medium text-white/80">
+                      <p className="text-[10px] sm:text-xs font-medium text-white/80">
                         {slide.secondaryText}
                       </p>
                     )}
                   </div>
 
-                  <div className="pt-1 sm:pt-3">
+                  <div className="pt-1 sm:pt-2">
                     <Link
                       href={slide.ctaLink}
-                      className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-[#2563eb] font-extrabold text-xs sm:text-base px-5 sm:px-6 py-2 sm:py-2.5 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 group/btn"
+                      className="inline-flex items-center gap-2 bg-white hover:bg-neutral-100 text-neutral-900 font-extrabold text-xs sm:text-sm px-5 sm:px-6 py-2 sm:py-2.5 rounded-full shadow-md transition-transform hover:scale-105 active:scale-95 group/btn cursor-pointer"
                     >
                       <span>{slide.ctaText}</span>
-                      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover/btn:translate-x-1" />
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
                     </Link>
                   </div>
                 </div>

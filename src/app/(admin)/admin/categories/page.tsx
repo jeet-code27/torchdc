@@ -12,7 +12,6 @@ import {
   Edit,
   Trash2,
   Globe,
-  UploadCloud,
   CheckCircle2,
   AlertTriangle,
   Layers,
@@ -89,26 +88,6 @@ export default function CategoriesPage() {
     fetchCategories();
   }, [fetchCategories]);
 
-  // Import categories from WooCommerce CSV
-  const handleImportWooCommerce = async () => {
-    const promise = (async () => {
-      const res = await fetch("/api/admin/categories/import-csv", {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to import categories");
-      }
-      await fetchCategories();
-      return data;
-    })();
-
-    toast.promise(promise, {
-      loading: "Importing categories from WooCommerce export...",
-      success: (data) => data.message || "Categories imported successfully!",
-      error: (err) => err.message,
-    });
-  };
 
   // Delete category
   const handleConfirmDelete = async () => {
@@ -340,15 +319,6 @@ export default function CategoriesPage() {
             <div className="flex items-center gap-2">
               <Can permission="categories.create">
                 <Button
-                  variant="outline"
-                  onClick={handleImportWooCommerce}
-                  className="text-xs"
-                >
-                  <UploadCloud className="w-4 h-4 mr-1 text-primary" />
-                  <span>Sync WooCommerce CSV</span>
-                </Button>
-
-                <Button
                   onClick={() => router.push("/admin/categories/new")}
                   className="text-xs"
                 >
@@ -367,7 +337,7 @@ export default function CategoriesPage() {
           searchKey="name"
           searchPlaceholder="Search categories by name..."
           isLoading={isLoading}
-          emptyMessage="No categories created yet. Click 'Sync WooCommerce CSV' or 'Add Category'."
+          emptyMessage="No categories created yet. Click 'Add Category' to create one."
         />
 
         {/* Confirm Delete Dialog */}

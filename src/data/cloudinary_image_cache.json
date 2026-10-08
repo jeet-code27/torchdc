@@ -1,0 +1,554 @@
+{
+  "https://torchdc.co/wp-content/uploads/2025/09/Untitled-design-3.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449527/torch/products/mef59qkep9b3gb7526zb.jpg",
+    "publicId": "torch/products/mef59qkep9b3gb7526zb"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/01/lemoncherrygelato-1.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449527/torch/products/eztntr8m1u0h544nmekb.jpg",
+    "publicId": "torch/products/eztntr8m1u0h544nmekb"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Blue-Zushi-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449527/torch/products/ytnnbegxfqifx1m3mdq2.png",
+    "publicId": "torch/products/ytnnbegxfqifx1m3mdq2"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Jealousy-Hybrid-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449527/torch/products/hqp8mbqiwv48iw6hy1h9.png",
+    "publicId": "torch/products/hqp8mbqiwv48iw6hy1h9"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Obama-Runtz-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449527/torch/products/wblu2rswlutquqalguad.png",
+    "publicId": "torch/products/wblu2rswlutquqalguad"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Mendo-Breath-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449528/torch/products/s3l1uzq574mjurou0vev.png",
+    "publicId": "torch/products/s3l1uzq574mjurou0vev"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Blackberry-Kush-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449528/torch/products/nomuk81exkye84lgock3.png",
+    "publicId": "torch/products/nomuk81exkye84lgock3"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/OG-Master-Kush-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449528/torch/products/t0kdfauba4gejadadg2t.png",
+    "publicId": "torch/products/t0kdfauba4gejadadg2t"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Gods-Gift-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449528/torch/products/qxvl1s0mpi3yqpp5zpw3.png",
+    "publicId": "torch/products/qxvl1s0mpi3yqpp5zpw3"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Platinum-Indica-sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449528/torch/products/kfughovtbyy6r8gjrbc2.png",
+    "publicId": "torch/products/kfughovtbyy6r8gjrbc2"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Garlic-Cookies-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449529/torch/products/cnxup9v4i9z6u5dbqyrs.png",
+    "publicId": "torch/products/cnxup9v4i9z6u5dbqyrs"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/GMO-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449530/torch/products/j9nercys3wcv3secbqd1.png",
+    "publicId": "torch/products/j9nercys3wcv3secbqd1"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/OG-Death-Star-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449531/torch/products/vdiokunnwicdpilykmmd.png",
+    "publicId": "torch/products/vdiokunnwicdpilykmmd"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/LA-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449531/torch/products/rdeln1gelu5oipxgk84m.png",
+    "publicId": "torch/products/rdeln1gelu5oipxgk84m"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Confidential-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449531/torch/products/l4drh4fosy5azojnwzr9.png",
+    "publicId": "torch/products/l4drh4fosy5azojnwzr9"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/skywalker-indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449532/torch/products/odixdjz8rxj3m8c9y4qy.png",
+    "publicId": "torch/products/odixdjz8rxj3m8c9y4qy"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Purple-Kush-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449533/torch/products/iezgxbj2tkhjaezeydf5.png",
+    "publicId": "torch/products/iezgxbj2tkhjaezeydf5"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Torch_FlowerbudSets_38-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449533/torch/products/k4s8zab38lslqein1vm3.png",
+    "publicId": "torch/products/k4s8zab38lslqein1vm3"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Torch_FlowerbudSets_41.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449533/torch/products/h4krfdkoftxyqpwyio7d.png",
+    "publicId": "torch/products/h4krfdkoftxyqpwyio7d"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Hindu-Kush-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449534/torch/products/ytobrp9j1o8cp1rnigdd.png",
+    "publicId": "torch/products/ytobrp9j1o8cp1rnigdd"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Afghan-Kush-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449534/torch/products/penmphklo2qyg9h4v9qz.png",
+    "publicId": "torch/products/penmphklo2qyg9h4v9qz"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Northern-Lights-strain-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449535/torch/products/iztjtfahislruvwtfmix.png",
+    "publicId": "torch/products/iztjtfahislruvwtfmix"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Sherbacio-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449536/torch/products/lqtnvkmov4q94u1sixut.png",
+    "publicId": "torch/products/lqtnvkmov4q94u1sixut"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/ChemDawg-strain-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449536/torch/products/payxoydydmcew1yxba4i.png",
+    "publicId": "torch/products/payxoydydmcew1yxba4i"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Torch_FlowerbudSets_35-300x300-4.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449537/torch/products/vpitjfhgijxiozq3v9rt.png",
+    "publicId": "torch/products/vpitjfhgijxiozq3v9rt"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Tropicana-Cookies-strain-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449537/torch/products/bxdanqyprqkxepmk2uq3.png",
+    "publicId": "torch/products/bxdanqyprqkxepmk2uq3"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Ice-Cream-Cake-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449538/torch/products/lohabxrsvzixfbieka8z.png",
+    "publicId": "torch/products/lohabxrsvzixfbieka8z"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Do-Si-Dos-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449539/torch/products/yyrtlscahmakmd6c06z7.png",
+    "publicId": "torch/products/yyrtlscahmakmd6c06z7"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Sunset-Sherbet-Strain-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449539/torch/products/hcmka1yg3eznciexoyvn.png",
+    "publicId": "torch/products/hcmka1yg3eznciexoyvn"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/MAC-Miracle-Alien-Cookies-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449539/torch/products/bdmwsqz8etqwgwk2g2h6.png",
+    "publicId": "torch/products/bdmwsqz8etqwgwk2g2h6"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/White-Widow-strainHybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449539/torch/products/oofsmzernsjvgwekmlfy.png",
+    "publicId": "torch/products/oofsmzernsjvgwekmlfy"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Cookies-and-Cream-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449541/torch/products/jmgaq7xkdtyewnxfbtcn.png",
+    "publicId": "torch/products/jmgaq7xkdtyewnxfbtcn"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Gorilla-Glue-4-GG4-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449541/torch/products/vcjvvbbhv9ousireyont.png",
+    "publicId": "torch/products/vcjvvbbhv9ousireyont"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Wedding-Cake-strain-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449541/torch/products/e9ulwtemmt0eorhbp3cb.png",
+    "publicId": "torch/products/e9ulwtemmt0eorhbp3cb"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Runtz-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449541/torch/products/cifbjrywhdrnqcic7s62.png",
+    "publicId": "torch/products/cifbjrywhdrnqcic7s62"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Gelato-strain-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449541/torch/products/rjmjvifd7vmyhlxdoirc.png",
+    "publicId": "torch/products/rjmjvifd7vmyhlxdoirc"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Girl-Scout-Cookies-GSC-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449543/torch/products/rtx7mxkhcfjsytjwffub.png",
+    "publicId": "torch/products/rtx7mxkhcfjsytjwffub"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Nevilles-Haze-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449544/torch/products/f7nfczc0feefmk0xm2jw.png",
+    "publicId": "torch/products/f7nfczc0feefmk0xm2jw"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Alaskan-Thunder-Fuck-ATF-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449544/torch/products/npjzhrb4yuwva2xojkoy.png",
+    "publicId": "torch/products/npjzhrb4yuwva2xojkoy"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Blue-Dream-strain-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449544/torch/products/evs60gmfrshi55epeyux.png",
+    "publicId": "torch/products/evs60gmfrshi55epeyux"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Torch_FlowerbudSets_20.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449544/torch/products/treaiyqr3gunsgnyjc5j.png",
+    "publicId": "torch/products/treaiyqr3gunsgnyjc5j"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Pineapple-Express-strain-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449544/torch/products/hzzxeoydjt0vzl2jl46u.png",
+    "publicId": "torch/products/hzzxeoydjt0vzl2jl46u"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Maui-Wowie-Strain-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449546/torch/products/pftriqes3bgpjb5aqc5q.png",
+    "publicId": "torch/products/pftriqes3bgpjb5aqc5q"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Chernobyl-Sativa-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449545/torch/products/qxs3kteg5ag1siyvtswp.png",
+    "publicId": "torch/products/qxs3kteg5ag1siyvtswp"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Ghost-Train-Haze-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449546/torch/products/yisf704j4w7qajdby17n.png",
+    "publicId": "torch/products/yisf704j4w7qajdby17n"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Lambs-Bread-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449546/torch/products/v3rr0p5bisf80imqcoue.png",
+    "publicId": "torch/products/v3rr0p5bisf80imqcoue"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Amnesia-Haze-strain-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449546/torch/products/ucilstwfz7mwigoznlai.png",
+    "publicId": "torch/products/ucilstwfz7mwigoznlai"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Strawberry-Cough-strain-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449547/torch/products/ehqsa2y5fgwoi1gf9whr.png",
+    "publicId": "torch/products/ehqsa2y5fgwoi1gf9whr"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Green-Crack-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449547/torch/products/hozgetl92u1tarhnz6n7.png",
+    "publicId": "torch/products/hozgetl92u1tarhnz6n7"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Durban-Poison-strain-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449547/torch/products/nrjgtldgzf3lsqpilchu.png",
+    "publicId": "torch/products/nrjgtldgzf3lsqpilchu"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Jack-Herer-strain-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449547/torch/products/ryxendqbxmv8y6gjzqjm.png",
+    "publicId": "torch/products/ryxendqbxmv8y6gjzqjm"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Sour-Diesel-strain-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449547/torch/products/s4ccuh9eajujv3hln4kr.png",
+    "publicId": "torch/products/s4ccuh9eajujv3hln4kr"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Animal-Mints-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449548/torch/products/nketespwgjbda0n590hd.png",
+    "publicId": "torch/products/nketespwgjbda0n590hd"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/WhatsApp-Image-2025-12-20-at-4.01.25-PM-1.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449548/torch/products/envklqwjgeaglueqouhe.jpg",
+    "publicId": "torch/products/envklqwjgeaglueqouhe"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Acapulco-Gold-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449548/torch/products/xy9unlxortenlaevxu90.png",
+    "publicId": "torch/products/xy9unlxortenlaevxu90"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/OG-Kush-strain-Hybrid.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449548/torch/products/qxvghxtiekibcjk1ip1t.png",
+    "publicId": "torch/products/qxvghxtiekibcjk1ip1t"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/9-Pound-Hammer-Strain-Indica.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449548/torch/products/tae7cyxlkdd1apgulkxl.png",
+    "publicId": "torch/products/tae7cyxlkdd1apgulkxl"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Tangie-strain-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449549/torch/products/o22kolpcugshihphqg9z.png",
+    "publicId": "torch/products/o22kolpcugshihphqg9z"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-05-at-10.49.49-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449549/torch/products/cdqvyrqmvrak5n48fnxu.jpg",
+    "publicId": "torch/products/cdqvyrqmvrak5n48fnxu"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-05-at-10.49.50-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449549/torch/products/jsoichai5wyxkfi93gsu.jpg",
+    "publicId": "torch/products/jsoichai5wyxkfi93gsu"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Super-Silver-Haze-Sativa.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449550/torch/products/xhou8uasr80a1rk0kevf.png",
+    "publicId": "torch/products/xhou8uasr80a1rk0kevf"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/09/Slurricane-strain-Hybrid-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449550/torch/products/jle5net4clwdjxa9qm2j.png",
+    "publicId": "torch/products/jle5net4clwdjxa9qm2j"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-6.21.41-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449550/torch/products/wdjrktevuaup5tj3mlyb.jpg",
+    "publicId": "torch/products/wdjrktevuaup5tj3mlyb"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-6.21.39-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449550/torch/products/vyfiw5qjmrmmr5rosm8o.jpg",
+    "publicId": "torch/products/vyfiw5qjmrmmr5rosm8o"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-05-at-10.49.48-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449550/torch/products/zzfgedgh5v327j9vshtl.jpg",
+    "publicId": "torch/products/zzfgedgh5v327j9vshtl"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-05-at-10.49.49-PM-2.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449551/torch/products/r9hffnofbupuedqsyu58.jpg",
+    "publicId": "torch/products/r9hffnofbupuedqsyu58"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-05-at-10.49.49-PM-1.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449551/torch/products/vphqj67540bpgdkoyzsp.jpg",
+    "publicId": "torch/products/vphqj67540bpgdkoyzsp"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-6.21.40-PM-2.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449552/torch/products/bvuvlddvbi2lim15iznt.jpg",
+    "publicId": "torch/products/bvuvlddvbi2lim15iznt"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-6.21.42-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449552/torch/products/epkk6gifoonjbxsssjzd.jpg",
+    "publicId": "torch/products/epkk6gifoonjbxsssjzd"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-6.21.40-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449552/torch/products/w1y88aej7eodmxikwb6t.jpg",
+    "publicId": "torch/products/w1y88aej7eodmxikwb6t"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-6.21.41-PM-2.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449552/torch/products/skdnea1vbqju6wrkv0ts.jpg",
+    "publicId": "torch/products/skdnea1vbqju6wrkv0ts"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-6.21.39-PM-2.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449552/torch/products/ra29d1eykf3acclxltdv.jpg",
+    "publicId": "torch/products/ra29d1eykf3acclxltdv"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-6.21.39-PM-1.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449553/torch/products/mczsb3u5ptz6xf3v2eu6.jpg",
+    "publicId": "torch/products/mczsb3u5ptz6xf3v2eu6"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-6.21.41-PM-1.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449554/torch/products/nby2qphayiajg62fxjit.jpg",
+    "publicId": "torch/products/nby2qphayiajg62fxjit"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-7.10.08-PM-2.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449554/torch/products/mj194382wnmjizyqq8jm.jpg",
+    "publicId": "torch/products/mj194382wnmjizyqq8jm"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-6.21.40-PM-1.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449554/torch/products/symnro2nuqvro6j5dyap.jpg",
+    "publicId": "torch/products/symnro2nuqvro6j5dyap"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-7.10.08-PM-1.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449554/torch/products/s4hicyvxe90djr4bnwtm.jpg",
+    "publicId": "torch/products/s4hicyvxe90djr4bnwtm"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-06-at-7.10.08-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449556/torch/products/xa1xcacr0lz5vrnlmhuy.jpg",
+    "publicId": "torch/products/xa1xcacr0lz5vrnlmhuy"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-10-at-3.11.05-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449556/torch/products/uwfmszg64xaviqgwlat1.jpg",
+    "publicId": "torch/products/uwfmszg64xaviqgwlat1"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-10-at-3.11.20-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449557/torch/products/yjysxih68bruf7pnkovz.jpg",
+    "publicId": "torch/products/yjysxih68bruf7pnkovz"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/01/obama.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449557/torch/products/m1senaq3va9u6q23eiw7.jpg",
+    "publicId": "torch/products/m1senaq3va9u6q23eiw7"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/WhatsApp-Image-2025-11-10-at-3.11.30-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449557/torch/products/lo2bxy6tq7usksg91nvc.jpg",
+    "publicId": "torch/products/lo2bxy6tq7usksg91nvc"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/01/blue-zushi.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449557/torch/products/k8jimfj9kjy7c2bjbd6q.jpg",
+    "publicId": "torch/products/k8jimfj9kjy7c2bjbd6q"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/01/jelousy.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449558/torch/products/abdkdd1nrj6kosyff1y6.jpg",
+    "publicId": "torch/products/abdkdd1nrj6kosyff1y6"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/01/Gushers.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449559/torch/products/umuoc8mqswymtmhovcgg.jpg",
+    "publicId": "torch/products/umuoc8mqswymtmhovcgg"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/01/rainbow-belts.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449559/torch/products/hvxxy6vpdkhjdqm5mf1t.jpg",
+    "publicId": "torch/products/hvxxy6vpdkhjdqm5mf1t"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/01/cereal-milk.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449559/torch/products/tu1ytwhw87xyhpaywncp.jpg",
+    "publicId": "torch/products/tu1ytwhw87xyhpaywncp"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-05-06-124856-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449559/torch/products/i6ptuxq7iut143n2klcm.png",
+    "publicId": "torch/products/i6ptuxq7iut143n2klcm"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-05-06-124404-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449560/torch/products/odzdtmvrdtgqw9yc73pf.png",
+    "publicId": "torch/products/odzdtmvrdtgqw9yc73pf"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-05-06-121341-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449561/torch/products/vfims1q29itr6y3qwu9u.png",
+    "publicId": "torch/products/vfims1q29itr6y3qwu9u"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-05-06-121404-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449561/torch/products/f1cuosnbeqdzt7q7kjni.png",
+    "publicId": "torch/products/f1cuosnbeqdzt7q7kjni"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-05-06-121433-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449561/torch/products/qzhxzmejvtsrsmiisxaw.png",
+    "publicId": "torch/products/qzhxzmejvtsrsmiisxaw"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-05-06-124633-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449562/torch/products/s0aelqsnbtue24hgtbrr.png",
+    "publicId": "torch/products/s0aelqsnbtue24hgtbrr"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-05-06-124503-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449563/torch/products/kieibyzgtxnymwvjqmvv.png",
+    "publicId": "torch/products/kieibyzgtxnymwvjqmvv"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-05-06-123552-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449563/torch/products/jasuyx9ytj3cazyxkxpf.png",
+    "publicId": "torch/products/jasuyx9ytj3cazyxkxpf"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-05-06-123427-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449564/torch/products/kk0iqdlevlts1xznappo.png",
+    "publicId": "torch/products/kk0iqdlevlts1xznappo"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/WhatsApp-Image-2026-04-11-at-6.46.53-PM-1.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449564/torch/products/tuxgnczz9vocbogqofek.jpg",
+    "publicId": "torch/products/tuxgnczz9vocbogqofek"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/WhatsApp-Image-2026-04-11-at-6.46.53-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449565/torch/products/hdqqu3liv9qnavqc6afg.jpg",
+    "publicId": "torch/products/hdqqu3liv9qnavqc6afg"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/WhatsApp-Image-2026-04-11-at-6.46.54-PM-1.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449566/torch/products/d4bve7idhgsgkgf55trz.jpg",
+    "publicId": "torch/products/d4bve7idhgsgkgf55trz"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/WhatsApp-Image-2026-04-11-at-6.46.54-PM.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449566/torch/products/ybuo066jrfapifox8ppf.jpg",
+    "publicId": "torch/products/ybuo066jrfapifox8ppf"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/plume-parlay-2g-liquid-live-diamonds-blend-vape-dulce-de-papaya-1192507008_1400x-600x750-1.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449567/torch/products/hhzjnrf7tgumxyfzjfn7.jpg",
+    "publicId": "torch/products/hhzjnrf7tgumxyfzjfn7"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/WhatsApp-Image-2026-04-11-at-6.46.55-PM-1.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449567/torch/products/ahblhd4c5urdjwibsuyv.jpg",
+    "publicId": "torch/products/ahblhd4c5urdjwibsuyv"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/plume-parlay-2g-liquid-live-diamonds-blend-vape-mile-high-club-1192506998_800x-600x750-1.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449567/torch/products/ahk4vqnjquavgkzdqwoe.jpg",
+    "publicId": "torch/products/ahk4vqnjquavgkzdqwoe"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/WhatsApp-Image-2026-04-11-at-6.46.56-PM-1.jpeg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449568/torch/products/jz8omqs2e8umwjmonx4h.jpg",
+    "publicId": "torch/products/jz8omqs2e8umwjmonx4h"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/4.webp": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449568/torch/products/shuikckxdo8pwx898gmo.webp",
+    "publicId": "torch/products/shuikckxdo8pwx898gmo"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/IMG_0175-600x750-1.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449568/torch/products/ukpjf2x2hrlklvrdhajd.jpg",
+    "publicId": "torch/products/ukpjf2x2hrlklvrdhajd"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/IMG_7459-300x300-1.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449568/torch/products/pbxzyndzvwtgqvlljsxc.jpg",
+    "publicId": "torch/products/pbxzyndzvwtgqvlljsxc"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/IMG_7458-300x300-1.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449569/torch/products/r6dygr3o1xtldaz6zmbw.jpg",
+    "publicId": "torch/products/r6dygr3o1xtldaz6zmbw"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-67-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449569/torch/products/iurhxvn6fyyxxab0gqut.png",
+    "publicId": "torch/products/iurhxvn6fyyxxab0gqut"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/IMG_7456-300x300-1.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449569/torch/products/pj2k0swk6jpkdoswghxi.jpg",
+    "publicId": "torch/products/pj2k0swk6jpkdoswghxi"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/IMG_7455-300x300-1.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449569/torch/products/soz92xxwzcrhoaco7rb0.jpg",
+    "publicId": "torch/products/soz92xxwzcrhoaco7rb0"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/IMG_7454-300x300-1.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449569/torch/products/kiudzfucok1xxcxbcxx8.jpg",
+    "publicId": "torch/products/kiudzfucok1xxcxbcxx8"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-02-26-114659-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449570/torch/products/s911ika55jbviodmomev.png",
+    "publicId": "torch/products/s911ika55jbviodmomev"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-02-26-115200-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449570/torch/products/yybmiequhmta67rkkbze.png",
+    "publicId": "torch/products/yybmiequhmta67rkkbze"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-02-26-115228-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449570/torch/products/zo6b23jma2ruoy5hxlib.png",
+    "publicId": "torch/products/zo6b23jma2ruoy5hxlib"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-02-26-115414-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449570/torch/products/l995j2x3zdungcycrkoy.png",
+    "publicId": "torch/products/l995j2x3zdungcycrkoy"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2026-02-26-114937-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449570/torch/products/vhpl8cczlwbhhuqzp1dm.png",
+    "publicId": "torch/products/vhpl8cczlwbhhuqzp1dm"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-70-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449571/torch/products/etzncttgm8qnu5w0lvfc.png",
+    "publicId": "torch/products/etzncttgm8qnu5w0lvfc"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-69-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449571/torch/products/mb8tqvpr1c2wlllqpg65.png",
+    "publicId": "torch/products/mb8tqvpr1c2wlllqpg65"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-71-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449571/torch/products/g7adxyluuflnbmoezfnc.png",
+    "publicId": "torch/products/g7adxyluuflnbmoezfnc"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-68-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449571/torch/products/mi662tn1p2gllvgjsm2u.png",
+    "publicId": "torch/products/mi662tn1p2gllvgjsm2u"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-66-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449571/torch/products/ymeqi49naojmavcafxnd.png",
+    "publicId": "torch/products/ymeqi49naojmavcafxnd"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2025-10-22-112602-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449572/torch/products/dhoq8t6c0ygsekleutb2.png",
+    "publicId": "torch/products/dhoq8t6c0ygsekleutb2"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-65-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449572/torch/products/w11xxiala8tbsid9qwjp.png",
+    "publicId": "torch/products/w11xxiala8tbsid9qwjp"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Hillbilly-Mushrooms-300x300-1.webp": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449572/torch/products/mqzxpevfwjscb3pasrmi.webp",
+    "publicId": "torch/products/mqzxpevfwjscb3pasrmi"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-63-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449572/torch/products/huevqpz3emhb52zhklzs.png",
+    "publicId": "torch/products/huevqpz3emhb52zhklzs"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-52-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449573/torch/products/txhbtzpydh8imbomhspu.png",
+    "publicId": "torch/products/txhbtzpydh8imbomhspu"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Screenshot-2025-09-30-154410-294x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449572/torch/products/rw0uxcbul4acnconheti.png",
+    "publicId": "torch/products/rw0uxcbul4acnconheti"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-51-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449573/torch/products/qq6gmpfyryfynnlc6avq.png",
+    "publicId": "torch/products/qq6gmpfyryfynnlc6avq"
+  },
+  "https://torchdc.co/wp-content/uploads/2025/11/new-torch-pre-rolls.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449573/torch/products/rfdq5evldcdi6m2std9j.jpg",
+    "publicId": "torch/products/rfdq5evldcdi6m2std9j"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/1592962312-HH_THC_BOX_ANGLE-scaled.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449574/torch/products/hiektotztezzo4xsew0q.jpg",
+    "publicId": "torch/products/hiektotztezzo4xsew0q"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/1683533657-hh_ultra_1g_box_and_vape-1200x1200-28e5ebb.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449574/torch/products/qufidnkjqfycvbmps55i.jpg",
+    "publicId": "torch/products/qufidnkjqfycvbmps55i"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/1683616620-hh_ultra_1g_box_and_vape-1200x1200-28e5ebb.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449574/torch/products/mihs6bqxxyiujvgetzbc.jpg",
+    "publicId": "torch/products/mihs6bqxxyiujvgetzbc"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/Untitled-design-50-300x300-1.png": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449573/torch/products/ifgeai2clnc9fn1d07gf.png",
+    "publicId": "torch/products/ifgeai2clnc9fn1d07gf"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/1772226370-5130655_rlr_0-5gcartridge_menuimage_1000px.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449576/torch/products/hacxr88euan3pysgd7hr.jpg",
+    "publicId": "torch/products/hacxr88euan3pysgd7hr"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/1617744009-kurvana_ascnd_canj_f-1500x2000-1.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449576/torch/products/pgxpqkxhejbdrskfuxtb.jpg",
+    "publicId": "torch/products/pgxpqkxhejbdrskfuxtb"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/1683528965-hh_ultra_1g_box_and_vape-1200x1200-28e5ebb.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449576/torch/products/dq3oipgmqqxzbnbnec6b.jpg",
+    "publicId": "torch/products/dq3oipgmqqxzbnbnec6b"
+  },
+  "https://torchdc.co/wp-content/uploads/2026/05/1725379742-illicit-marijuana-vape-classy-cart-1-0g-pink-runtz-1-scaled.jpg": {
+    "url": "https://res.cloudinary.com/omtao1np/image/upload/v1791449576/torch/products/vbfqk92qi4ayudst9thu.jpg",
+    "publicId": "torch/products/vbfqk92qi4ayudst9thu"
+  }
+}
