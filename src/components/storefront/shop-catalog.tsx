@@ -257,7 +257,7 @@ const INITIAL_PRODUCTS: ShopProduct[] = [
 export function ShopCatalog() {
   const { fulfillment, setFulfillment, totalCount } = useCart();
 
-  const [activeCategory, setActiveCategory] = React.useState("all");
+  const [activeCategory, setActiveCategory] = React.useState("best-sellers");
   const [activeTier, setActiveTier] = React.useState("all");
   const [activeStrain, setActiveStrain] = React.useState("all");
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -369,6 +369,17 @@ export function ShopCatalog() {
               <Phone className="w-3.5 h-3.5 text-[#557754]" />
               <span>(202) 468-1966</span>
             </a>
+
+            <Link
+              href="/cart"
+              className="inline-flex items-center gap-2 bg-[#557754] hover:bg-[#466645] text-white font-bold text-xs px-4 py-2.5 rounded-full shadow-xs hover:shadow transition-all group"
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>Cart</span>
+              <span className="w-4 h-4 rounded-full bg-white/25 text-white text-[10px] flex items-center justify-center font-bold">
+                {totalCount}
+              </span>
+            </Link>
           </div>
         </div>
       </div>
@@ -557,9 +568,9 @@ export function ShopCatalog() {
               </button>
             </div>
 
-            {/* Flower Tiers Section (When Flowers or All is selected) */}
-            {(activeCategory === "all" || activeCategory === "flowers") && (
-              <div className="mb-6">
+            {/* Flower Tiers Section (STRICTLY ONLY WHEN FLOWERS CATEGORY IS SELECTED) */}
+            {activeCategory === "flowers" && (
+              <div className="mb-6 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[11px] font-black uppercase tracking-wider text-[#E8561E]">
                     Lab-Tested · Same-Day Delivery
@@ -580,72 +591,143 @@ export function ShopCatalog() {
               </div>
             )}
 
-            {/* Filters & Header Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-neutral-200/80">
-              {/* Left: Section Title & Count */}
-              <div>
-                <h2 className="text-2xl font-black text-neutral-900 leading-tight">
-                  {categoryTitle}
-                </h2>
-                <p className="text-xs text-neutral-500">
-                  {filteredProducts.length}{" "}
-                  {filteredProducts.length === 1 ? "product" : "products"} available
-                </p>
-              </div>
+            {/* When "best-sellers" is selected, render the multi-section showcase matching Screenshot 1 & 2 */}
+            {activeCategory === "best-sellers" && !searchQuery.trim() ? (
+              <div className="space-y-10">
+                {/* 1. Best Sellers Section */}
+                <section>
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-neutral-100">
+                    <h3 className="text-xl font-black text-neutral-900 flex items-center gap-2">
+                      <span>Best Sellers</span>
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCategory("all")}
+                      className="text-xs font-bold text-neutral-500 hover:text-neutral-900 underline underline-offset-4 cursor-pointer"
+                    >
+                      See all
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+                    {INITIAL_PRODUCTS.filter((p) => p.isBestSeller).map((product) => (
+                      <ShopProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                </section>
 
-              {/* Right: Strain Filters & Sort */}
-              <div className="flex items-center gap-3 flex-wrap">
-                <ShopStrainFilters
-                  activeStrain={activeStrain}
-                  onSelectStrain={(strain) => setActiveStrain(strain)}
-                />
+                {/* 2. New Arrivals Section */}
+                <section>
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-neutral-100">
+                    <h3 className="text-xl font-black text-neutral-900 flex items-center gap-2">
+                      <span>New Arrivals</span>
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCategory("new-arrivals")}
+                      className="text-xs font-bold text-neutral-500 hover:text-neutral-900 underline underline-offset-4 cursor-pointer"
+                    >
+                      See all
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+                    {INITIAL_PRODUCTS.filter((p) => p.isNewArrival).map((product) => (
+                      <ShopProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                </section>
 
-                {/* Sort Dropdown */}
-                <div className="relative">
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="bg-white border border-neutral-200 text-xs font-bold text-neutral-800 rounded-full px-3.5 py-1.5 outline-none hover:border-neutral-300 cursor-pointer"
-                  >
-                    <option value="popular">Popular</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="latest">New Arrivals</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Products Grid */}
-            {filteredProducts.length === 0 ? (
-              <div className="bg-white rounded-3xl p-12 text-center border border-neutral-200/80 my-6">
-                <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400 mx-auto mb-3">
-                  <Search className="w-5 h-5" />
-                </div>
-                <h3 className="font-black text-lg text-neutral-900">
-                  No products found
-                </h3>
-                <p className="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
-                  Try adjusting your search query, flower tier, or strain filter to see available DC menu items.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveCategory("all");
-                    setActiveTier("all");
-                    setActiveStrain("all");
-                    setSearchQuery("");
-                  }}
-                  className="mt-4 bg-[#557754] text-white font-bold text-xs px-5 py-2.5 rounded-full hover:bg-[#466645] transition-all cursor-pointer"
-                >
-                  Reset all filters
-                </button>
+                {/* 3. Flowers Preview Section */}
+                <section>
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-neutral-100">
+                    <h3 className="text-xl font-black text-neutral-900 flex items-center gap-2">
+                      <span>Flowers</span>
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCategory("flowers")}
+                      className="text-xs font-bold text-neutral-500 hover:text-neutral-900 underline underline-offset-4 cursor-pointer"
+                    >
+                      See all
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+                    {INITIAL_PRODUCTS.filter((p) => p.category === "flowers").slice(0, 3).map((product) => (
+                      <ShopProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                </section>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-                {filteredProducts.map((product) => (
-                  <ShopProductCard key={product.id} product={product} />
-                ))}
+              /* Specific Category View or Search Results */
+              <div>
+                {/* Filters & Header Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-neutral-200/80">
+                  {/* Left: Section Title & Count */}
+                  <div>
+                    <h2 className="text-2xl font-black text-neutral-900 leading-tight">
+                      {categoryTitle}
+                    </h2>
+                    <p className="text-xs text-neutral-500">
+                      {filteredProducts.length}{" "}
+                      {filteredProducts.length === 1 ? "product" : "products"} available
+                    </p>
+                  </div>
+
+                  {/* Right: Strain Filters & Sort */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <ShopStrainFilters
+                      activeStrain={activeStrain}
+                      onSelectStrain={(strain) => setActiveStrain(strain)}
+                    />
+
+                    {/* Sort Dropdown */}
+                    <div className="relative">
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="bg-white border border-neutral-200 text-xs font-bold text-neutral-800 rounded-full px-3.5 py-1.5 outline-none hover:border-neutral-300 cursor-pointer"
+                      >
+                        <option value="popular">Popular</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="latest">New Arrivals</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Products Grid */}
+                {filteredProducts.length === 0 ? (
+                  <div className="bg-white rounded-3xl p-12 text-center border border-neutral-200/80 my-6">
+                    <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400 mx-auto mb-3">
+                      <Search className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-black text-lg text-neutral-900">
+                      No products found
+                    </h3>
+                    <p className="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
+                      Try adjusting your search query, flower tier, or strain filter to see available DC menu items.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveCategory("best-sellers");
+                        setActiveTier("all");
+                        setActiveStrain("all");
+                        setSearchQuery("");
+                      }}
+                      className="mt-4 bg-[#557754] text-white font-bold text-xs px-5 py-2.5 rounded-full hover:bg-[#466645] transition-all cursor-pointer"
+                    >
+                      Reset all filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+                    {filteredProducts.map((product) => (
+                      <ShopProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </main>

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { StoreStatusBar } from "@/components/storefront/store-statusbar";
-import { StoreNavbar } from "@/components/storefront/store-navbar";
 import { StoreFooter } from "@/components/storefront/store-footer";
 import { ShopCatalog } from "@/components/storefront/shop-catalog";
 
@@ -16,15 +15,12 @@ export default function ShopPage() {
       {/* 1. Top Announcement Status Bar */}
       <StoreStatusBar />
 
-      {/* 2. Main Store Navbar */}
-      <StoreNavbar />
-
-      {/* 3. Shop Catalog (Desktop 3-Column + Mobile Views) */}
+      {/* 2. Shop Catalog (With single dedicated search header matching mockup) */}
       <div className="flex-1">
         <ShopCatalog />
       </div>
 
-      {/* 4. Footer */}
+      {/* 3. Footer */}
       <StoreFooter />
     </div>
   );
