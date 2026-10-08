@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CartProvider } from "@/context/cart-context";
+import { StoreAgeGate } from "@/components/storefront/store-age-gate";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -11,8 +13,8 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "TORCH | Admin",
-  description: "TORCH - Premium CBD & Hemp Admin Portal",
+  title: "TORCH | Premium Dispensary & Delivery in Washington DC",
+  description: "Torch - Washington DC Premium Weed Dispensary & Same-Day Delivery. 21+ only.",
   icons: {
     icon: "/images/torch-logo.svg",
     shortcut: "/images/torch-logo.svg",
@@ -35,7 +37,11 @@ export default function RootLayout({
           storageKey="torch-theme-v2"
           disableTransitionOnChange
         >
-          {children}
+          <CartProvider>
+            {/* Immediate 21+ Age Gate Modal */}
+            <StoreAgeGate />
+            {children}
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>

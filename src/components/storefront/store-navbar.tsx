@@ -4,9 +4,11 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Phone, ShoppingCart, Menu, X, ArrowRight } from "lucide-react";
+import { useCart } from "@/context/cart-context";
 
 export function StoreNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const { totalCount } = useCart();
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-2xs transition-colors">
@@ -96,7 +98,7 @@ export function StoreNavbar() {
               <ShoppingCart className="w-4 h-4 transition-transform group-hover:scale-110" />
               <span>Cart</span>
               <span className="w-5 h-5 rounded-full bg-white/20 text-white text-xs flex items-center justify-center font-bold">
-                0
+                {totalCount}
               </span>
             </Link>
           </div>
@@ -105,10 +107,15 @@ export function StoreNavbar() {
           <div className="flex md:hidden items-center gap-2">
             <Link
               href="/cart"
-              className="w-10 h-10 rounded-full bg-[#557954] text-white flex items-center justify-center shadow-xs"
+              className="relative w-10 h-10 rounded-full bg-[#557954] text-white flex items-center justify-center shadow-xs"
               aria-label="View Cart"
             >
               <ShoppingCart className="w-4 h-4" />
+              {totalCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#E8561E] text-white text-[11px] font-bold flex items-center justify-center shadow-xs">
+                  {totalCount}
+                </span>
+              )}
             </Link>
             <button
               type="button"

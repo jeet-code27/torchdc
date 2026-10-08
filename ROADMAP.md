@@ -13,16 +13,70 @@
 | **Step 1** | **Project Setup & Admin Shell** | Next.js 16, Tailwind, Design Tokens, Admin Shell, Sidebar, Responsive Drawer, Toast |  **Completed** |
 | **Step 2** | **Auth & RBAC Foundation** | Role/User Models, Seeding, Login, JWT Session, Proxy/Middleware, `<Can />`, 403 Page |  **Completed** |
 | **Step 3** | **Staff & Roles** | Staff CRUD, Passwords, Role Permission Matrix, Super Admin Security Lock |  **Completed** |
-| **Step 4** | **Customers Module** | Customer Directory, Search, Filters, Detail Drawer (Orders, Addresses, Lifetime Stats) | 📋 Planned |
-| **Step 5** | **Categories Module** | Tree Hierarchy, Cloudinary Images, SEO Engine, Dedicated Edit Page |  **Completed** |
-| **Step 6** | **Brands Module** | Handled natively inside Product model (No separate entity needed) | ⏭️ **Skipped** |
-| **Step 7** | **Products Module** | 135 Catalog Products, 250 Variations, Yoast SEO Preserved, Dedicated Edit Page |  **Completed** |
-| **Storefront** | **Public Home Page** | Navbar, Jost typography, Wake & Bake Carousel, Delivery Steps, Best Sellers (🔥), New Arrivals (✨) |  **Completed** |
-| **Step 8** | **Orders & Fulfillment** | Delivery & Pickup flows, COD Payment status, Status Transitions, Order Detail Drawer | ⏳ **Next Up** |
+| **Step 4** | **Categories Module** | Tree Hierarchy, Cloudinary Images, SEO Engine, Dedicated Edit Page |  **Completed** |
+| **Step 5** | **Products Module** | 135 Catalog Products, 250 Variations, Yoast SEO Preserved, Dedicated Edit Page |  **Completed** |
+| **Storefront** | **Public Home Page** | Navbar, Jost typography, Wake & Bake Carousel, Delivery Steps, Best Sellers (🔥), New Arrivals (✨), Footer |  **Completed** |
+| **Compliance** | **21+ Age Gate Modal** | Client 2-step age gate, 30-day verification remember, DC legal disclaimer |  **Completed** |
+| **Storefront** | **Shop / Menu Page** | 3-Column Desktop Layout (Left Menu, Center Feed, Right Live Cart), Mobile Tiers & Filters |  **Completed** |
+| **Storefront** | **Cart & Checkout** | Guest Checkout (COD), DC Address & ZIP validation (`200*`), Delivery/Pickup slots | 📋 Planned |
+| **Step 8** | **Orders & Fulfillment** | Delivery & Pickup queues, COD payment status, Status transitions, Order Drawer | 📋 Planned |
 | **Step 9** | **Blog & Content Engine** | Rich Text Editor, Cover Images, Categories/Tags, Publishing workflow, SEO fields | 📋 Planned |
 | **Step 10** | **SEO Management** | 301 Redirects Manager (from WP/WooCommerce), Global Meta, Sitemap generator | 📋 Planned |
-| **Step 11** | **Deals, Coupons & Loyalty** | Promo codes, Flash sales, Loyalty points, VIP tiers & rewards tracking | 📋 Planned |
-| **Step 12** | **Activity Log & Live Dashboard** | Audit logging (Who/What/When/IP), Real aggregation stats on Dashboard | 📋 Planned |
+| **Step 11** | **Deals & Hustle Engine** | Half Oz Hustle, Wake & Bake (9AM-12PM), Spin to Win coupon system | 📋 Planned |
+| **Step 12** | **Customers Directory** | Customer Directory, Search, Filters, Detail Drawer (Orders, Lifetime Stats) | 📋 Planned |
+| **Step 13** | **Activity Log & Dashboard** | Audit logging (Who/What/When/IP), Real aggregation stats on Dashboard | 📋 Planned |
+
+---
+
+## 🎨 CLIENT REFERENCE & ARCHITECTURE BLUEPRINT (From Official Mockups)
+
+### 🌿 Brand Tokens & Colors:
+- **Brand Green:** `#5A805B` (Medium `#4A6E4B`, Dark `#2F4F30`, Light Tint `#EEF5EE`, Soft `#D5E3D3`)
+- **Accent Orange:** `#E8561E` (Dark `#A3400F`, Light Tint `#FDF1EA`)
+- **Neutrals:** Text `#111111`, Muted `#4F5A50`, Border `#DDE6DD`, Soft Background `#F6F8F6`
+- **Typography:** Jost (Google Fonts)
+
+### 🔞 21+ Age Gate Modal Specification:
+1. **Trigger:** Evaluated immediately on client enter. Reads `localStorage` / cookie (`torch_age_verified`).
+2. **Backdrop:** Fullscreen deep forest green overlay (`bg-[#2F4F30]/95` or `bg-[#557754]/90` backdrop-blur).
+3. **Card UI:**
+   - Torch Logo
+   - `21+ ONLY` solid badge (`#E8561E`)
+   - `Are you 21 or older?`
+   - `You must be 21+ to shop Torch. A valid government ID is checked at delivery or pickup.`
+   - `YES, I'M 21+` primary button (`bg-[#557754] text-white`)
+   - `No, I'm under 21` ghost button (transitions to polite rejection message with retry option)
+   - `Remember me for 30 days` checkbox (persists 30 days)
+   - Legal notice: `By entering you agree to our Terms and Privacy Policy.`
+   - Footer: `Free same-day delivery across Washington, DC`
+
+### 🛒 Shop & Catalog Page (`/shop` or `/menu`) Architecture:
+1. **Desktop Layout (3-Column Power Layout):**
+   - **Left Sidebar (`MENU`):** Sticky category navigation (`Best Sellers`, `New Arrivals`, `Flowers`, `Pre-rolls`, `Disposables`, `Concentrates`, `Edibles`, `Mushrooms`).
+   - **Center Feed:**
+     - Wake & Bake / Promotional Banner.
+     - Flower Tiers Bar: Midshelf ($70), Topshelf ($40), Exotic ($60).
+     - Strain Type Filter Pills: All, Sativa, Indica, Hybrid.
+     - Sectional Product Grids with badges (`BEST SELLER`, `EXOTIC`, `NEW`), title, weight/strain, price, and instant `+` Add to Cart button.
+   - **Right Sidebar (`Your order`):**
+     - Sticky real-time Cart container.
+     - Segmented `Delivery` vs `Pickup` pill switch.
+     - ETA badge: `Free delivery across DC · about 35 to 45 min` (or `Curbside pickup at 1025 F St NW`).
+     - Live Cart Items with quantity selectors.
+     - Subtotal, Half Oz Hustle discount calculations, and Checkout button.
+2. **Mobile Layout:**
+   - Header with Back `<` button, centered logo, cart icon.
+   - Delivery / Pickup segmented switch.
+   - Horizontal category chip rail (`All`, `Flowers`, `Pre-rolls`...).
+   - Tier selection cards & strain type chips.
+   - 2-Column responsive product grid with quick `+` add button.
+   - Floating Sticky Cart Bar at the bottom when cart has items.
+
+### 🚚 Delivery & Regional Rules:
+- **Eligible DC ZIP Codes:** `200*`, `203*`, `204*`, `205*`.
+- **Hours:** Open daily, 7AM to 11PM.
+- **Payment Method:** Cash on Delivery (COD) only.
+- **Guest Checkout:** Enabled by default (no forced login) for maximum conversion.
 
 ---
 
