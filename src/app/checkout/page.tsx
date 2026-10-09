@@ -249,26 +249,26 @@ export default function CheckoutPage() {
                   <span>1. Select Order Mode</span>
                 </h2>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setFulfillment("delivery")}
-                    className={`p-3.5 sm:p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col gap-1 ${
+                    className={`relative p-3.5 sm:p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col gap-1.5 overflow-hidden ${
                       fulfillment === "delivery"
-                        ? "border-[#557754] bg-[#edf4ec] text-neutral-900 shadow-2xs"
+                        ? "border-[#5A805B] bg-[#edf4ec] text-neutral-900 shadow-2xs"
                         : "border-neutral-200/90 bg-white text-neutral-600 hover:border-neutral-300"
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 font-black text-sm">
-                        <Truck className="w-4 h-4 text-[#557754]" />
-                        <span>DC Delivery</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 font-black text-sm min-w-0">
+                        <Truck className="w-4 h-4 text-[#5A805B] shrink-0" />
+                        <span className="truncate">DC Delivery</span>
                       </div>
-                      <span className="text-[10px] font-black uppercase bg-[#2F4F30] text-white px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-black uppercase bg-[#5A805B] text-white px-2 py-0.5 rounded-full shrink-0 shadow-2xs">
                         FREE
                       </span>
                     </div>
-                    <span className="text-[11px] text-neutral-500 font-medium">
+                    <span className="text-[11px] text-neutral-500 font-medium leading-normal">
                       Across DC · 35-45 min
                     </span>
                   </button>
@@ -276,23 +276,23 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={() => setFulfillment("pickup")}
-                    className={`p-3.5 sm:p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col gap-1 ${
+                    className={`relative p-3.5 sm:p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col gap-1.5 overflow-hidden ${
                       fulfillment === "pickup"
-                        ? "border-[#557754] bg-[#edf4ec] text-neutral-900 shadow-2xs"
+                        ? "border-[#5A805B] bg-[#edf4ec] text-neutral-900 shadow-2xs"
                         : "border-neutral-200/90 bg-white text-neutral-600 hover:border-neutral-300"
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 font-black text-sm">
-                        <Store className="w-4 h-4 text-[#557754]" />
-                        <span>Curbside Pickup</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 font-black text-sm min-w-0">
+                        <Store className="w-4 h-4 text-[#5A805B] shrink-0" />
+                        <span className="truncate">Curbside Pickup</span>
                       </div>
-                      <span className="text-[10px] font-black uppercase bg-neutral-200 text-neutral-700 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-black uppercase bg-neutral-200 text-neutral-700 px-2 py-0.5 rounded-full shrink-0">
                         15 MIN
                       </span>
                     </div>
-                    <span className="text-[11px] text-neutral-500 font-medium">
-                      1025 F St NW, DC
+                    <span className="text-[11px] text-neutral-500 font-medium leading-normal">
+                      1025 F St NW, Washington, DC
                     </span>
                   </button>
                 </div>
