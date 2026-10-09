@@ -16,9 +16,11 @@ export const metadata = {
     "Order premium flowers, pre-rolls, cartridges, edibles, and concentrates in Washington DC. Fast delivery in 35-45 minutes. Initiative 71 compliant.",
 };
 
+export const revalidate = 60;
+
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafbfa] text-gray-900 selection:bg-[#557754]/20 selection:text-[#557754]">
+    <div className="min-h-screen flex flex-col bg-[#fafbfa] text-gray-900 selection:bg-[#5A805B]/20 selection:text-[#5A805B]">
       {/* 1. Top Announcement Status Bar */}
       <StoreStatusBar />
 

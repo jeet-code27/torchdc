@@ -15,7 +15,7 @@ interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
@@ -23,7 +23,19 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     await connectToDatabase();
-    const product = await Product.findOne({ slug, isActive: true }).lean();
+    const targetSlug = decodeURIComponent(slug).trim().toLowerCase();
+
+    // 1. Exact match
+    let product: any = await Product.findOne({ slug: targetSlug, isActive: true }).lean();
+
+    // 2. Prefix / Fuzzy regex fallback
+    if (!product) {
+      product = await Product.findOne({
+        slug: { $regex: `^${targetSlug.replace(/-/g, "[- ]?")}`, $options: "i" },
+        isActive: true,
+      }).lean();
+    }
+
     if (!product) {
       return {
         title: "Product Not Found | Torch Dispensary",
@@ -57,13 +69,33 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
 
   await connectToDatabase();
+  const targetSlug = decodeURIComponent(slug).trim().toLowerCase();
 
-  // 1. Fetch main product
+  // 1. Fetch main product: Exact slug first, then fallback to prefix / fuzzy slug
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const productDoc: any = await Product.findOne({
-    slug: decodeURIComponent(slug),
+  let productDoc: any = await Product.findOne({
+    slug: targetSlug,
     isActive: true,
   }).lean();
+
+  if (!productDoc) {
+    productDoc = await Product.findOne({
+      slug: { $regex: `^${targetSlug.replace(/-/g, "[- ]?")}`, $options: "i" },
+      isActive: true,
+    }).lean();
+  }
+
+  // 2. Fallback: Word boundary search if still not found
+  if (!productDoc) {
+    const keywords = targetSlug.split("-").filter((k) => k.length > 2);
+    if (keywords.length >= 2) {
+      const pattern = keywords.map((k) => `(?=.*${k})`).join("");
+      productDoc = await Product.findOne({
+        slug: { $regex: pattern, $options: "i" },
+        isActive: true,
+      }).lean();
+    }
+  }
 
   if (!productDoc) {
     notFound();

@@ -3,8 +3,10 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
+import toast from "react-hot-toast";
 import { useDragScroll } from "@/hooks/use-drag-scroll";
+import { useCart } from "@/context/cart-context";
 
 export interface SliderProduct {
   id: string;
@@ -28,7 +30,7 @@ const BEST_SELLER_PRODUCTS: SliderProduct[] = [
   {
     id: "bs-2",
     name: "2G Plume Sweet Pop",
-    slug: "2g-plume-sweet-pop",
+    slug: "2g-plume-sweet-pop-berry-runtz-x-fruit-tart",
     subtitle: "Berry Runtz x Fruit Tart",
     price: 60,
     image:
@@ -37,7 +39,7 @@ const BEST_SELLER_PRODUCTS: SliderProduct[] = [
   {
     id: "bs-3",
     name: "Rocket Bites Orange Sun",
-    slug: "rocket-bites-orange-sun",
+    slug: "rocket-bites-orange-sun-gummies-200mg-10ct",
     subtitle: "200mg · 10 ct Artisanal",
     price: 60,
     image:
@@ -45,8 +47,8 @@ const BEST_SELLER_PRODUCTS: SliderProduct[] = [
   },
   {
     id: "bs-4",
-    name: "Exotic 1G Pre-Roll",
-    slug: "exotic-1g-pre-roll",
+    name: "Exotic 1G Pre-Rolls",
+    slug: "exotic-1g-pre-rolls",
     subtitle: "Pre-roll · 1g Artisanal",
     price: 15,
     image:
@@ -127,6 +129,7 @@ const BEST_SELLER_PRODUCTS: SliderProduct[] = [
 ];
 
 export function StoreBestSellers() {
+  const { addItem } = useCart();
   const { ref: scrollRef, events: dragEvents } = useDragScroll();
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(true);
@@ -202,7 +205,7 @@ export function StoreBestSellers() {
 
           <Link
             href="/shop?sort=best-sellers"
-            className="text-xs sm:text-sm font-bold text-[#557754] hover:text-[#415e40] hover:underline transition-colors"
+            className="text-xs sm:text-sm font-bold text-[#5A805B] hover:text-[#415e40] hover:underline transition-colors"
           >
             See all
           </Link>
@@ -218,59 +221,76 @@ export function StoreBestSellers() {
         {BEST_SELLER_PRODUCTS.map((item) => (
           <div
             key={item.id}
-            className="w-[170px] sm:w-[200px] md:w-[220px] lg:w-[225px] shrink-0 snap-start group flex flex-col justify-between"
+            className="w-[170px] sm:w-[200px] md:w-[220px] lg:w-[225px] shrink-0 snap-start group relative flex flex-col justify-between"
           >
-            {/* Pure White Card Graphic Container with Flame */}
+            {/* The Entire Card Box Is Clickable (Image, Title, Subtitle, Price) */}
             <Link
               href={`/product/${item.slug}`}
-              className="relative w-full aspect-square bg-white hover:bg-white rounded-2xl sm:rounded-3xl p-1.5 sm:p-2.5 flex items-center justify-center transition-all duration-300 border border-gray-100/90 shadow-2xs group-hover:shadow-md cursor-pointer"
+              className="flex flex-col h-full cursor-pointer focus:outline-none"
+              title={`View ${item.name}`}
             >
-              {/* Top Left Flame Badge */}
-              <span
-                className="absolute top-2.5 left-2.5 text-base select-none pointer-events-none drop-shadow-xs z-10"
-                role="img"
-                aria-label="hot"
-              >
-                🔥
-              </span>
+              {/* Pure White Card Graphic Container with Flame */}
+              <div className="relative w-full aspect-square bg-white rounded-2xl sm:rounded-3xl p-1.5 sm:p-2.5 flex items-center justify-center transition-all duration-300 border border-gray-100/90 shadow-2xs group-hover:shadow-md">
+                {/* Top Left Flame Badge */}
+                <span
+                  className="absolute top-2.5 left-2.5 text-base select-none pointer-events-none drop-shadow-xs z-10"
+                  role="img"
+                  aria-label="hot"
+                >
+                  🔥
+                </span>
 
-              {/* Product Image */}
-              <div className="relative w-full h-full max-h-[160px] sm:max-h-[175px] flex items-center justify-center">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  sizes="(max-width: 640px) 45vw, (max-width: 1024px) 25vw, 220px"
-                  className="object-contain p-1 mix-blend-multiply group-hover:scale-108 transition-transform duration-300"
-                />
+                {/* Product Image */}
+                <div className="relative w-full h-full max-h-[160px] sm:max-h-[175px] flex items-center justify-center">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    sizes="(max-width: 640px) 45vw, (max-width: 1024px) 25vw, 220px"
+                    className="object-contain p-1 mix-blend-multiply group-hover:scale-108 transition-transform duration-300"
+                  />
+                </div>
+              </div>
+
+              {/* Product Meta Below Card */}
+              <div className="pt-2.5 px-0.5 space-y-1">
+                <h3 className="font-extrabold text-[13px] sm:text-sm text-gray-900 line-clamp-1 group-hover:text-[#5A805B] transition-colors">
+                  {item.name}
+                </h3>
+                <p className="text-[11px] sm:text-xs text-gray-500 font-medium line-clamp-1">
+                  {item.subtitle}
+                </p>
+
+                {/* Price Display */}
+                <div className="pt-1">
+                  <span className="font-black text-sm sm:text-base text-gray-900">
+                    ${item.price}
+                  </span>
+                </div>
               </div>
             </Link>
 
-            {/* Product Meta & Actions Below Card */}
-            <div className="pt-2.5 px-0.5 space-y-1">
-              <Link href={`/product/${item.slug}`}>
-                <h3 className="font-extrabold text-[13px] sm:text-sm text-gray-900 line-clamp-1 group-hover:text-[#557754] transition-colors">
-                  {item.name}
-                </h3>
-              </Link>
-              <p className="text-[11px] sm:text-xs text-gray-500 font-medium line-clamp-1">
-                {item.subtitle}
-              </p>
-
-              {/* Price & Add Pill Button */}
-              <div className="flex items-center justify-between pt-1">
-                <span className="font-black text-sm sm:text-base text-gray-900">
-                  ${item.price}
-                </span>
-
-                <button
-                  type="button"
-                  aria-label={`Add ${item.name} to cart`}
-                  className="bg-black hover:bg-neutral-800 active:scale-95 text-white text-xs font-extrabold px-3.5 sm:px-4 py-1.5 rounded-full transition-all shadow-2xs cursor-pointer"
-                >
-                  Add
-                </button>
-              </div>
+            {/* Floating Add Pill Button (Isolated click handler so clicking Add doesn't trigger navigation) */}
+            <div className="absolute bottom-0 right-0 z-10">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  addItem({
+                    id: item.id,
+                    name: item.name,
+                    slug: item.slug,
+                    price: item.price,
+                    image: item.image,
+                  });
+                  toast.success(`Added ${item.name} to cart!`);
+                }}
+                aria-label={`Add ${item.name} to cart`}
+                className="bg-black hover:bg-neutral-800 active:scale-95 text-white text-xs font-extrabold px-3.5 sm:px-4 py-1.5 rounded-full transition-all shadow-2xs cursor-pointer"
+              >
+                Add
+              </button>
             </div>
           </div>
         ))}

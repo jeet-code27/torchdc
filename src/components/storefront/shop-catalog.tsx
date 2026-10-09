@@ -79,9 +79,10 @@ function getPageNumbers(currentPage: number, totalPages: number): (number | stri
 
 interface ShopCatalogProps {
   initialProducts?: ShopProduct[];
+  initialCategory?: string;
 }
 
-export function ShopCatalog({ initialProducts = [] }: ShopCatalogProps) {
+export function ShopCatalog({ initialProducts = [], initialCategory }: ShopCatalogProps) {
   const { fulfillment, setFulfillment, totalCount } = useCart();
   const [products, setProducts] = React.useState<ShopProduct[]>(initialProducts);
 
@@ -91,8 +92,15 @@ export function ShopCatalog({ initialProducts = [] }: ShopCatalogProps) {
     }
   }, [initialProducts]);
 
-  // By default, Shop page shows ALL products
-  const [activeCategory, setActiveCategory] = React.useState("all");
+  // By default, Shop page shows ALL products unless an initialCategory is specified
+  const [activeCategory, setActiveCategory] = React.useState(initialCategory || "all");
+
+  React.useEffect(() => {
+    if (initialCategory) {
+      setActiveCategory(initialCategory);
+    }
+  }, [initialCategory]);
+
   const [activeTier, setActiveTier] = React.useState("all");
   const [activeStrain, setActiveStrain] = React.useState("all");
   const [searchQuery, setSearchQuery] = React.useState("");

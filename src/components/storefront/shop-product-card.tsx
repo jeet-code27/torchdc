@@ -129,8 +129,8 @@ export function ShopProductCard({
             onClick={handleAdd}
             className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
               justAdded
-                ? "bg-[#557754] text-white"
-                : "border border-neutral-300 text-neutral-700 hover:bg-[#557754] hover:text-white hover:border-[#557754]"
+                ? "bg-[#5A805B] text-white"
+                : "border border-neutral-300 text-neutral-700 hover:bg-[#5A805B] hover:text-white hover:border-[#5A805B]"
             }`}
             aria-label={`Add ${product.name} to cart`}
           >
@@ -164,7 +164,7 @@ export function ShopProductCard({
 
       {/* Title & Metadata */}
       <div className="flex-1 flex flex-col">
-        <h3 className="font-bold text-[14px] sm:text-[15px] text-neutral-900 leading-snug line-clamp-1 group-hover:text-[#557754] transition-colors">
+        <h3 className="font-bold text-[14px] sm:text-[15px] text-neutral-900 leading-snug line-clamp-1 group-hover:text-[#5A805B] transition-colors">
           <Link href={`/product/${product.slug}`}>{product.name}</Link>
         </h3>
         <p className="text-[12px] text-neutral-500 line-clamp-1 mt-0.5 mb-2.5">

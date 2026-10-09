@@ -66,7 +66,7 @@ export function StoreCategoryGrid() {
         </h2>
         <Link
           href="/shop"
-          className="text-xs sm:text-sm font-bold text-[#557754] hover:text-[#415e40] hover:underline transition-colors"
+          className="text-xs sm:text-sm font-bold text-[#5A805B] hover:text-[#415e40] hover:underline transition-colors"
         >
           Browse all
         </Link>
@@ -92,7 +92,7 @@ export function StoreCategoryGrid() {
             </div>
 
             {/* Title */}
-            <span className="text-[11px] sm:text-xs lg:text-[13px] font-extrabold text-[#2a4429] group-hover:text-[#557754] tracking-wide uppercase leading-tight line-clamp-1 transition-colors">
+            <span className="text-[11px] sm:text-xs lg:text-[13px] font-extrabold text-[#2a4429] group-hover:text-[#5A805B] tracking-wide uppercase leading-tight line-clamp-1 transition-colors">
               {cat.name}
             </span>
           </Link>

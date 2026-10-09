@@ -15,6 +15,7 @@ export async function getShopProducts(): Promise<ShopProduct[]> {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const products = await Product.find({ isActive: true })
+      .select("name slug price salePrice images categoryIds isBestSeller isNewArrival strainType tier variants shortDescription")
       .sort({ isBestSeller: -1, isNewArrival: -1, createdAt: -1 })
       .lean();
 

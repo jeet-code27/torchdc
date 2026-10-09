@@ -10,13 +10,13 @@ export const metadata: Metadata = {
     "Explore Torch's curated dispensary menu: Midshelf, Topshelf, and Private Reserve flower, pre-rolls, disposables, concentrates, edibles, and mushrooms. Fast DC delivery.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function ShopPage() {
   const products = await getShopProducts();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafbfa] text-neutral-900 selection:bg-[#557754]/20 selection:text-[#557754]">
+    <div className="min-h-screen flex flex-col bg-[#fafbfa] text-neutral-900 selection:bg-[#5A805B]/20 selection:text-[#5A805B]">
       {/* 1. Top Announcement Status Bar */}
       <StoreStatusBar />
 
