@@ -17,10 +17,14 @@ import {
   Lock,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 import { useCart } from "@/context/cart-context";
+import { CustomerAuthModal } from "@/components/storefront/customer-auth-modal";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const [authModalOpen, setAuthModalOpen] = React.useState(false);
   const {
     items,
     fulfillment,
@@ -50,6 +54,15 @@ export default function CheckoutPage() {
     if (zip) setDeliveryZip(zip);
   }, [zip, setDeliveryZip]);
 
+  // Pre-fill fields from active customer session
+  React.useEffect(() => {
+    if (session?.user) {
+      if (session.user.name && !name) setName(session.user.name);
+      if (session.user.email && !email) setEmail(session.user.email);
+      if (session.user.phone && !phone) setPhone(session.user.phone);
+    }
+  }, [session, name, email, phone]);
+
   // Sync customer info live to capture potential abandoned carts
   const handleBlurCustomerInfo = () => {
     if (name || email || phone || street) {
@@ -64,6 +77,24 @@ export default function CheckoutPage() {
     }
   };
 
+  // Live phone formatter for (XXX) XXX-XXXX
+  const handlePhoneChange = (val: string) => {
+    let digits = val.replace(/\D/g, "");
+    if (digits.length === 11 && digits.startsWith("1")) {
+      digits = digits.slice(1);
+    }
+    digits = digits.slice(0, 10);
+    let formatted = digits;
+    if (digits.length > 6) {
+      formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+    } else if (digits.length > 3) {
+      formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    } else if (digits.length > 0) {
+      formatted = `(${digits}`;
+    }
+    setPhone(formatted);
+  };
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
@@ -75,6 +106,12 @@ export default function CheckoutPage() {
 
     if (!name.trim() || !email.trim() || !phone.trim()) {
       setErrorMsg("Please fill in your name, email, and mobile phone number.");
+      return;
+    }
+
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length < 10) {
+      setErrorMsg("Please enter a valid 10-digit mobile phone number (e.g. (202) 555-0143).");
       return;
     }
 
@@ -111,6 +148,7 @@ export default function CheckoutPage() {
           deliveryNotes: notes.trim(),
           items,
           sessionId,
+          userId: session?.user?.id || null,
           isAgeVerified: true,
         }),
       });
@@ -146,14 +184,20 @@ export default function CheckoutPage() {
             <span>Back to Menu</span>
           </Link>
 
-          <Link href="/" className="flex items-center gap-1">
-            <span className="font-black text-xl tracking-tight text-[#557754]">
-              TORCH <span className="text-neutral-900 font-extrabold text-sm tracking-normal">DC</span>
-            </span>
+          <Link href="/" className="flex items-center gap-2">
+            <div className="relative w-32 h-8">
+              <Image
+                src="/images/torch-logo.svg"
+                alt="Torch"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
           </Link>
 
           <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-500">
-            <Lock className="w-3.5 h-3.5 text-[#557754]" />
+            <Lock className="w-3.5 h-3.5 text-[#5A805B]" />
             <span className="hidden sm:inline">Secure Checkout</span>
           </div>
         </div>
@@ -275,9 +319,19 @@ export default function CheckoutPage() {
                   <h2 className="text-base font-extrabold text-neutral-900">
                     2. Contact Information
                   </h2>
-                  <span className="text-[11px] font-bold text-neutral-400">
-                    Guest Checkout
-                  </span>
+                  {session?.user ? (
+                    <span className="text-[11px] font-bold text-[#5A805B] flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5" /> Signed In as {session.user.name?.split(" ")[0]}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setAuthModalOpen(true)}
+                      className="text-[11px] font-bold text-[#5A805B] hover:underline cursor-pointer"
+                    >
+                      Already a customer? Sign In →
+                    </button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -297,18 +351,35 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-neutral-700">
-                      Mobile Phone (for ETA SMS) <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      onBlur={handleBlurCustomerInfo}
-                      placeholder="e.g. (202) 555-0199"
-                      className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#557754]/30 focus:border-[#557754]"
-                    />
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-bold text-neutral-700">
+                        Mobile Phone (for ETA SMS) <span className="text-red-500">*</span>
+                      </label>
+                      {phone.replace(/\D/g, "").length === 10 ? (
+                        <span className="text-[10px] text-[#5A805B] font-bold">
+                          ✓ Verified 10 Digits
+                        </span>
+                      ) : phone.replace(/\D/g, "").length > 0 ? (
+                        <span className="text-[10px] text-amber-600 font-medium">
+                          {10 - phone.replace(/\D/g, "").length} digits left
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3 flex items-center gap-1 text-neutral-500 font-semibold text-xs pointer-events-none pr-2 border-r border-neutral-200">
+                        <span>+1</span>
+                      </div>
+                      <input
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={(e) => handlePhoneChange(e.target.value)}
+                        onBlur={handleBlurCustomerInfo}
+                        placeholder="(202) 555-0199"
+                        maxLength={14}
+                        className="w-full pl-14 pr-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-1.5">
@@ -545,6 +616,12 @@ export default function CheckoutPage() {
           </div>
         )}
       </main>
+
+      {/* Customer Auth Modal for returning shoppers */}
+      <CustomerAuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </div>
   );
 }

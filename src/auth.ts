@@ -8,8 +8,8 @@ import { User } from "@/models/User";
 import "@/models/Role"; // Ensure Role model is registered in Mongoose schema cache
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().min(1, "Email or phone number is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -18,7 +18,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Credentials({
       name: "credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        email: { label: "Email or Phone", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
@@ -31,12 +31,30 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         await connectToDatabase();
 
-        // Use .lean() to ensure plain JS objects are returned, preventing DataCloneError
-        const user = await User.findOne({
-          email: email.toLowerCase().trim(),
+        const identifier = email.trim();
+        const digitsOnly = identifier.replace(/\D/g, "");
+
+        // Allow login by email or phone number
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const query: Record<string, any> = {
           isDeleted: false,
           isActive: true,
-        })
+        };
+
+        if (identifier.includes("@")) {
+          query.email = identifier.toLowerCase();
+        } else if (digitsOnly.length >= 7) {
+          query.$or = [
+            { phone: identifier },
+            { phone: digitsOnly },
+            { phone: digitsOnly.slice(-10) },
+          ];
+        } else {
+          query.email = identifier.toLowerCase();
+        }
+
+        // Use .lean() to ensure plain JS objects are returned, preventing DataCloneError
+        const user = await User.findOne(query)
           .select("+passwordHash")
           .populate("role")
           .lean();
@@ -63,6 +81,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: String(user._id),
           name: String(user.name),
           email: String(user.email),
+          phone: user.phone ? String(user.phone) : undefined,
           role: String(roleObj.key),
           permissions: safePermissions,
         };

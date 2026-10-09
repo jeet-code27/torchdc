@@ -35,6 +35,7 @@ export const authConfig: NextAuthConfig = {
       if (user) {
         token.id = String(user.id);
         token.role = String(user.role);
+        token.phone = user.phone ? String(user.phone) : undefined;
         token.permissions = Array.isArray(user.permissions)
           ? Array.from(user.permissions).map((p) => String(p))
           : [];
@@ -44,7 +45,8 @@ export const authConfig: NextAuthConfig = {
     session({ session, token }) {
       if (token && session.user) {
         session.user.id = String(token.id || token.sub);
-        session.user.role = String(token.role || "user");
+        session.user.role = String(token.role || "customer");
+        session.user.phone = token.phone ? String(token.phone) : undefined;
         session.user.permissions = Array.isArray(token.permissions)
           ? Array.from(token.permissions).map((p) => String(p))
           : [];

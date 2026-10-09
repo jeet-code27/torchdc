@@ -4,6 +4,7 @@ import { IRole } from "./Role";
 export interface IUser extends Document {
   name: string;
   email: string;
+  phone?: string;
   passwordHash: string;
   role: Types.ObjectId | IRole;
   isActive: boolean;
@@ -26,6 +27,12 @@ const UserSchema = new Schema<IUser>(
       unique: true,
       lowercase: true,
       trim: true,
+      index: true,
+    },
+    phone: {
+      type: String,
+      trim: true,
+      sparse: true,
       index: true,
     },
     passwordHash: {

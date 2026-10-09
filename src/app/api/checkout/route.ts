@@ -32,6 +32,14 @@ export async function POST(request: Request) {
       );
     }
 
+    const phoneDigits = String(customer.phone).replace(/\D/g, "");
+    if (phoneDigits.length < 10) {
+      return NextResponse.json(
+        { success: false, error: "Please provide a valid 10-digit mobile phone number (e.g. (202) 555-0143)." },
+        { status: 400 }
+      );
+    }
+
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { success: false, error: "Your cart is empty. Please add items to order." },

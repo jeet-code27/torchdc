@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/context/cart-context";
 import { StoreAgeGate } from "@/components/storefront/store-age-gate";
 
+import { SessionProvider } from "@/components/auth/session-provider";
+
 const jost = Jost({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -30,19 +32,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={jost.variable}>
       <body className="min-h-screen bg-background text-foreground antialiased font-sans">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          storageKey="torch-theme-v2"
-          disableTransitionOnChange
-        >
-          <CartProvider>
-            {/* Immediate 21+ Age Gate Modal */}
-            <StoreAgeGate />
-            {children}
-          </CartProvider>
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+            storageKey="torch-theme-v2"
+            disableTransitionOnChange
+          >
+            <CartProvider>
+              {/* Immediate 21+ Age Gate Modal */}
+              <StoreAgeGate />
+              {children}
+            </CartProvider>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );
