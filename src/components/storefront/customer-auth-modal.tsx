@@ -248,11 +248,53 @@ export function CustomerAuthModal({
           </div>
         </div>
 
-        {/* Error Alert */}
+        {/* Error Alert with Smart Quick Actions */}
         {errorMessage && (
-          <div className="mx-6 mt-3 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
-            <span>{errorMessage}</span>
+          <div className="mx-6 mt-3 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-2 animate-in fade-in slide-in-from-top-1">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+              <span className="font-medium flex-1">{errorMessage}</span>
+            </div>
+
+            {/* Smart 1-click action if user already exists */}
+            {mode === "signup" && errorMessage.toLowerCase().includes("already exists") && (
+              <div className="pt-2 border-t border-rose-200/60 flex items-center justify-between">
+                <span className="text-[11px] text-rose-700">Already registered?</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("signin");
+                    setSignInIdentifier(signUpEmail || signUpPhone);
+                    setErrorMessage("");
+                  }}
+                  className="text-[11px] font-bold text-rose-900 underline hover:text-black cursor-pointer"
+                >
+                  Switch to Sign In →
+                </button>
+              </div>
+            )}
+
+            {/* Smart 1-click action if account not found during sign in */}
+            {mode === "signin" && errorMessage.toLowerCase().includes("invalid") && (
+              <div className="pt-2 border-t border-rose-200/60 flex items-center justify-between">
+                <span className="text-[11px] text-rose-700">Don&apos;t have an account?</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("signup");
+                    if (signInIdentifier.includes("@")) {
+                      setSignUpEmail(signInIdentifier);
+                    } else if (signInIdentifier.replace(/\D/g, "").length >= 7) {
+                      setSignUpPhone(signInIdentifier);
+                    }
+                    setErrorMessage("");
+                  }}
+                  className="text-[11px] font-bold text-rose-900 underline hover:text-black cursor-pointer"
+                >
+                  Create an account →
+                </button>
+              </div>
+            )}
           </div>
         )}
 

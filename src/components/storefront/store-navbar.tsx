@@ -179,10 +179,9 @@ export function StoreNavbar() {
                 </button>
               )}
 
-              {/* Cart Pill Button (Triggers Cart Drawer) */}
-              <button
-                type="button"
-                onClick={() => setIsCartDrawerOpen(true)}
+              {/* Cart Pill Button (Links to /cart page) */}
+              <Link
+                href="/cart"
                 className="inline-flex items-center gap-2 bg-[#5A805B] hover:bg-[#4d704e] active:scale-95 text-white font-bold text-sm px-5 py-2.5 rounded-full shadow-sm hover:shadow transition-all group"
               >
                 <ShoppingCart className="w-4 h-4 transition-transform group-hover:scale-110" />
@@ -190,15 +189,14 @@ export function StoreNavbar() {
                 <span className="w-5 h-5 rounded-full bg-white/20 text-white text-xs flex items-center justify-center font-bold">
                   {totalCount}
                 </span>
-              </button>
+              </Link>
             </div>
 
             {/* ================= MOBILE RIGHT ================= */}
             <div className="flex md:hidden items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setIsCartDrawerOpen(true)}
-                className="relative w-10 h-10 rounded-full bg-[#5A805B] text-white flex items-center justify-center shadow-xs"
+              <Link
+                href="/cart"
+                className="relative w-10 h-10 rounded-full bg-[#5A805B] text-white flex items-center justify-center shadow-xs active:scale-95 transition"
                 aria-label="View Cart"
               >
                 <ShoppingCart className="w-4 h-4" />
@@ -207,7 +205,7 @@ export function StoreNavbar() {
                     {totalCount}
                   </span>
                 )}
-              </button>
+              </Link>
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -256,6 +254,19 @@ export function StoreNavbar() {
             </div>
 
             <nav className="flex flex-col gap-2 text-sm font-semibold text-gray-800">
+              <Link
+                href="/cart"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-2.5 px-3 rounded-xl bg-[#edf4ec] text-[#5A805B] font-bold flex items-center justify-between"
+              >
+                <span className="flex items-center gap-2">
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>My Cart</span>
+                </span>
+                <span className="text-xs bg-[#5A805B] text-white px-2 py-0.5 rounded-full font-extrabold">
+                  {totalCount} {totalCount === 1 ? "item" : "items"}
+                </span>
+              </Link>
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
