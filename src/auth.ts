@@ -10,6 +10,7 @@ import "@/models/Role"; // Ensure Role model is registered in Mongoose schema ca
 const loginSchema = z.object({
   email: z.string().min(1, "Email or phone number is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  portal: z.string().optional(),
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -20,6 +21,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: "Email or Phone", type: "text" },
         password: { label: "Password", type: "password" },
+        portal: { label: "Portal", type: "text" },
       },
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
@@ -27,7 +29,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const { email, password } = parsed.data;
+        const { email, password, portal } = parsed.data;
 
         await connectToDatabase();
 
@@ -72,6 +74,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           key: string;
           permissions?: string[];
         };
+
+        const roleKey = String(roleObj.key).toLowerCase();
+        const isStaffOrAdmin = [
+          "superadmin",
+          "super_admin",
+          "admin",
+          "manager",
+          "staff",
+        ].includes(roleKey);
+
+        // Strict Separation: Admin portal only for staff/admins
+        if (portal === "admin" && !isStaffOrAdmin) {
+          return null;
+        }
+
+        // Strict Separation: Storefront customer portal only for customers
+        if (portal === "customer" && isStaffOrAdmin) {
+          return null;
+        }
 
         const safePermissions = Array.isArray(roleObj.permissions)
           ? Array.from(roleObj.permissions).map((p) => String(p))

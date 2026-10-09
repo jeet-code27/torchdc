@@ -23,7 +23,8 @@ export function AdminUserMenu() {
   const handleLogout = async () => {
     setIsOpen(false);
     toast.loading("Signing out...");
-    await signOut({ callbackUrl: "/admin/login" });
+    await signOut({ redirect: false });
+    window.location.href = "/admin/login";
   };
 
   const user = session?.user;

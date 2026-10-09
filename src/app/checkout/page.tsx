@@ -56,7 +56,7 @@ export default function CheckoutPage() {
 
   // Pre-fill fields from active customer session
   React.useEffect(() => {
-    if (session?.user) {
+    if (session?.user && session.user.role === "customer") {
       if (session.user.name && !name) setName(session.user.name);
       if (session.user.email && !email) setEmail(session.user.email);
       if (session.user.phone && !phone) setPhone(session.user.phone);
@@ -319,7 +319,7 @@ export default function CheckoutPage() {
                   <h2 className="text-base font-extrabold text-neutral-900">
                     2. Contact Information
                   </h2>
-                  {session?.user ? (
+                  {session?.user && session.user.role === "customer" ? (
                     <span className="text-[11px] font-bold text-[#5A805B] flex items-center gap-1">
                       <ShieldCheck className="w-3.5 h-3.5" /> Signed In as {session.user.name?.split(" ")[0]}
                     </span>

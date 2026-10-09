@@ -14,6 +14,7 @@ import {
   Package,
   MapPin,
   ChevronDown,
+  ShieldCheck,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { useCart } from "@/context/cart-context";
@@ -28,6 +29,18 @@ export function StoreNavbar() {
   const { totalCount, setIsCartDrawerOpen } = useCart();
 
   const userDropdownRef = React.useRef<HTMLDivElement>(null);
+
+  const isCustomer = Boolean(session?.user && session.user.role === "customer");
+  const isAdminStaff = Boolean(
+    session?.user && session.user.role && session.user.role !== "customer"
+  );
+
+  const handleSignOut = async () => {
+    setUserDropdownOpen(false);
+    setMobileMenuOpen(false);
+    await signOut({ redirect: false });
+    window.location.href = "/";
+  };
 
   // Close dropdown on outside click
   React.useEffect(() => {
@@ -111,18 +124,18 @@ export function StoreNavbar() {
 
             {/* ================= DESKTOP RIGHT NAVIGATION ================= */}
             <div className="hidden md:flex items-center justify-end gap-5 flex-1">
-              {/* Customer Account / Sign In */}
-              {session?.user ? (
+              {/* Customer Account or Admin Badge */}
+              {isCustomer ? (
                 <div className="relative" ref={userDropdownRef}>
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="inline-flex items-center gap-2 py-2 px-3.5 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-sm font-semibold text-gray-800 transition"
+                    className="inline-flex items-center gap-2 py-2 px-3.5 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-sm font-semibold text-gray-800 transition cursor-pointer"
                   >
                     <div className="w-7 h-7 rounded-full bg-[#5A805B] text-white flex items-center justify-center text-xs font-bold uppercase">
-                      {session.user.name?.[0] || "U"}
+                      {session?.user?.name?.[0] || "U"}
                     </div>
                     <span className="max-w-[100px] truncate">
-                      {session.user.name?.split(" ")[0]}
+                      {session?.user?.name?.split(" ")[0]}
                     </span>
                     <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
                   </button>
@@ -131,10 +144,10 @@ export function StoreNavbar() {
                     <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white border border-gray-100 shadow-xl py-2 z-50 text-xs font-medium text-gray-700 animate-in fade-in slide-in-from-top-1">
                       <div className="px-4 py-2 border-b border-gray-100">
                         <p className="font-bold text-gray-900 truncate">
-                          {session.user.name}
+                          {session?.user?.name}
                         </p>
                         <p className="text-[11px] text-gray-400 truncate">
-                          {session.user.email}
+                          {session?.user?.email}
                         </p>
                       </div>
 
@@ -157,11 +170,8 @@ export function StoreNavbar() {
                       </Link>
 
                       <button
-                        onClick={() => {
-                          setUserDropdownOpen(false);
-                          signOut();
-                        }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-rose-600 hover:bg-rose-50 transition border-t border-gray-50 mt-1"
+                        onClick={handleSignOut}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-rose-600 hover:bg-rose-50 transition border-t border-gray-50 mt-1 cursor-pointer"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>Sign Out</span>
@@ -170,13 +180,25 @@ export function StoreNavbar() {
                   )}
                 </div>
               ) : (
-                <button
-                  onClick={() => setAuthModalOpen(true)}
-                  className="inline-flex items-center gap-2 py-2 px-3.5 rounded-full hover:bg-gray-100 text-sm font-semibold text-gray-700 transition"
-                >
-                  <User className="w-4 h-4 text-[#5A805B]" />
-                  <span>Sign In</span>
-                </button>
+                <div className="flex items-center gap-3">
+                  {isAdminStaff && (
+                    <Link
+                      href="/admin"
+                      className="inline-flex items-center gap-1.5 py-1.5 px-3.5 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold shadow-xs transition"
+                      title="Open Torch Admin Dashboard"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#5A805B]" />
+                      <span>Admin Panel ↗</span>
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => setAuthModalOpen(true)}
+                    className="inline-flex items-center gap-2 py-2 px-3.5 rounded-full hover:bg-gray-100 text-sm font-semibold text-gray-700 transition cursor-pointer"
+                  >
+                    <User className="w-4 h-4 text-[#5A805B]" />
+                    <span>Sign In</span>
+                  </button>
+                </div>
               )}
 
               {/* Cart Pill Button (Links to /cart page) */}
@@ -223,18 +245,37 @@ export function StoreNavbar() {
           <div className="md:hidden border-t border-gray-100 bg-white px-5 py-4 space-y-3 animate-in slide-in-from-top-2 duration-200 shadow-lg">
             {/* Mobile Auth Header */}
             <div className="p-3 bg-gray-50 rounded-xl flex items-center justify-between border border-gray-100">
-              {session?.user ? (
+              {isCustomer ? (
                 <div className="flex items-center justify-between w-full">
                   <div>
-                    <div className="text-xs font-bold text-gray-900">{session.user.name}</div>
-                    <div className="text-[11px] text-gray-500">{session.user.email}</div>
+                    <div className="text-xs font-bold text-gray-900">{session?.user?.name}</div>
+                    <div className="text-[11px] text-gray-500">{session?.user?.email}</div>
                   </div>
                   <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      signOut();
-                    }}
-                    className="text-xs font-semibold text-rose-600 hover:underline"
+                    onClick={handleSignOut}
+                    className="text-xs font-semibold text-rose-600 hover:underline cursor-pointer"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : isAdminStaff ? (
+                <div className="flex items-center justify-between w-full">
+                  <div>
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-900">
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#5A805B]" />
+                      <span>Staff Logged In</span>
+                    </div>
+                    <Link
+                      href="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[11px] text-[#5A805B] font-bold underline block mt-0.5"
+                    >
+                      Admin Dashboard ↗
+                    </Link>
+                  </div>
+                  <button
+                    onClick={handleSignOut}
+                    className="text-xs font-semibold text-rose-600 hover:underline cursor-pointer"
                   >
                     Sign Out
                   </button>
@@ -245,7 +286,7 @@ export function StoreNavbar() {
                     setMobileMenuOpen(false);
                     setAuthModalOpen(true);
                   }}
-                  className="w-full py-2 rounded-lg bg-[#5A805B] text-white text-xs font-bold flex items-center justify-center gap-2"
+                  className="w-full py-2 rounded-lg bg-[#5A805B] text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <User className="w-4 h-4" />
                   <span>Sign In / Create Account</span>

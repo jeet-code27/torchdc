@@ -49,11 +49,15 @@ export default function AdminLoginPage() {
       const res = await signIn("credentials", {
         email: data.email.toLowerCase().trim(),
         password: data.password,
+        portal: "admin",
         redirect: false,
       });
 
       if (!res || res.error) {
-        toast.error(res?.error || "Invalid email or password", { id: toastId });
+        toast.error(
+          res?.error || "Invalid staff email or password. Access restricted to authorized personnel.",
+          { id: toastId }
+        );
         setIsLoading(false);
         return;
       }

@@ -54,8 +54,18 @@ export default function CustomerAccountPage() {
   const [orders, setOrders] = React.useState<CustomerOrder[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = React.useState(true);
 
+  const isCustomer = Boolean(session?.user && session.user.role === "customer");
+  const isAdminStaff = Boolean(
+    session?.user && session.user.role && session.user.role !== "customer"
+  );
+
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
+    window.location.href = "/";
+  };
+
   React.useEffect(() => {
-    if (session?.user) {
+    if (isCustomer) {
       setIsLoadingOrders(true);
       fetch("/api/customer/orders")
         .then((r) => r.json())
@@ -66,8 +76,10 @@ export default function CustomerAccountPage() {
         })
         .catch(console.error)
         .finally(() => setIsLoadingOrders(false));
+    } else {
+      setIsLoadingOrders(false);
     }
-  }, [session]);
+  }, [isCustomer]);
 
   const getStatusBadge = (status: CustomerOrder["orderStatus"]) => {
     switch (status) {
@@ -133,13 +145,48 @@ export default function CustomerAccountPage() {
               </p>
               <button
                 onClick={() => setAuthModalOpen(true)}
-                className="w-full py-3 rounded-xl bg-[#5A805B] hover:bg-[#4d704e] text-white font-bold text-xs uppercase tracking-wider shadow transition"
+                className="w-full py-3 rounded-xl bg-[#5A805B] hover:bg-[#4d704e] text-white font-bold text-xs uppercase tracking-wider shadow transition cursor-pointer"
               >
                 Sign In / Register
               </button>
             </div>
+          ) : isAdminStaff ? (
+            /* Admin Logged In Screen on Storefront */
+            <div className="bg-white rounded-3xl p-10 border border-zinc-200 text-center space-y-5 max-w-md mx-auto shadow-sm animate-in fade-in">
+              <div className="w-16 h-16 rounded-2xl bg-zinc-900 text-[#5A805B] flex items-center justify-center mx-auto shadow">
+                <ShieldCheck className="w-8 h-8" />
+              </div>
+              <div>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-700 border border-zinc-200">
+                  Staff Role: {session.user.role}
+                </span>
+                <h1 className="text-2xl font-extrabold text-zinc-900 mt-2">
+                  Admin Account Active
+                </h1>
+                <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
+                  You are currently logged in with staff credentials (
+                  <span className="font-semibold text-zinc-800">{session.user.email}</span>
+                  ). Customer orders, personal cart, and customer accounts are separate from the Admin Portal.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                <Link
+                  href="/admin"
+                  className="flex-1 py-3 px-4 rounded-xl bg-[#5A805B] hover:bg-[#4d704e] text-white font-bold text-xs uppercase tracking-wider text-center transition shadow"
+                >
+                  Go to Admin Portal ↗
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="py-3 px-4 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-bold text-xs uppercase tracking-wider transition cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </div>
+            </div>
           ) : (
-            /* Logged In Dashboard */
+            /* Logged In Customer Dashboard */
             <>
               {/* Profile Card */}
               <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
@@ -181,8 +228,8 @@ export default function CustomerAccountPage() {
                   </Link>
 
                   <button
-                    onClick={() => signOut()}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200 transition"
+                    onClick={handleSignOut}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200 transition cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>Sign Out</span>

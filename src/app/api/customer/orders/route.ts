@@ -17,6 +17,13 @@ export async function GET() {
       );
     }
 
+    if (session.user.role !== "customer") {
+      return NextResponse.json({
+        success: true,
+        orders: [],
+      });
+    }
+
     await connectToDatabase();
 
     const userEmail = session.user.email?.toLowerCase().trim();

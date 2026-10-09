@@ -13,19 +13,27 @@ export const authConfig: NextAuthConfig = {
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
+      const userRole = (auth?.user?.role || "").toLowerCase();
+      const isAdminStaff = [
+        "superadmin",
+        "super_admin",
+        "admin",
+        "manager",
+        "staff",
+      ].includes(userRole);
       const isLoggedIn = !!auth?.user;
       const isOnAdmin = nextUrl.pathname.startsWith("/admin");
       const isOnLogin = nextUrl.pathname === "/admin/login";
 
       if (isOnLogin) {
-        if (isLoggedIn) {
+        if (isLoggedIn && isAdminStaff) {
           return Response.redirect(new URL("/admin", nextUrl));
         }
         return true;
       }
 
       if (isOnAdmin) {
-        if (isLoggedIn) return true;
+        if (isLoggedIn && isAdminStaff) return true;
         return false;
       }
 

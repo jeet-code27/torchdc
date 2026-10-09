@@ -88,10 +88,11 @@ export function CustomerAuthModal({
         redirect: false,
         email: signInIdentifier.trim(),
         password: signInPassword,
+        portal: "customer",
       });
 
       if (res?.error) {
-        setErrorMessage("Invalid email, phone, or password. Please try again.");
+        setErrorMessage("Invalid email, phone, or password. (Staff/Admin accounts must sign in at the Admin Portal).");
       } else {
         toast.success("Welcome back to Torch!");
         if (sessionId) {
@@ -159,6 +160,7 @@ export function CustomerAuthModal({
         redirect: false,
         email: signUpEmail.trim().toLowerCase(),
         password: signUpPassword,
+        portal: "customer",
       });
 
       if (signInRes?.error) {
