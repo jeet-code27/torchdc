@@ -215,7 +215,7 @@ export default function CheckoutPage() {
 
         {items.length === 0 ? (
           <div className="bg-white rounded-3xl p-10 sm:p-14 text-center border border-neutral-200/80 max-w-lg mx-auto shadow-2xs">
-            <div className="w-16 h-16 rounded-full bg-[#edf4ed] text-[#557754] flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-[#5A805B]/10 text-[#5A805B] flex items-center justify-center mx-auto mb-4">
               <Truck className="w-7 h-7" />
             </div>
             <h2 className="text-xl font-black text-neutral-900">Your cart is empty</h2>
@@ -224,7 +224,7 @@ export default function CheckoutPage() {
             </p>
             <Link
               href="/shop"
-              className="mt-6 inline-flex items-center justify-center gap-2 bg-[#557754] text-white font-extrabold text-sm px-6 py-3 rounded-full shadow-md hover:bg-[#466645] transition-all"
+              className="mt-6 inline-flex items-center justify-center gap-2 bg-[#5A805B] text-white font-extrabold text-sm px-6 py-3 rounded-full shadow-md hover:bg-[#4d704e] transition-all"
             >
               Explore Dispensary Menu
             </Link>

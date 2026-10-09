@@ -38,15 +38,20 @@ export default async function OrderSuccessPage({
     <div className="min-h-screen bg-[#fafbfa] text-neutral-900 pb-20">
       {/* Minimal Header */}
       <header className="bg-white border-b border-neutral-200/80">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-1">
-            <span className="font-black text-xl tracking-tight text-[#557754]">
-              TORCH <span className="text-neutral-900 font-extrabold text-sm tracking-normal">DC</span>
-            </span>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+          <Link href="/" className="flex items-center py-2" title="Torch Dispensary">
+            <Image
+              src="/images/torch-logo.svg"
+              alt="Torch"
+              width={160}
+              height={45}
+              priority
+              className="h-10 sm:h-12 w-auto object-contain drop-shadow-xs"
+            />
           </Link>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#557754] hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#5A805B] hover:underline"
           >
             <span>Browse More Strains</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -57,7 +62,7 @@ export default async function OrderSuccessPage({
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-10 space-y-8">
         {/* Success Hero Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-10 border border-neutral-200/80 shadow-xs text-center space-y-4">
-          <div className="w-18 h-18 rounded-full bg-[#edf4ed] text-[#557754] flex items-center justify-center mx-auto shadow-2xs">
+          <div className="w-18 h-18 rounded-full bg-[#5A805B]/10 text-[#5A805B] flex items-center justify-center mx-auto shadow-2xs">
             <CheckCircle className="w-10 h-10" />
           </div>
 
@@ -77,9 +82,9 @@ export default async function OrderSuccessPage({
           <div className="bg-[#edf4ec] rounded-2xl p-4 sm:p-5 border border-[#deebd9] text-left space-y-2 text-xs sm:text-sm">
             <div className="flex items-center gap-2 font-black text-[#2F4F30]">
               {order.fulfillment === "delivery" ? (
-                <Truck className="w-4 h-4 text-[#557754]" />
+                <Truck className="w-4 h-4 text-[#5A805B]" />
               ) : (
-                <Store className="w-4 h-4 text-[#557754]" />
+                <Store className="w-4 h-4 text-[#5A805B]" />
               )}
               <span>
                 {order.fulfillment === "delivery"
@@ -177,7 +182,7 @@ export default async function OrderSuccessPage({
           </div>
 
           <div className="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100 flex items-center gap-2.5 text-xs text-neutral-600">
-            <ShieldCheck className="w-4 h-4 text-[#557754] shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-[#5A805B] shrink-0" />
             <span>
               Please have exact cash and your 21+ valid government ID ready for the courier.
             </span>
@@ -188,7 +193,7 @@ export default async function OrderSuccessPage({
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <Link
             href="/shop"
-            className="w-full sm:flex-1 h-12 rounded-full bg-[#557754] hover:bg-[#466645] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all"
+            className="w-full sm:flex-1 h-12 rounded-full bg-[#5A805B] hover:bg-[#4d704e] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all"
           >
             <ShoppingBag className="w-4 h-4" />
             <span>Continue to Dispensary Menu</span>
@@ -198,7 +203,7 @@ export default async function OrderSuccessPage({
             href="tel:+12024681966"
             className="w-full sm:w-auto h-12 px-6 rounded-full bg-white hover:bg-neutral-50 border border-neutral-200/90 text-neutral-800 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-2xs transition-all"
           >
-            <Phone className="w-4 h-4 text-[#557754]" />
+            <Phone className="w-4 h-4 text-[#5A805B]" />
             <span>Call Support (202) 468-1966</span>
           </a>
         </div>
