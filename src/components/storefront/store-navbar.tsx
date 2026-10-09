@@ -20,8 +20,8 @@ export function StoreNavbar() {
             <a
               href="tel:+12024681966"
               className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors"
-              title="Call Torch DC: (202) 468-1966"
-              aria-label="Call Torch DC"
+              title="Call Torch: (202) 468-1966"
+              aria-label="Call Torch"
             >
               <Phone className="w-4 h-4" />
             </a>
@@ -29,25 +29,25 @@ export function StoreNavbar() {
             <nav className="flex items-center gap-6 lg:gap-8 text-[15px] font-semibold text-gray-800">
               <Link
                 href="/"
-                className="hover:text-[#557954] transition-colors"
+                className="hover:text-[#5A805B] transition-colors"
               >
                 Home
               </Link>
               <Link
                 href="/shop"
-                className="hover:text-[#557954] transition-colors"
+                className="hover:text-[#5A805B] transition-colors"
               >
                 Shop
               </Link>
               <Link
                 href="/category/flowers"
-                className="hover:text-[#557954] transition-colors"
+                className="hover:text-[#5A805B] transition-colors"
               >
                 Flowers
               </Link>
               <Link
                 href="/deals"
-                className="hover:text-[#557954] transition-colors text-[#557954]"
+                className="hover:text-[#5A805B] transition-colors text-[#5A805B]"
               >
                 Deals
               </Link>
@@ -59,7 +59,7 @@ export function StoreNavbar() {
             <a
               href="tel:+12024681966"
               className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors"
-              aria-label="Call Torch DC"
+              aria-label="Call Torch"
             >
               <Phone className="w-4 h-4" />
             </a>

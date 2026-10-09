@@ -10,13 +10,12 @@ export function StoreDeliverySteps() {
         </h2>
 
         {/* Steps Container */}
-        <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
-          {/* Desktop Connecting Line behind steps */}
-          <div className="hidden md:block absolute top-5 left-[15%] right-[15%] h-[2px] bg-[#d3e3ce] z-0" />
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-8">
           {/* Step 1 */}
-          <div className="relative z-10 flex flex-col items-start md:items-start space-y-2">
-            <div className="w-10 h-10 rounded-full bg-[#557754] text-white font-black text-sm flex items-center justify-center shadow-xs">
+          <div className="relative flex flex-col items-start space-y-2">
+            {/* Line connecting to Step 2 (starts behind Circle 1, ends behind Circle 2) */}
+            <div className="hidden md:block absolute top-5 left-5 w-[calc(100%+2rem)] h-[2px] bg-[#cde0c8] z-0" />
+            <div className="relative z-10 w-10 h-10 rounded-full bg-[#557754] text-white font-black text-sm flex items-center justify-center shadow-xs">
               1
             </div>
             <h3 className="text-base font-extrabold text-gray-900 pt-1">
@@ -28,8 +27,10 @@ export function StoreDeliverySteps() {
           </div>
 
           {/* Step 2 */}
-          <div className="relative z-10 flex flex-col items-start md:items-start space-y-2">
-            <div className="w-10 h-10 rounded-full bg-[#557754] text-white font-black text-sm flex items-center justify-center shadow-xs">
+          <div className="relative flex flex-col items-start space-y-2">
+            {/* Line connecting to Step 3 (starts behind Circle 2, ends behind Circle 3) */}
+            <div className="hidden md:block absolute top-5 left-5 w-[calc(100%+2rem)] h-[2px] bg-[#cde0c8] z-0" />
+            <div className="relative z-10 w-10 h-10 rounded-full bg-[#557754] text-white font-black text-sm flex items-center justify-center shadow-xs">
               2
             </div>
             <h3 className="text-base font-extrabold text-gray-900 pt-1">
@@ -40,9 +41,9 @@ export function StoreDeliverySteps() {
             </p>
           </div>
 
-          {/* Step 3 */}
-          <div className="relative z-10 flex flex-col items-start md:items-start space-y-2">
-            <div className="w-10 h-10 rounded-full bg-[#ea5825] text-white font-black text-sm flex items-center justify-center shadow-xs">
+          {/* Step 3 (Ends at circle 3 - no trailing line) */}
+          <div className="relative flex flex-col items-start space-y-2">
+            <div className="relative z-10 w-10 h-10 rounded-full bg-[#ea5825] text-white font-black text-sm flex items-center justify-center shadow-xs">
               3
             </div>
             <h3 className="text-base font-extrabold text-gray-900 pt-1">

@@ -33,8 +33,8 @@ export function ShopSidebar({
   onSelectCategory,
 }: ShopSidebarProps) {
   return (
-    <aside className="w-48 lg:w-52 flex-shrink-0">
-      <div className="sticky top-24 space-y-6">
+    <aside className="w-48 xl:w-52 shrink-0 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-none pr-1">
+      <div className="space-y-6 pb-8">
         {/* ================= 1. SITE NAVIGATION (Home, Deals, About, Contact) ================= */}
         <div>
           <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-3">
@@ -105,7 +105,7 @@ export function ShopSidebar({
         </div>
 
         {/* Promo box */}
-        <div className="mt-8 p-3.5 bg-[#f5f8f5] rounded-2xl border border-emerald-100/60 text-xs">
+        <div className="p-3.5 bg-[#f5f8f5] rounded-2xl border border-emerald-100/60 text-xs">
           <div className="flex items-center gap-1.5 font-bold text-[#2F4F30] mb-1">
             <Tag className="w-3.5 h-3.5 text-[#557754]" />
             <span>Daily Wake & Bake</span>
@@ -113,6 +113,24 @@ export function ShopSidebar({
           <p className="text-neutral-600 leading-snug">
             Save every morning 9AM - 12PM on half ounces across DC!
           </p>
+        </div>
+
+        {/* Store Hours & Quick Contact */}
+        <div className="p-3.5 bg-white rounded-2xl border border-neutral-200/80 text-xs space-y-1.5 shadow-2xs">
+          <div className="flex items-center gap-1.5 font-extrabold text-neutral-900">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Open Daily 7AM - 11PM</span>
+          </div>
+          <p className="text-[11px] text-neutral-500 font-medium">
+            1025 F St NW, Washington, DC
+          </p>
+          <a
+            href="tel:+12024681966"
+            className="inline-flex items-center gap-1 text-[11px] font-bold text-[#557754] hover:underline pt-0.5"
+          >
+            <Phone className="w-3 h-3" />
+            <span>(202) 468-1966</span>
+          </a>
         </div>
       </div>
     </aside>

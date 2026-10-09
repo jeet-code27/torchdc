@@ -16,7 +16,17 @@ export interface CartItem {
 
 export type FulfillmentType = "delivery" | "pickup";
 
+export interface CartCustomerInfo {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  zip?: string;
+}
+
 interface CartContextType {
+  sessionId: string;
   items: CartItem[];
   fulfillment: FulfillmentType;
   deliveryZip: string;
@@ -30,23 +40,50 @@ interface CartContextType {
   removeItem: (id: string, weight?: string) => void;
   updateQuantity: (id: string, quantity: number, weight?: string) => void;
   clearCart: () => void;
+  syncCustomerInfo: (info: CartCustomerInfo) => void;
+  mergeSessionCart: () => Promise<void>;
 }
 
 const CartContext = React.createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = "torch_cart_items";
 const FULFILLMENT_STORAGE_KEY = "torch_fulfillment_mode";
+const SESSION_STORAGE_KEY = "torch_session_id";
+
+function getOrCreateSessionId(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    let sid = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (!sid) {
+      sid =
+        "torch_sess_" +
+        Math.random().toString(36).substring(2, 9) +
+        "_" +
+        Date.now().toString(36);
+      localStorage.setItem(SESSION_STORAGE_KEY, sid);
+      document.cookie = `torch_session_id=${sid}; path=/; max-age=2592000; SameSite=Lax`;
+    }
+    return sid;
+  } catch {
+    return "torch_sess_fallback";
+  }
+}
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [sessionId, setSessionId] = React.useState<string>("");
   const [items, setItems] = React.useState<CartItem[]>([]);
   const [fulfillment, setFulfillmentState] = React.useState<FulfillmentType>("delivery");
   const [deliveryZip, setDeliveryZip] = React.useState("20004");
+  const [customerInfo, setCustomerInfo] = React.useState<CartCustomerInfo>({});
   const [isCartDrawerOpen, setIsCartDrawerOpen] = React.useState(false);
   const [isInitialized, setIsInitialized] = React.useState(false);
 
-  // Load from localStorage on mount
+  // Initialize session ID and load from localStorage
   React.useEffect(() => {
     try {
+      const sid = getOrCreateSessionId();
+      setSessionId(sid);
+
       const storedItems = localStorage.getItem(CART_STORAGE_KEY);
       if (storedItems) {
         setItems(JSON.parse(storedItems));
@@ -71,6 +108,42 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       console.warn("Could not save cart to storage", e);
     }
   }, [items, isInitialized]);
+
+  // Real-time Background Sync to MongoDB via /api/cart/sync (Debounced)
+  React.useEffect(() => {
+    if (!isInitialized || !sessionId) return;
+
+    const handler = setTimeout(async () => {
+      try {
+        const computedSubtotal = items.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+        const computedTotalCount = items.reduce(
+          (sum, item) => sum + item.quantity,
+          0
+        );
+
+        await fetch("/api/cart/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId,
+            items,
+            fulfillment,
+            deliveryZip,
+            subtotal: computedSubtotal,
+            totalCount: computedTotalCount,
+            customerInfo,
+          }),
+        });
+      } catch (err) {
+        console.warn("Background cart sync failed:", err);
+      }
+    }, 600);
+
+    return () => clearTimeout(handler);
+  }, [items, fulfillment, deliveryZip, customerInfo, sessionId, isInitialized]);
 
   // Set fulfillment mode and persist
   const setFulfillment = React.useCallback((mode: FulfillmentType) => {
@@ -131,7 +204,47 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = React.useCallback(() => {
     setItems([]);
+    if (sessionId) {
+      fetch(`/api/cart/sync?sessionId=${encodeURIComponent(sessionId)}`, {
+        method: "DELETE",
+      }).catch(() => null);
+    }
+  }, [sessionId]);
+
+  // Live customer info sync (captures email/phone/address during checkout for abandoned cart tracking)
+  const syncCustomerInfo = React.useCallback((info: CartCustomerInfo) => {
+    setCustomerInfo((prev) => ({ ...prev, ...info }));
   }, []);
+
+  // Merge guest session cart when user logs in
+  const mergeSessionCart = React.useCallback(async () => {
+    if (!sessionId) return;
+    try {
+      const res = await fetch("/api/cart/merge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      });
+      const data = await res.json();
+      if (data.success && data.cart?.items) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const merged: CartItem[] = data.cart.items.map((it: any) => ({
+          id: it.productId,
+          name: it.name,
+          slug: it.slug,
+          price: it.price,
+          image: it.image,
+          weight: it.weight,
+          tier: it.tier,
+          category: it.category,
+          quantity: it.quantity,
+        }));
+        setItems(merged);
+      }
+    } catch (e) {
+      console.warn("Failed to merge cart on login:", e);
+    }
+  }, [sessionId]);
 
   const totalCount = React.useMemo(() => {
     return items.reduce((sum, item) => sum + item.quantity, 0);
@@ -144,6 +257,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   return (
     <CartContext.Provider
       value={{
+        sessionId,
         items,
         fulfillment,
         deliveryZip,
@@ -157,6 +271,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         removeItem,
         updateQuantity,
         clearCart,
+        syncCustomerInfo,
+        mergeSessionCart,
       }}
     >
       {children}

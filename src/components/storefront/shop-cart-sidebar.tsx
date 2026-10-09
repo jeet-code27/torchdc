@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Minus, Trash2, ShieldCheck, ArrowRight, ShoppingBag } from "lucide-react";
+import { Plus, Minus, Trash2, ShieldCheck, ArrowRight, ShoppingBag, Truck, Clock } from "lucide-react";
 import { useCart, FulfillmentType } from "@/context/cart-context";
 
 export function ShopCartSidebar() {
@@ -19,8 +19,8 @@ export function ShopCartSidebar() {
   } = useCart();
 
   return (
-    <aside className="w-80 lg:w-[330px] flex-shrink-0">
-      <div className="sticky top-24 bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-xs flex flex-col">
+    <aside className="w-72 xl:w-80 shrink-0 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-none">
+      <div className="bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-xs flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-extrabold text-[18px] text-neutral-900">
@@ -60,7 +60,7 @@ export function ShopCartSidebar() {
         </div>
 
         {/* Location / ETA note */}
-        <p className="text-[12px] text-neutral-500 text-center mb-5 leading-normal">
+        <p className="text-[12px] text-neutral-500 text-center mb-4 leading-normal">
           {fulfillment === "delivery"
             ? "Free delivery across DC · about 35 to 45 min"
             : "Curbside pickup at 1025 F St NW · Ready in 15 min"}
@@ -68,7 +68,7 @@ export function ShopCartSidebar() {
 
         {/* Cart items list or empty state */}
         {items.length === 0 ? (
-          <div className="py-12 flex flex-col items-center justify-center text-center">
+          <div className="py-8 flex flex-col items-center justify-center text-center">
             <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400 mb-3">
               <ShoppingBag className="w-5 h-5" />
             </div>
@@ -78,6 +78,22 @@ export function ShopCartSidebar() {
             <p className="text-[12px] text-neutral-400 mt-1 max-w-[200px]">
               Tap + on anything in the menu to start your order.
             </p>
+
+            {/* Quick Delivery Guarantees */}
+            <div className="w-full mt-6 pt-5 border-t border-neutral-100 space-y-2.5 text-left">
+              <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600">
+                <Truck className="w-3.5 h-3.5 text-[#557754] shrink-0" />
+                <span>Free delivery across Washington DC</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600">
+                <Clock className="w-3.5 h-3.5 text-[#557754] shrink-0" />
+                <span>Fast 35 to 45 minute arrival</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#557754] shrink-0" />
+                <span>21+ valid government ID required</span>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col flex-1">

@@ -248,10 +248,10 @@ export function ShopCatalog({ initialProducts = [] }: ShopCatalogProps) {
             <a
               href="tel:+12024681966"
               className="w-10 h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-700 flex items-center justify-center transition-colors"
-              aria-label="Call Torch DC"
+              aria-label="Call Torch"
               title="Call (202) 468-1966"
             >
-              <Phone className="w-4 h-4 text-[#557754]" />
+              <Phone className="w-4 h-4 text-[#5A805B]" />
             </a>
           </div>
 
@@ -529,10 +529,10 @@ export function ShopCatalog({ initialProducts = [] }: ShopCatalogProps) {
       </div>
 
       {/* ================= MAIN CONTAINER ================= */}
-      <div className="max-w-[1340px] mx-auto px-4 sm:px-6 py-6">
-        <div className="flex gap-8 items-start">
-          {/* ================= 1. DESKTOP LEFT RAIL (Screenshot 1) ================= */}
-          <div className="hidden lg:block">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-6">
+        <div className="flex gap-6 xl:gap-8 items-start">
+          {/* ================= 1. DESKTOP LEFT RAIL (Sticky Categories & Nav) ================= */}
+          <div className="hidden lg:block shrink-0 sticky top-24 self-start">
             <ShopSidebar
               activeCategory={activeCategory}
               onSelectCategory={(slug) => {
@@ -699,7 +699,7 @@ export function ShopCatalog({ initialProducts = [] }: ShopCatalogProps) {
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
                     {paginatedProducts.map((product) => (
                       <ShopProductCard key={product.id} product={product} />
                     ))}
@@ -817,8 +817,8 @@ export function ShopCatalog({ initialProducts = [] }: ShopCatalogProps) {
             </div>
           </main>
 
-          {/* ================= 3. DESKTOP RIGHT ORDER DRAWER (Screenshot 1) ================= */}
-          <div className="hidden lg:block">
+          {/* ================= 3. DESKTOP RIGHT ORDER DRAWER (Sticky Order Summary) ================= */}
+          <div className="hidden lg:block shrink-0 sticky top-24 self-start">
             <ShopCartSidebar />
           </div>
         </div>

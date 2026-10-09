@@ -11,7 +11,7 @@ import { StoreFaqSection } from "@/components/storefront/store-faq-section";
 import { StoreFooter } from "@/components/storefront/store-footer";
 
 export const metadata = {
-  title: "Torch DC | Premium Cannabis Delivery & Pickup in Washington D.C.",
+  title: "Torch | Premium Cannabis Delivery & Pickup in Washington D.C.",
   description:
     "Order premium flowers, pre-rolls, cartridges, edibles, and concentrates in Washington DC. Fast delivery in 35-45 minutes. Initiative 71 compliant.",
 };
