@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/models/Order";
 import { Cart } from "@/models/Cart";
+import { Coupon } from "@/models/Coupon";
 import { auth } from "@/auth";
 import {
   sendOrderConfirmationEmail,
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
       items,
       sessionId,
       isAgeVerified,
+      couponCode,
     } = body;
 
     // Validate customer fields
@@ -84,8 +86,44 @@ export async function POST(request: Request) {
         sum + it.price * it.quantity,
       0
     );
+
+    // Apply Coupon Code if provided
+    let discountAmount = 0;
+    let appliedCouponCode: string | undefined = undefined;
+
+    if (couponCode && typeof couponCode === "string" && couponCode.trim()) {
+      const cleanCode = couponCode.trim().toUpperCase();
+      const couponDoc = await Coupon.findOne({ code: cleanCode, isActive: true });
+      if (couponDoc) {
+        const now = new Date();
+        const isValidDate =
+          (!couponDoc.startDate || new Date(couponDoc.startDate) <= now) &&
+          (!couponDoc.endDate || new Date(couponDoc.endDate) >= now);
+        const hasUsesLeft =
+          !couponDoc.usageLimit || (couponDoc.usageCount || 0) < couponDoc.usageLimit;
+        const meetsMin =
+          !couponDoc.minOrderAmount || subtotal >= couponDoc.minOrderAmount;
+
+        if (isValidDate && hasUsesLeft && meetsMin) {
+          if (couponDoc.discountType === "percentage") {
+            discountAmount = (subtotal * couponDoc.discountValue) / 100;
+            if (couponDoc.maxDiscount && discountAmount > couponDoc.maxDiscount) {
+              discountAmount = couponDoc.maxDiscount;
+            }
+          } else if (couponDoc.discountType === "fixed_amount") {
+            discountAmount = Math.min(couponDoc.discountValue, subtotal);
+          }
+          discountAmount = Number(discountAmount.toFixed(2));
+          appliedCouponCode = cleanCode;
+
+          // Increment usage count
+          await Coupon.findByIdAndUpdate(couponDoc._id, { $inc: { usageCount: 1 } });
+        }
+      }
+    }
+
     const deliveryFee = 0; // Free delivery across DC
-    const total = subtotal + deliveryFee;
+    const total = Math.max(0, Number((subtotal - discountAmount + deliveryFee).toFixed(2)));
 
     // Generate unique sequential / timestamp order number (e.g. TORCH-849201)
     const randomDigits = Math.floor(100000 + Math.random() * 900000);
@@ -114,6 +152,8 @@ export async function POST(request: Request) {
       items: orderItems,
       subtotal,
       deliveryFee,
+      couponCode: appliedCouponCode,
+      discountAmount,
       total,
       paymentMethod:
         fulfillment === "pickup" ? "cash_on_pickup" : "cash_on_delivery",

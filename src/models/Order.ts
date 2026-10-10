@@ -36,6 +36,8 @@ export interface IOrder extends Document {
   items: IOrderItem[];
   subtotal: number;
   deliveryFee: number;
+  couponCode?: string;
+  discountAmount?: number;
   total: number;
   paymentMethod: "cash_on_delivery" | "cash_on_pickup";
   paymentStatus: "pending" | "paid" | "failed";
@@ -113,6 +115,15 @@ const OrderSchema = new Schema<IOrder>(
       default: 0,
     },
     deliveryFee: {
+      type: Number,
+      default: 0,
+    },
+    couponCode: {
+      type: String,
+      trim: true,
+      uppercase: true,
+    },
+    discountAmount: {
       type: Number,
       default: 0,
     },

@@ -54,7 +54,7 @@ export default function AdminDashboardPage() {
   const { user, role, permissions } = usePermissions();
 
   const triggerToastDemo = () => {
-    toast.success("Welcome to TORCH Admin! RBAC session active.");
+    toast.success("Welcome to Torch Admin! RBAC session active.");
   };
 
   return (

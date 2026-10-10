@@ -15,6 +15,8 @@ import {
   Clock,
   MapPin,
   Lock,
+  Tag,
+  X,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
@@ -48,6 +50,48 @@ export default function CheckoutPage() {
   const [isAgeVerified, setIsAgeVerified] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState("");
+
+  // Promo code states
+  const [promoCode, setPromoCode] = React.useState("");
+  const [isApplyingPromo, setIsApplyingPromo] = React.useState(false);
+  const [appliedCoupon, setAppliedCoupon] = React.useState<{
+    code: string;
+    discountAmount: number;
+    description?: string;
+  } | null>(null);
+
+  const handleApplyPromo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoCode.trim()) return;
+    setIsApplyingPromo(true);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoCode.trim(), subtotal }),
+      });
+      const data = await res.json();
+      if (data.success && data.coupon) {
+        setAppliedCoupon(data.coupon);
+        toast.success(`Coupon "${data.coupon.code}" applied!`);
+        setPromoCode("");
+      } else {
+        toast.error(data.error || "Invalid coupon code");
+      }
+    } catch {
+      toast.error("Failed to apply coupon");
+    } finally {
+      setIsApplyingPromo(false);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedCoupon(null);
+    toast.success("Coupon removed");
+  };
+
+  const discountAmount = appliedCoupon?.discountAmount || 0;
+  const finalTotal = Math.max(0, subtotal - discountAmount);
 
   // Keep cart context zip in sync
   React.useEffect(() => {
@@ -150,6 +194,7 @@ export default function CheckoutPage() {
           sessionId,
           userId: session?.user?.id || null,
           isAgeVerified: true,
+          couponCode: appliedCoupon?.code,
         }),
       });
 
@@ -418,7 +463,7 @@ export default function CheckoutPage() {
                         onChange={(e) => setStreet(e.target.value)}
                         onBlur={handleBlurCustomerInfo}
                         placeholder="e.g. 1400 K St NW"
-                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#557754]/30 focus:border-[#557754]"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
                       />
                     </div>
 
@@ -433,7 +478,7 @@ export default function CheckoutPage() {
                           onChange={(e) => setApartment(e.target.value)}
                           onBlur={handleBlurCustomerInfo}
                           placeholder="Apt 4B"
-                          className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#557754]/30 focus:border-[#557754]"
+                          className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
                         />
                       </div>
 
@@ -461,7 +506,7 @@ export default function CheckoutPage() {
                           onBlur={handleBlurCustomerInfo}
                           placeholder="20004"
                           maxLength={5}
-                          className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#557754]/30 focus:border-[#557754]"
+                          className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
                         />
                       </div>
                     </div>
@@ -475,7 +520,7 @@ export default function CheckoutPage() {
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="e.g. Call upon arrival, buzzer #12, leave at front desk"
-                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#557754]/30 focus:border-[#557754]"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
                       />
                     </div>
                   </div>
@@ -488,9 +533,9 @@ export default function CheckoutPage() {
                   4. Payment & Age Verification
                 </h2>
 
-                <div className="p-4 rounded-2xl bg-[#edf4ec] border border-[#deebd9] flex items-center justify-between">
+                <div className="p-4 rounded-2xl bg-[#5A805B]/10 border border-[#5A805B]/20 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#557754] text-white flex items-center justify-center font-black text-sm">
+                    <div className="w-10 h-10 rounded-full bg-[#5A805B] text-white flex items-center justify-center font-black text-sm">
                       $
                     </div>
                     <div>
@@ -502,7 +547,7 @@ export default function CheckoutPage() {
                       </span>
                     </div>
                   </div>
-                  <span className="text-xs font-black text-[#557754] bg-white px-2.5 py-1 rounded-full shadow-2xs">
+                  <span className="text-xs font-black text-[#5A805B] bg-white px-2.5 py-1 rounded-full shadow-2xs">
                     Standard
                   </span>
                 </div>
@@ -513,7 +558,7 @@ export default function CheckoutPage() {
                     type="checkbox"
                     checked={isAgeVerified}
                     onChange={(e) => setIsAgeVerified(e.target.checked)}
-                    className="mt-1 w-4 h-4 rounded text-[#557754] focus:ring-[#557754]"
+                    className="mt-1 w-4 h-4 rounded text-[#5A805B] focus:ring-[#5A805B]"
                   />
                   <div className="text-xs leading-relaxed text-neutral-700">
                     <strong className="text-neutral-900">I am 21+ years old: </strong>
@@ -526,14 +571,14 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-14 rounded-full bg-[#557754] hover:bg-[#466645] disabled:opacity-60 text-white font-black text-base flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-all cursor-pointer"
+                className="w-full h-14 rounded-full bg-[#5A805B] hover:bg-[#4d704e] disabled:opacity-60 text-white font-black text-base flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-all cursor-pointer"
               >
                 {isSubmitting ? (
                   <span>Processing Your Order...</span>
                 ) : (
                   <>
                     <Check className="w-5 h-5" />
-                    <span>Place Order · ${subtotal.toFixed(2)}</span>
+                    <span>Place Order · ${finalTotal.toFixed(2)}</span>
                   </>
                 )}
               </button>
@@ -546,7 +591,7 @@ export default function CheckoutPage() {
                   <h3 className="font-extrabold text-lg text-neutral-900">
                     Order Summary
                   </h3>
-                  <span className="text-xs font-bold bg-[#edf4ec] text-[#2F4F30] px-2.5 py-0.5 rounded-full">
+                  <span className="text-xs font-bold bg-[#5A805B]/10 text-[#5A805B] px-2.5 py-0.5 rounded-full">
                     {totalCount} {totalCount === 1 ? "item" : "items"}
                   </span>
                 </div>
@@ -555,7 +600,7 @@ export default function CheckoutPage() {
                 <div className="max-h-[300px] overflow-y-auto space-y-3 pr-1 divide-y divide-neutral-100">
                   {items.map((it) => (
                     <div key={`${it.id}-${it.weight}`} className="pt-3 first:pt-0 flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-xl bg-[#edf4ec] p-1 shrink-0 overflow-hidden">
+                      <div className="relative w-12 h-12 rounded-xl bg-[#5A805B]/10 p-1 shrink-0 overflow-hidden">
                         <Image
                           src={it.image || "/images/placeholder-product.png"}
                           alt={it.name}
@@ -578,20 +623,73 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
+                {/* Promo Code Box */}
+                <div className="pt-2">
+                  {appliedCoupon ? (
+                    <div className="p-3 rounded-2xl bg-[#5A805B]/10 border border-[#5A805B]/30 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <Tag className="w-4 h-4 text-[#5A805B]" />
+                        <div>
+                          <span className="font-mono font-bold text-[#5A805B]">
+                            {appliedCoupon.code}
+                          </span>
+                          <span className="text-[11px] text-neutral-600 block">
+                            ${appliedCoupon.discountAmount.toFixed(2)} discount applied
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemovePromo}
+                        className="text-neutral-400 hover:text-rose-600 p-1 rounded cursor-pointer transition"
+                        title="Remove coupon"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={promoCode}
+                          onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                          placeholder="Promo code (e.g. TORCH10)"
+                          className="flex-1 px-3.5 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-mono font-bold uppercase placeholder:normal-case placeholder:font-normal focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#5A805B] transition"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleApplyPromo}
+                          disabled={isApplyingPromo || !promoCode.trim()}
+                          className="px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 disabled:opacity-50 text-white text-xs font-bold transition cursor-pointer"
+                        >
+                          {isApplyingPromo ? "..." : "Apply"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Cost breakdown */}
                 <div className="pt-3 border-t border-neutral-200/80 space-y-2 text-xs">
                   <div className="flex justify-between text-neutral-600">
                     <span>Subtotal</span>
                     <span className="font-bold text-neutral-900">${subtotal.toFixed(2)}</span>
                   </div>
+                  {appliedCoupon && appliedCoupon.discountAmount > 0 && (
+                    <div className="flex justify-between text-[#5A805B] font-semibold">
+                      <span>Promo Discount ({appliedCoupon.code})</span>
+                      <span>-${appliedCoupon.discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-neutral-600">
                     <span>DC Delivery</span>
                     <span className="font-bold text-emerald-600">FREE</span>
                   </div>
                   <div className="flex justify-between items-baseline pt-2 border-t border-dashed border-neutral-200 text-sm">
                     <span className="font-black text-neutral-900">Total</span>
-                    <span className="font-black text-lg text-neutral-900">
-                      ${subtotal.toFixed(2)}
+                    <span className="font-black text-xl text-[#5A805B]">
+                      ${finalTotal.toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -599,7 +697,7 @@ export default function CheckoutPage() {
                 {/* Trust perks */}
                 <div className="pt-4 border-t border-neutral-100 space-y-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600">
-                    <Clock className="w-4 h-4 text-[#557754] shrink-0" />
+                    <Clock className="w-4 h-4 text-[#5A805B] shrink-0" />
                     <span>Estimated arrival: 35-45 minutes</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600">

@@ -72,6 +72,12 @@ const navItems: NavEntry[] = [
         icon: FolderTree,
         permission: "categories.view",
       },
+      {
+        title: "Brands",
+        href: "/admin/brands",
+        icon: Tag,
+        permission: "brands.view",
+      },
     ],
   },
   {
@@ -127,7 +133,8 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: SidebarProps) {
   React.useEffect(() => {
     if (
       pathname.startsWith("/admin/products") ||
-      pathname.startsWith("/admin/categories")
+      pathname.startsWith("/admin/categories") ||
+      pathname.startsWith("/admin/brands")
     ) {
       setCatalogOpen(true);
     }
