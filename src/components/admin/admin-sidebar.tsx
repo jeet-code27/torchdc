@@ -278,7 +278,7 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: SidebarProps) {
       {/* Footer Info */}
       <div className="p-4 border-t border-sidebar-border">
         <div className="text-[11px] text-muted-foreground text-center">
-          TORCH Admin Panel • v1.0
+          Torch Admin Panel • v1.0
         </div>
       </div>
     </div>

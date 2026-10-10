@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import { LoyaltyMember, User, Order } from "@/models";
+import { LoyaltyMember, User, Order, Role } from "@/models";
 import { requirePermission } from "@/lib/permissions";
 
 export async function GET(req: NextRequest) {
@@ -28,7 +28,9 @@ export async function GET(req: NextRequest) {
 
     // If loyalty collection is empty or fresh, auto-populate from existing customers/orders
     if (members.length === 0 && !search && tier === "all") {
-      const users = await User.find({ role: "customer" }).limit(10).lean();
+      const customerRole = await Role.findOne({ key: "customer" }).lean();
+      const userFilter = customerRole ? { role: customerRole._id, isDeleted: false } : { isDeleted: false };
+      const users = await User.find(userFilter).limit(10).lean();
       for (const u of users) {
         const orderCount = await Order.countDocuments({
           $or: [{ customerId: u._id.toString() }, { customerEmail: u.email.toLowerCase() }],
