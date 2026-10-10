@@ -11,6 +11,8 @@ import {
   ChevronRight,
   Tag,
   Filter,
+  Truck,
+  Store,
 } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { ShopSidebar, STORE_CATEGORIES } from "./shop-sidebar";
@@ -190,8 +192,55 @@ export function ShopCatalog({
 
           {/* ================= 2. CENTER PRODUCT FEED ================= */}
           <main className="flex-1 min-w-0">
+            {/* Mobile Search Bar (Above Banner) */}
+            <div className="lg:hidden mb-3">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                }}
+                className="relative w-full"
+              >
+                <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="What are you looking for today?"
+                  className="w-full bg-[#f4f5f4] hover:bg-[#edf0ed] focus:bg-white text-sm text-neutral-800 placeholder-neutral-500 rounded-full pl-11 pr-4 py-2.5 sm:py-3 outline-none border border-transparent focus:border-[#5A805B] transition-all shadow-2xs"
+                />
+              </form>
+            </div>
+
             {/* Hero Slider Carousel */}
             <StoreHeroCarousel compact={true} />
+
+            {/* Mobile Order Mode Switcher (Below Banner, No Extra Text) */}
+            <div className="lg:hidden bg-neutral-100 p-1 rounded-full flex text-xs font-bold max-w-md mx-auto my-3">
+              <button
+                type="button"
+                onClick={() => setFulfillment("delivery")}
+                className={`flex-1 py-2 sm:py-2.5 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  fulfillment === "delivery"
+                    ? "bg-[#5A805B] text-white font-black shadow-xs"
+                    : "text-neutral-600 hover:text-neutral-900"
+                }`}
+              >
+                <Truck className="w-3.5 h-3.5" />
+                <span>Delivery</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFulfillment("pickup")}
+                className={`flex-1 py-2 sm:py-2.5 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  fulfillment === "pickup"
+                    ? "bg-[#5A805B] text-white font-black shadow-xs"
+                    : "text-neutral-600 hover:text-neutral-900"
+                }`}
+              >
+                <Store className="w-3.5 h-3.5" />
+                <span>Pickup</span>
+              </button>
+            </div>
 
             {/* Category Filter Pills (Matching Client Reference) */}
             <div className="mb-4 flex items-center gap-2 overflow-x-auto scrollbar-none py-1.5 -mx-4 px-4 sm:mx-0 sm:px-0">

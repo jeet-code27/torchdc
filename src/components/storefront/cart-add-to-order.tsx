@@ -130,15 +130,20 @@ export function CartAddToOrder({
               {/* Product Image */}
               <Link
                 href={`/product/${prod.slug}`}
-                className="relative aspect-square w-full rounded-xl bg-white p-2 flex items-center justify-center overflow-hidden mb-2 group"
+                style={{ backgroundColor: "#F6F8F6" }}
+                className="relative aspect-square w-full rounded-xl p-2 flex items-center justify-center overflow-hidden mb-2 group"
               >
-                <div className="relative w-full h-full transition-transform duration-300 group-hover:scale-105">
+                <div
+                  style={{ backgroundColor: "#F6F8F6" }}
+                  className="relative w-full h-full transition-transform duration-300 group-hover:scale-105"
+                >
                   <Image
                     src={prod.image || "/images/placeholder-product.png"}
                     alt={prod.name}
                     fill
                     sizes="(max-width: 640px) 150px, 200px"
                     className="object-contain mix-blend-multiply"
+                    style={{ mixBlendMode: "multiply" }}
                   />
                 </div>
               </Link>

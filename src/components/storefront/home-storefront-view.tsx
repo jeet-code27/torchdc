@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Sparkles,
   Flame,
@@ -9,6 +10,7 @@ import {
   Info,
   Truck,
   Store,
+  Search,
 } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { ShopSidebar } from "./shop-sidebar";
@@ -17,12 +19,15 @@ import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { ShopProductCard, ShopProduct } from "./shop-product-card";
 import { StoreHeroCarousel } from "./store-hero-carousel";
 import { StoreFaqSection } from "./store-faq-section";
+import { MobileCategoryGrid } from "./mobile-category-grid";
+import { ProductSlider } from "./product-slider";
 
 interface HomeStorefrontViewProps {
   products: ShopProduct[];
 }
 
 export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
+  const router = useRouter();
   const { fulfillment, setFulfillment, isPickupEnabled } = useCart();
   const [showFullLegalText, setShowFullLegalText] = React.useState(false);
 
@@ -73,217 +78,121 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
         </div>
 
         {/* ================= 2. MAIN CENTER CONTENT (Slider + Categorized Sections) ================= */}
-        <main className="flex-1 min-w-0 space-y-6 sm:space-y-10">
-          {/* ================= MOBILE ORDER MODE SWITCHER (Mobile only) ================= */}
-          <div className="lg:hidden bg-white rounded-2xl p-2 sm:p-2.5 border border-neutral-200/80 shadow-2xs">
-            <div className="bg-neutral-100 p-1 rounded-full flex text-xs font-bold">
-              <button
-                type="button"
-                onClick={() => setFulfillment("delivery")}
-                className={`flex-1 py-2 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  fulfillment === "delivery"
-                    ? "bg-[#5A805B] text-white font-black shadow-xs"
-                    : "text-neutral-600 hover:text-neutral-900"
-                }`}
-              >
-                <Truck className="w-3.5 h-3.5" />
-                <span>Delivery</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setFulfillment("pickup")}
-                className={`flex-1 py-2 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  fulfillment === "pickup"
-                    ? "bg-[#5A805B] text-white font-black shadow-xs"
-                    : "text-neutral-600 hover:text-neutral-900"
-                }`}
-              >
-                <Store className="w-3.5 h-3.5" />
-                <span>Pickup</span>
-              </button>
-            </div>
-            <div className="mt-2 px-1 flex items-center justify-between text-[11px] text-neutral-500 font-medium">
-              <span>
-                {fulfillment === "delivery"
-                  ? "⚡ Washington D.C. 35-45 min delivery"
-                  : "🏪 Store pickup available"}
-              </span>
-              {!isPickupEnabled && (
-                <span className="text-[#E8561E] font-bold text-[10px] bg-orange-50 px-2 py-0.5 rounded-full">
-                  Pickup paused
-                </span>
-              )}
-            </div>
+        <main className="flex-1 min-w-0 space-y-4 sm:space-y-6">
+          {/* ================= MOBILE SEARCH BAR (Above Banner) ================= */}
+          <div className="lg:hidden">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.currentTarget;
+                const input = form.elements.namedItem("search") as HTMLInputElement;
+                if (input?.value.trim()) {
+                  router.push(`/shop?search=${encodeURIComponent(input.value.trim())}`);
+                }
+              }}
+              className="relative w-full"
+            >
+              <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                name="search"
+                placeholder="What are you looking for today?"
+                className="w-full bg-[#f4f5f4] hover:bg-[#edf0ed] focus:bg-white text-sm text-neutral-800 placeholder-neutral-500 rounded-full pl-11 pr-4 py-2.5 sm:py-3 outline-none border border-transparent focus:border-[#5A805B] transition-all shadow-2xs"
+              />
+            </form>
           </div>
 
           {/* ================= HERO SLIDER CAROUSEL ================= */}
           <StoreHeroCarousel />
 
-          {/* ================= 1. BEST SELLERS ================= */}
-          <section id="section-best-sellers" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-[#E8561E]" />
-                <h2 className="text-xl sm:text-2xl font-black text-neutral-900">
-                  Best Sellers
-                </h2>
-              </div>
-              <Link
-                href="/shop?category=best-sellers"
-                className="text-xs font-bold text-[#5A805B] hover:underline flex items-center gap-1"
-              >
-                <span>See all</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+          {/* ================= MOBILE ORDER MODE SWITCHER (Below Banner, No Extra Text) ================= */}
+          <div className="lg:hidden bg-neutral-100 p-1 rounded-full flex text-xs font-bold max-w-md mx-auto">
+            <button
+              type="button"
+              onClick={() => setFulfillment("delivery")}
+              className={`flex-1 py-2 sm:py-2.5 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                fulfillment === "delivery"
+                  ? "bg-[#5A805B] text-white font-black shadow-xs"
+                  : "text-neutral-600 hover:text-neutral-900"
+              }`}
+            >
+              <Truck className="w-3.5 h-3.5" />
+              <span>Delivery</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFulfillment("pickup")}
+              className={`flex-1 py-2 sm:py-2.5 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                fulfillment === "pickup"
+                  ? "bg-[#5A805B] text-white font-black shadow-xs"
+                  : "text-neutral-600 hover:text-neutral-900"
+              }`}
+            >
+              <Store className="w-3.5 h-3.5" />
+              <span>Pickup</span>
+            </button>
+          </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {bestSellers.map((prod) => (
-                <ShopProductCard
-                  key={prod.id}
-                  product={{ ...prod, badge: "Best Seller" }}
-                />
-              ))}
-            </div>
-          </section>
+          {/* ================= MOBILE SHOP BY CATEGORY (Below Toggle, Mobile Only) ================= */}
+          <MobileCategoryGrid />
+
+          {/* ================= 1. BEST SELLERS ================= */}
+          <ProductSlider
+            id="section-best-sellers"
+            title="Best Sellers"
+            seeAllHref="/shop?category=best-sellers"
+            products={bestSellers}
+            defaultBadge="Best Seller"
+          />
 
           {/* ================= 2. NEW ARRIVALS ================= */}
-          <section id="section-new-arrivals" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-600" />
-                <h2 className="text-xl sm:text-2xl font-black text-neutral-900">
-                  New Arrivals
-                </h2>
-              </div>
-              <Link
-                href="/shop?category=new-arrivals"
-                className="text-xs font-bold text-[#5A805B] hover:underline flex items-center gap-1"
-              >
-                <span>See all</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {newArrivals.map((prod) => (
-                <ShopProductCard
-                  key={prod.id}
-                  product={{ ...prod, badge: "New" }}
-                />
-              ))}
-            </div>
-          </section>
+          <ProductSlider
+            id="section-new-arrivals"
+            title="New Arrivals"
+            seeAllHref="/shop?category=new-arrivals"
+            products={newArrivals}
+            defaultBadge="New"
+          />
 
           {/* ================= 3. FLOWERS ================= */}
-          <section id="section-flowers" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-black text-neutral-900">
-                Flowers
-              </h2>
-              <Link
-                href="/shop?category=flowers"
-                className="text-xs font-bold text-[#5A805B] hover:underline flex items-center gap-1"
-              >
-                <span>See all</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {flowers.map((prod) => (
-                <ShopProductCard key={prod.id} product={prod} />
-              ))}
-            </div>
-          </section>
+          <ProductSlider
+            id="section-flowers"
+            title="Flowers"
+            seeAllHref="/shop?category=flowers"
+            products={flowers}
+          />
 
           {/* ================= 4. PRE-ROLLS ================= */}
-          <section id="section-pre-rolls" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-black text-neutral-900">
-                Pre-rolls
-              </h2>
-              <Link
-                href="/shop?category=pre-rolls"
-                className="text-xs font-bold text-[#5A805B] hover:underline flex items-center gap-1"
-              >
-                <span>See all</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {preRolls.map((prod) => (
-                <ShopProductCard key={prod.id} product={prod} />
-              ))}
-            </div>
-          </section>
+          <ProductSlider
+            id="section-pre-rolls"
+            title="Pre-rolls"
+            seeAllHref="/shop?category=pre-rolls"
+            products={preRolls}
+          />
 
           {/* ================= 5. DISPOSABLES & CARTRIDGES ================= */}
-          <section id="section-disposables" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-black text-neutral-900">
-                Disposable Vape & Cartridges
-              </h2>
-              <Link
-                href="/shop?category=disposables"
-                className="text-xs font-bold text-[#5A805B] hover:underline flex items-center gap-1"
-              >
-                <span>See all</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {disposables.map((prod) => (
-                <ShopProductCard key={prod.id} product={prod} />
-              ))}
-            </div>
-          </section>
+          <ProductSlider
+            id="section-disposables"
+            title="Disposable Vape & Cartridges"
+            seeAllHref="/shop?category=disposables"
+            products={disposables}
+          />
 
           {/* ================= 6. EDIBLES ================= */}
-          <section id="section-edibles" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-black text-neutral-900">
-                Edibles
-              </h2>
-              <Link
-                href="/shop?category=edibles"
-                className="text-xs font-bold text-[#5A805B] hover:underline flex items-center gap-1"
-              >
-                <span>See all</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {edibles.map((prod) => (
-                <ShopProductCard key={prod.id} product={prod} />
-              ))}
-            </div>
-          </section>
+          <ProductSlider
+            id="section-edibles"
+            title="Edibles"
+            seeAllHref="/shop?category=edibles"
+            products={edibles}
+          />
 
           {/* ================= 7. MUSHROOMS ================= */}
-          <section id="section-mushrooms" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-black text-neutral-900">
-                Mushrooms
-              </h2>
-              <Link
-                href="/shop?category=mushrooms"
-                className="text-xs font-bold text-[#5A805B] hover:underline flex items-center gap-1"
-              >
-                <span>See all</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {mushrooms.map((prod) => (
-                <ShopProductCard key={prod.id} product={prod} />
-              ))}
-            </div>
-          </section>
+          <ProductSlider
+            id="section-mushrooms"
+            title="Mushrooms"
+            seeAllHref="/shop?category=mushrooms"
+            products={mushrooms}
+          />
 
           {/* ================= LEGAL COMPLIANCE BOX ================= */}
           <div className="rounded-3xl bg-neutral-100/70 border border-neutral-200/80 p-6 sm:p-8 space-y-4 text-neutral-800">

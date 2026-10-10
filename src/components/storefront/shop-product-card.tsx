@@ -65,8 +65,8 @@ export function ShopProductCard({
     );
   } else if (product.isBestSeller) {
     badgeContent = (
-      <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 text-[11px] font-black px-2 py-0.5 rounded-full">
-        🔥 <span className="hidden sm:inline">BEST SELLER</span>
+      <span className="inline-block bg-[#E8561E] text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-xs">
+        BEST SELLER
       </span>
     );
   } else if (product.isNewArrival) {
@@ -139,58 +139,67 @@ export function ShopProductCard({
   }
 
   return (
-    <article className="flex flex-col h-full bg-white rounded-2xl p-3 sm:p-3.5 border border-neutral-200/70 hover:border-neutral-300/80 hover:shadow-xs transition-all group">
-      {/* Product Image Box - Pure White with Multiply Blend Mode */}
-      <Link
-        href={`/product/${product.slug}`}
-        className="relative aspect-square w-full rounded-xl bg-white border border-neutral-100/90 p-3 flex items-center justify-center overflow-hidden mb-2.5"
+    <article className="flex flex-col h-full bg-transparent group">
+      {/* Product Image Box - #F6F8F6 soft rounded background */}
+      <div
+        style={{ backgroundColor: "#F6F8F6" }}
+        className="relative h-[132px] sm:h-[148px] w-full rounded-2xl p-2.5 sm:p-3 flex items-center justify-center overflow-hidden mb-2"
       >
         {/* Badges */}
-        <div className="absolute top-2.5 left-2.5 z-10">{badgeContent}</div>
+        {badgeContent && (
+          <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 z-10">
+            {badgeContent}
+          </div>
+        )}
 
-        <div className="relative w-[82%] h-[82%] transition-transform duration-300 group-hover:scale-105">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-contain mix-blend-multiply"
-          />
-        </div>
-      </Link>
+        {/* Product Image Link */}
+        <Link
+          href={`/product/${product.slug}`}
+          style={{ backgroundColor: "#F6F8F6" }}
+          className="relative w-full h-full flex items-center justify-center"
+        >
+          <div
+            style={{ backgroundColor: "#F6F8F6" }}
+            className="relative w-[80%] h-[80%] transition-transform duration-300 group-hover:scale-105"
+          >
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
+              className="object-contain mix-blend-multiply"
+              style={{ mixBlendMode: "multiply" }}
+            />
+          </div>
+        </Link>
 
-      {/* Title & Metadata */}
-      <div className="flex-1 flex flex-col">
-        <h3 className="font-bold text-[14px] sm:text-[15px] text-neutral-900 leading-snug line-clamp-1 group-hover:text-[#5A805B] transition-colors">
+        {/* Floating Circular Plus Button in Bottom Right of Image Box */}
+        <button
+          type="button"
+          onClick={handleAdd}
+          className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white text-neutral-900 hover:bg-[#5A805B] hover:text-white shadow-xs flex items-center justify-center transition-all cursor-pointer active:scale-95"
+          aria-label={`Add ${product.name} to cart`}
+        >
+          {justAdded ? (
+            <Check className="w-3.5 h-3.5 stroke-[3] text-[#5A805B]" />
+          ) : (
+            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+          )}
+        </button>
+      </div>
+
+      {/* Title & Metadata & Price below image container */}
+      <div className="flex-1 flex flex-col pt-0.5">
+        <h3 className="font-bold text-[13px] sm:text-[14px] text-neutral-900 leading-snug line-clamp-1 group-hover:text-[#5A805B] transition-colors">
           <Link href={`/product/${product.slug}`}>{product.name}</Link>
         </h3>
-        <p className="text-[12px] text-neutral-500 line-clamp-1 mt-0.5 mb-2.5">
+        <p className="text-[11px] sm:text-[12px] text-neutral-500 line-clamp-1 mt-0.5">
           {metaText}
         </p>
 
-        {/* Footer: Price & Add Button */}
-        <div className="mt-auto flex items-center justify-between pt-1">
-          <div>
-            <span className="text-[11px] text-neutral-400 block leading-none">
-              from
-            </span>
-            <span className="text-[16px] sm:text-[17px] font-extrabold text-neutral-900 leading-tight">
-              ${product.price}
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleAdd}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#5A805B] hover:bg-[#4a6b4b] text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
-            aria-label={`Add ${product.name} to cart`}
-          >
-            {justAdded ? (
-              <Check className="w-4 h-4 stroke-[3]" />
-            ) : (
-              <Plus className="w-4 h-4 stroke-[2.5]" />
-            )}
-          </button>
+        {/* Plain bold price (Matching client screenshot) */}
+        <div className="mt-1 text-[15px] sm:text-[16px] font-extrabold text-neutral-900 leading-tight">
+          ${product.price}
         </div>
       </div>
     </article>

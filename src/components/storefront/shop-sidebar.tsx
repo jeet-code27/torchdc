@@ -48,13 +48,13 @@ export function ShopSidebar({
   return (
     <aside className="w-44 xl:w-48 shrink-0 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-none pr-1">
       <div className="space-y-6 pb-8">
-        {/* ================= DISPENSARY MENU CATEGORIES ================= */}
+        {/* ================= DISPENSARY MENU ================= */}
         <div>
           <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-3">
-            Categories
+            Menu
           </span>
 
-          <nav className="flex flex-col gap-1" aria-label="Dispensary menu categories">
+          <nav className="flex flex-col gap-0.5" aria-label="Dispensary menu">
             {STORE_CATEGORIES.map((cat) => {
               const isActive = activeCategory === cat.slug;
               return (
@@ -62,16 +62,13 @@ export function ShopSidebar({
                   key={cat.slug}
                   type="button"
                   onClick={() => handleCategoryClick(cat.slug)}
-                  className={`w-full flex items-center justify-between text-left px-3.5 py-2 rounded-xl text-[14px] font-bold transition-all cursor-pointer ${
+                  className={`w-full text-left px-3.5 py-2.5 rounded-xl text-[14px] font-bold transition-all cursor-pointer ${
                     isActive
                       ? "bg-[#5A805B]/10 text-[#5A805B] font-extrabold shadow-2xs"
                       : "text-neutral-700 hover:bg-neutral-100/70 hover:text-neutral-900"
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    {cat.icon}
-                    <span>{cat.name}</span>
-                  </span>
+                  <span>{cat.name}</span>
                 </button>
               );
             })}

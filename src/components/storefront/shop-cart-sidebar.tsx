@@ -20,8 +20,8 @@ export function ShopCartSidebar() {
   } = useCart();
 
   return (
-    <aside className="w-72 xl:w-80 shrink-0 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-none">
-      <div className="bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-xs flex flex-col">
+    <aside className="w-72 xl:w-80 shrink-0 sticky top-24 self-start min-h-[calc(100vh-8rem)] max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-none border-l border-neutral-200/80 pl-5 xl:pl-6 py-1">
+      <div className="flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-extrabold text-[18px] text-neutral-900">

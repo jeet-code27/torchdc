@@ -382,10 +382,10 @@ export function StoreNavbar() {
                 </nav>
               </div>
 
-              {/* 2. Categories */}
+              {/* 2. Menu */}
               <div>
                 <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-1">
-                  Categories
+                  Menu
                 </span>
                 <nav className="space-y-1">
                   {STORE_CATEGORIES.map((cat) => (
@@ -395,10 +395,7 @@ export function StoreNavbar() {
                       onClick={() => setMobileMenuOpen(false)}
                       className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold text-neutral-700 hover:bg-neutral-50"
                     >
-                      <span className="flex items-center gap-2.5">
-                        {cat.icon}
-                        <span>{cat.name}</span>
-                      </span>
+                      <span>{cat.name}</span>
                       <ChevronRight className="w-4 h-4 text-neutral-400" />
                     </Link>
                   ))}
