@@ -108,7 +108,7 @@ export function ShopCartSidebar() {
                   {/* Thumbnail */}
                   <div className="relative w-12 h-12 rounded-lg bg-neutral-100 p-1 flex-shrink-0 overflow-hidden">
                     <Image
-                      src={item.image}
+                      src={typeof item.image === "string" && item.image ? item.image : "/images/placeholder-product.png"}
                       alt={item.name}
                       fill
                       sizes="48px"

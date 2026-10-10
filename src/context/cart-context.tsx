@@ -86,7 +86,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       const storedItems = localStorage.getItem(CART_STORAGE_KEY);
       if (storedItems) {
-        setItems(JSON.parse(storedItems));
+        const parsed = JSON.parse(storedItems);
+        if (Array.isArray(parsed)) {
+          const clean = parsed.map((item: any) => ({
+            ...item,
+            image:
+              typeof item.image === "string" && item.image.trim() !== ""
+                ? item.image
+                : item.image?.url || "/images/placeholder-product.png",
+          }));
+          setItems(clean);
+        }
       }
       const storedFulfillment = localStorage.getItem(FULFILLMENT_STORAGE_KEY);
       if (storedFulfillment === "delivery" || storedFulfillment === "pickup") {
@@ -157,9 +167,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = React.useCallback(
     (product: Omit<CartItem, "quantity">, quantity = 1) => {
+      const sanitizedImage =
+        typeof product.image === "string" && product.image.trim() !== ""
+          ? product.image
+          : (product.image as any)?.url || "/images/placeholder-product.png";
+
+      const cleanProduct = {
+        ...product,
+        image: sanitizedImage,
+      };
+
       setItems((prev) => {
         const itemIndex = prev.findIndex(
-          (item) => item.id === product.id && item.weight === product.weight
+          (item) => item.id === cleanProduct.id && item.weight === cleanProduct.weight
         );
 
         if (itemIndex > -1) {
@@ -171,7 +191,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           return updated;
         }
 
-        return [...prev, { ...product, quantity }];
+        return [...prev, { ...cleanProduct, quantity }];
       });
     },
     []

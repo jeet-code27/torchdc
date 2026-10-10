@@ -603,7 +603,11 @@ export default function CheckoutPage() {
                     <div key={`${it.id}-${it.weight}`} className="pt-3 first:pt-0 flex items-center gap-3">
                       <div className="relative w-12 h-12 rounded-xl bg-[#5A805B]/10 p-1 shrink-0 overflow-hidden">
                         <Image
-                          src={it.image || "/images/placeholder-product.png"}
+                          src={
+                            typeof it.image === "string" && it.image.trim() !== ""
+                              ? it.image
+                              : (it.image as any)?.url || "/images/placeholder-product.png"
+                          }
                           alt={it.name}
                           fill
                           sizes="48px"

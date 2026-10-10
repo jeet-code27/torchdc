@@ -124,7 +124,7 @@ export function StoreCartDrawer() {
                 {/* Thumbnail */}
                 <div className="w-16 h-16 rounded-2xl bg-neutral-100 border border-neutral-200/80 overflow-hidden relative shrink-0">
                   <Image
-                    src={item.image}
+                    src={typeof item.image === "string" && item.image ? item.image : "/images/placeholder-product.png"}
                     alt={item.name}
                     fill
                     sizes="64px"

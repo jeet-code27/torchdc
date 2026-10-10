@@ -235,7 +235,11 @@ export default function CartPage() {
                         <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-neutral-100 overflow-hidden shrink-0 border border-neutral-200/60">
                           {item.image ? (
                             <Image
-                              src={item.image}
+                              src={
+                                typeof item.image === "string" && item.image.trim() !== ""
+                                  ? item.image
+                                  : (item.image as any)?.url || "/images/placeholder-product.png"
+                              }
                               alt={item.name}
                               fill
                               sizes="80px"

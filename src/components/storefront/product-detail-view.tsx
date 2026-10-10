@@ -480,7 +480,10 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
 
   // Primary image
   const primaryImage =
-    product.images?.[0]?.url || "/images/placeholder-product.png";
+    product.images?.find((img) => img?.isPrimary && img?.url)?.url ||
+    product.images?.[0]?.url ||
+    (typeof (product.images?.[0] as any) === "string" ? (product.images[0] as unknown as string) : null) ||
+    "/images/placeholder-product.png";
 
   const handleAddToCart = () => {
     const itemWeight =
@@ -566,6 +569,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                   src={primaryImage}
                   alt={product.name}
                   fill
+                  sizes="(max-width: 640px) 340px, (max-width: 1024px) 400px, 480px"
                   className="object-contain mix-blend-multiply drop-shadow-sm transition-transform duration-300 hover:scale-105"
                   priority
                 />
@@ -845,9 +849,10 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                 >
                   <div className="relative aspect-square w-full rounded-xl bg-[#edf4ec] overflow-hidden mb-2.5 flex items-center justify-center">
                     <Image
-                      src={rel.image}
+                      src={rel.image || "/images/placeholder-product.png"}
                       alt={rel.name}
                       fill
+                      sizes="(max-width: 640px) 192px, 224px"
                       className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform p-2"
                     />
                   </div>

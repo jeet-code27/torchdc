@@ -33,15 +33,24 @@ export function CartAddToOrder({
         const data = await res.json();
         if (data.success && Array.isArray(data.products) && isMounted) {
           // Normalize to ShopProduct format
-          const formatted: ShopProduct[] = data.products.map((p: any) => ({
-            id: p._id || p.id,
-            name: p.name,
-            slug: p.slug,
-            price: p.salePrice || p.price,
-            image: p.images?.[0] || "/images/placeholder-product.png",
-            category: "pre-rolls",
-            weight: p.variants?.[0]?.weight || "1g",
-          }));
+          const formatted: ShopProduct[] = data.products.map((p: any) => {
+            const resolvedImg =
+              p.images?.find((img: any) => img?.isPrimary && img?.url)?.url ||
+              p.images?.find((img: any) => typeof img?.url === "string" && img.url)?.url ||
+              (typeof p.images?.[0] === "string" ? p.images[0] : p.images?.[0]?.url) ||
+              (typeof p.image === "string" ? p.image : null) ||
+              "/images/placeholder-product.png";
+
+            return {
+              id: p._id || p.id,
+              name: p.name,
+              slug: p.slug,
+              price: p.salePrice || p.price || 0,
+              image: resolvedImg,
+              category: "pre-rolls",
+              weight: p.variants?.[0]?.weight || "1g",
+            };
+          });
           setSuggestions(formatted);
         }
       } catch (err) {
@@ -125,7 +134,7 @@ export function CartAddToOrder({
               >
                 <div className="relative w-full h-full transition-transform duration-300 group-hover:scale-105">
                   <Image
-                    src={prod.image}
+                    src={prod.image || "/images/placeholder-product.png"}
                     alt={prod.name}
                     fill
                     sizes="(max-width: 640px) 150px, 200px"
