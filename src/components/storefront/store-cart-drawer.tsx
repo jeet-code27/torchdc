@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { X, Plus, Minus, Trash2, ArrowRight, ShoppingBag, ShieldCheck } from "lucide-react";
 import { useCart } from "@/context/cart-context";
+import { CartAddToOrder } from "./cart-add-to-order";
 
 export function StoreCartDrawer() {
   const {
@@ -181,6 +182,9 @@ export function StoreCartDrawer() {
               </div>
             ))
           )}
+
+          {/* Add to your order suggestions */}
+          <CartAddToOrder compact={true} className="pt-3 border-t border-neutral-100" />
         </div>
 
         {/* Footer with Subtotal & Checkout */}

@@ -128,14 +128,10 @@ export function ShopProductCard({
           <button
             type="button"
             onClick={handleAdd}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-              justAdded
-                ? "bg-[#5A805B] text-white"
-                : "border border-neutral-300 text-neutral-700 hover:bg-[#5A805B] hover:text-white hover:border-[#5A805B]"
-            }`}
+            className="w-9 h-9 rounded-full bg-[#5A805B] hover:bg-[#4a6b4b] text-white flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
             aria-label={`Add ${product.name} to cart`}
           >
-            {justAdded ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            {justAdded ? <Check className="w-4 h-4 stroke-[3]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
           </button>
         </div>
       </div>
@@ -186,11 +182,7 @@ export function ShopProductCard({
           <button
             type="button"
             onClick={handleAdd}
-            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              justAdded
-                ? "bg-[#557754] text-white scale-110 shadow-xs"
-                : "border border-neutral-300 text-neutral-800 hover:bg-[#557754] hover:text-white hover:border-[#557754] active:scale-95"
-            }`}
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#5A805B] hover:bg-[#4a6b4b] text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
             aria-label={`Add ${product.name} to cart`}
           >
             {justAdded ? (

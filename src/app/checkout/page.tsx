@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/context/cart-context";
 import { CustomerAuthModal } from "@/components/storefront/customer-auth-modal";
+import { CartAddToOrder } from "@/components/storefront/cart-add-to-order";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -711,6 +712,9 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Add to your order suggestions */}
+              <CartAddToOrder compact={true} className="pt-2" />
             </div>
           </div>
         )}

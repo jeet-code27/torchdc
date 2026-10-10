@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Plus, Minus, Trash2, ShieldCheck, ArrowRight, ShoppingBag, Truck, Clock } from "lucide-react";
 import { useCart, FulfillmentType } from "@/context/cart-context";
+import { CartAddToOrder } from "./cart-add-to-order";
 
 export function ShopCartSidebar() {
   const {
@@ -181,7 +182,7 @@ export function ShopCartSidebar() {
             {/* Checkout CTA Button */}
             <Link
               href="/checkout"
-              className="w-full mt-4 bg-[#557754] hover:bg-[#466645] active:scale-[0.99] text-white font-extrabold py-3.5 px-5 rounded-full text-center text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
+              className="w-full mt-4 bg-[#5A805B] hover:bg-[#466645] active:scale-[0.99] text-white font-extrabold py-3.5 px-5 rounded-full text-center text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
             >
               <span>Proceed to Checkout</span>
               <ArrowRight className="w-4 h-4" />
@@ -192,6 +193,9 @@ export function ShopCartSidebar() {
               <ShieldCheck className="w-3.5 h-3.5 text-neutral-400" />
               <span>Valid 21+ government ID required</span>
             </div>
+
+            {/* Add to your order suggestions */}
+            <CartAddToOrder compact={true} className="mt-4 pt-3 border-t border-neutral-100" />
           </div>
         )}
       </div>

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { StoreNavbar } from "@/components/storefront/store-navbar";
 import { StoreFooter } from "@/components/storefront/store-footer";
+import { CartAddToOrder } from "@/components/storefront/cart-add-to-order";
 import { useCart } from "@/context/cart-context";
 
 export default function CartPage() {
@@ -346,6 +347,9 @@ export default function CartPage() {
                   <span>Continue Shopping Dispensary Menu</span>
                 </Link>
               </div>
+
+              {/* Add to your order Upsell Section */}
+              <CartAddToOrder className="pt-4" />
             </div>
 
             {/* Right Column: Order Summary & Checkout Card */}
