@@ -211,8 +211,8 @@ export function ShopCatalog({
               </form>
             </div>
 
-            {/* Hero Slider Carousel */}
-            <StoreHeroCarousel compact={true} />
+            {/* Hero Slider Carousel - Exact same size as home page */}
+            <StoreHeroCarousel />
 
             {/* Mobile Order Mode Switcher (Below Banner, No Extra Text) */}
             <div className="lg:hidden bg-neutral-100 p-1 rounded-full flex text-xs font-bold max-w-md mx-auto my-3">

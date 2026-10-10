@@ -43,7 +43,7 @@ export function ProductSlider({
         {products.map((prod) => (
           <div
             key={prod.id}
-            className="w-[140px] sm:w-[155px] shrink-0"
+            className="w-[155px] sm:w-[170px] shrink-0"
           >
             <ShopProductCard
               product={defaultBadge && !prod.badge ? { ...prod, badge: defaultBadge } : prod}
@@ -52,8 +52,8 @@ export function ProductSlider({
         ))}
       </div>
 
-      {/* 2. Desktop Grid (≥ lg screens) - Clean compact grid */}
-      <div className="hidden lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {/* 2. Desktop Grid (≥ lg screens) */}
+      <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {products.map((prod) => (
           <ShopProductCard
             key={prod.id}
