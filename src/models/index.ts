@@ -10,3 +10,4 @@ export * from "./Redirect";
 export * from "./Blog";
 export * from "./ActivityLog";
 export * from "./Loyalty";
+export * from "./StoreSettings";

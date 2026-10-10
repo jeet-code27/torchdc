@@ -7,7 +7,10 @@ import {
   Flame,
   ChevronRight,
   Info,
+  Truck,
+  Store,
 } from "lucide-react";
+import { useCart } from "@/context/cart-context";
 import { ShopSidebar } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
@@ -20,6 +23,7 @@ interface HomeStorefrontViewProps {
 }
 
 export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
+  const { fulfillment, setFulfillment, isPickupEnabled } = useCart();
   const [showFullLegalText, setShowFullLegalText] = React.useState(false);
 
   // Group products by category (6 products per section for 2 balanced rows of 3)
@@ -69,7 +73,49 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
         </div>
 
         {/* ================= 2. MAIN CENTER CONTENT (Slider + Categorized Sections) ================= */}
-        <main className="flex-1 min-w-0 space-y-10">
+        <main className="flex-1 min-w-0 space-y-6 sm:space-y-10">
+          {/* ================= MOBILE ORDER MODE SWITCHER (Mobile only) ================= */}
+          <div className="lg:hidden bg-white rounded-2xl p-2 sm:p-2.5 border border-neutral-200/80 shadow-2xs">
+            <div className="bg-neutral-100 p-1 rounded-full flex text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setFulfillment("delivery")}
+                className={`flex-1 py-2 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  fulfillment === "delivery"
+                    ? "bg-[#5A805B] text-white font-black shadow-xs"
+                    : "text-neutral-600 hover:text-neutral-900"
+                }`}
+              >
+                <Truck className="w-3.5 h-3.5" />
+                <span>Delivery</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFulfillment("pickup")}
+                className={`flex-1 py-2 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  fulfillment === "pickup"
+                    ? "bg-[#5A805B] text-white font-black shadow-xs"
+                    : "text-neutral-600 hover:text-neutral-900"
+                }`}
+              >
+                <Store className="w-3.5 h-3.5" />
+                <span>Pickup</span>
+              </button>
+            </div>
+            <div className="mt-2 px-1 flex items-center justify-between text-[11px] text-neutral-500 font-medium">
+              <span>
+                {fulfillment === "delivery"
+                  ? "⚡ Washington D.C. 35-45 min delivery"
+                  : "🏪 Store pickup available"}
+              </span>
+              {!isPickupEnabled && (
+                <span className="text-[#E8561E] font-bold text-[10px] bg-orange-50 px-2 py-0.5 rounded-full">
+                  Pickup paused
+                </span>
+              )}
+            </div>
+          </div>
+
           {/* ================= HERO SLIDER CAROUSEL ================= */}
           <StoreHeroCarousel />
 

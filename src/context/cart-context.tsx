@@ -14,6 +14,8 @@ export interface CartItem {
   quantity: number;
 }
 
+import { PickupPausedModal } from "@/components/storefront/pickup-paused-modal";
+
 export type FulfillmentType = "delivery" | "pickup";
 
 export interface CartCustomerInfo {
@@ -33,7 +35,10 @@ interface CartContextType {
   totalCount: number;
   subtotal: number;
   isCartDrawerOpen: boolean;
-  setFulfillment: (mode: FulfillmentType) => void;
+  isPickupEnabled: boolean;
+  isPickupPausedModalOpen: boolean;
+  setIsPickupPausedModalOpen: (open: boolean) => void;
+  setFulfillment: (mode: FulfillmentType, force?: boolean) => void;
   setDeliveryZip: (zip: string) => void;
   setIsCartDrawerOpen: (open: boolean) => void;
   addItem: (product: Omit<CartItem, "quantity">, quantity?: number) => void;
@@ -77,6 +82,48 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [customerInfo, setCustomerInfo] = React.useState<CartCustomerInfo>({});
   const [isCartDrawerOpen, setIsCartDrawerOpen] = React.useState(false);
   const [isInitialized, setIsInitialized] = React.useState(false);
+
+  // Store fulfillment settings (Admin can pause or enable store pickup)
+  const [isPickupEnabled, setIsPickupEnabled] = React.useState<boolean>(false);
+  const [isPickupPausedModalOpen, setIsPickupPausedModalOpen] = React.useState<boolean>(false);
+  const [pickupNotice, setPickupNotice] = React.useState<{
+    title: string;
+    message: string;
+  }>({
+    title: "Pickup is paused right now",
+    message: "We'll deliver it free, with a pre-roll on us.",
+  });
+
+  // Fetch store fulfillment settings
+  React.useEffect(() => {
+    let mounted = true;
+    fetch("/api/settings/store")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.settings && mounted) {
+          const enabled = Boolean(data.settings.pickupEnabled);
+          setIsPickupEnabled(enabled);
+          if (data.settings.pickupPausedTitle) {
+            setPickupNotice({
+              title: data.settings.pickupPausedTitle,
+              message:
+                data.settings.pickupPausedMessage ||
+                "We'll deliver it free, with a pre-roll on us.",
+            });
+          }
+          if (!enabled) {
+            setFulfillmentState((curr) =>
+              curr === "pickup" ? "delivery" : curr
+            );
+          }
+        }
+      })
+      .catch(() => null);
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Initialize session ID and load from localStorage
   React.useEffect(() => {
@@ -155,15 +202,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(handler);
   }, [items, fulfillment, deliveryZip, customerInfo, sessionId, isInitialized]);
 
-  // Set fulfillment mode and persist
-  const setFulfillment = React.useCallback((mode: FulfillmentType) => {
-    setFulfillmentState(mode);
-    try {
-      localStorage.setItem(FULFILLMENT_STORAGE_KEY, mode);
-    } catch {
-      // ignore
-    }
-  }, []);
+  // Set fulfillment mode and persist (Intercepts pickup when paused by admin)
+  const setFulfillment = React.useCallback(
+    (mode: FulfillmentType, force = false) => {
+      if (mode === "pickup" && !isPickupEnabled && !force) {
+        setIsPickupPausedModalOpen(true);
+        return;
+      }
+      setFulfillmentState(mode);
+      try {
+        localStorage.setItem(FULFILLMENT_STORAGE_KEY, mode);
+      } catch {
+        // ignore
+      }
+    },
+    [isPickupEnabled]
+  );
 
   const addItem = React.useCallback(
     (product: Omit<CartItem, "quantity">, quantity = 1) => {
@@ -284,6 +338,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         totalCount,
         subtotal,
         isCartDrawerOpen,
+        isPickupEnabled,
+        isPickupPausedModalOpen,
+        setIsPickupPausedModalOpen,
         setFulfillment,
         setDeliveryZip,
         setIsCartDrawerOpen,
@@ -296,6 +353,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
+      <PickupPausedModal
+        isOpen={isPickupPausedModalOpen}
+        onClose={() => setIsPickupPausedModalOpen(false)}
+        title={pickupNotice.title}
+        message={pickupNotice.message}
+      />
     </CartContext.Provider>
   );
 }

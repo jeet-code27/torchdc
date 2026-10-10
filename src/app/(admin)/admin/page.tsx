@@ -65,6 +65,18 @@ export default function AdminDashboardPage() {
 
   const [data, setData] = React.useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [storeSettings, setStoreSettings] = React.useState<{
+    pickupEnabled: boolean;
+    deliveryEnabled: boolean;
+    pickupPausedTitle: string;
+    pickupPausedMessage: string;
+  }>({
+    pickupEnabled: false,
+    deliveryEnabled: true,
+    pickupPausedTitle: "Pickup is paused right now",
+    pickupPausedMessage: "We'll deliver it free, with a pre-roll on us.",
+  });
+  const [isUpdatingPickup, setIsUpdatingPickup] = React.useState(false);
 
   React.useEffect(() => {
     async function loadStats() {
@@ -80,8 +92,50 @@ export default function AdminDashboardPage() {
         setIsLoading(false);
       }
     }
+
+    async function loadSettings() {
+      try {
+        const res = await fetch("/api/admin/settings/store");
+        const json = await res.json();
+        if (json.success && json.settings) {
+          setStoreSettings(json.settings);
+        }
+      } catch (err) {
+        console.error("Failed to load store settings", err);
+      }
+    }
+
     loadStats();
+    loadSettings();
   }, []);
+
+  const handleTogglePickup = async () => {
+    setIsUpdatingPickup(true);
+    const nextState = !storeSettings.pickupEnabled;
+    try {
+      const res = await fetch("/api/admin/settings/store", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pickupEnabled: nextState }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setStoreSettings((prev) => ({ ...prev, pickupEnabled: nextState }));
+        toast.success(
+          nextState
+            ? "Store Pickup ENABLED! Customers can now choose pickup."
+            : "Store Pickup PAUSED! Notice popup will appear if customer clicks pickup.",
+          { duration: 4000 }
+        );
+      } else {
+        toast.error(json.error || "Failed to update pickup setting");
+      }
+    } catch {
+      toast.error("Network error while updating pickup setting");
+    } finally {
+      setIsUpdatingPickup(false);
+    }
+  };
 
   const stats = data?.stats;
 
@@ -273,7 +327,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Store Pickup Queue */}
+            {/* Store Pickup Queue & Operational Switch */}
             <div className="p-4 rounded-lg border border-border/80 bg-background/50 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -289,10 +343,47 @@ export default function AdminDashboardPage() {
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-secondary-foreground">
-                  {stats?.queues.pickup.active || 0} Active
-                </span>
+                <div className="flex items-center gap-2">
+                  {storeSettings.pickupEnabled ? (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      🟢 Active
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
+                      🔴 Paused
+                    </span>
+                  )}
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded bg-secondary text-secondary-foreground">
+                    {stats?.queues.pickup.active || 0} Active
+                  </span>
+                </div>
               </div>
+
+              {/* Operational Control Toggle Button */}
+              <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
+                  {storeSettings.pickupEnabled
+                    ? "Store pickup is open"
+                    : "Pickup paused (customers see notice modal)"}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleTogglePickup}
+                  disabled={isUpdatingPickup}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer shadow-xs disabled:opacity-50 ${
+                    storeSettings.pickupEnabled
+                      ? "bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200"
+                      : "bg-[#5A805B] text-white hover:bg-[#466645]"
+                  }`}
+                >
+                  {isUpdatingPickup
+                    ? "Updating..."
+                    : storeSettings.pickupEnabled
+                    ? "Pause Store Pickup"
+                    : "Enable Store Pickup"}
+                </button>
+              </div>
+
               <div className="text-xs text-muted-foreground flex justify-between pt-1 border-t border-border/60">
                 <span>Pending Prep: {stats?.queues.pickup.pending || 0}</span>
                 <span>Ready for Pickup: {stats?.queues.pickup.ready || 0}</span>
