@@ -212,13 +212,15 @@ export function AboutStorefrontView({
           <button
             type="button"
             onClick={handleOrderDelivery}
-            className="w-full sm:w-auto flex-1 px-8 py-3.5 rounded-full bg-[#5A805B] hover:bg-[#466645] active:scale-95 text-white font-black text-xs sm:text-sm tracking-wider uppercase transition-all shadow-md hover:shadow-lg cursor-pointer"
+            style={{ backgroundColor: "#5A805B", color: "#ffffff" }}
+            className="w-full sm:w-auto flex-1 px-8 py-3.5 rounded-full bg-[#5A805B] hover:brightness-95 active:scale-95 text-white font-black text-xs sm:text-sm tracking-wider uppercase transition-all shadow-md hover:shadow-lg cursor-pointer"
           >
             ORDER DELIVERY
           </button>
           <button
             type="button"
             onClick={handleOrderPickup}
+            style={{ backgroundColor: "#111827", color: "#ffffff" }}
             className="w-full sm:w-auto flex-1 px-8 py-3.5 rounded-full bg-[#111827] hover:bg-black active:scale-95 text-white font-black text-xs sm:text-sm tracking-wider uppercase transition-all shadow-md hover:shadow-lg cursor-pointer"
           >
             ORDER PICKUP

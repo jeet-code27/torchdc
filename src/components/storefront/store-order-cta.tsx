@@ -10,6 +10,7 @@ export function StoreOrderCta() {
         {/* Order Delivery Button */}
         <Link
           href="/shop?mode=delivery"
+          style={{ backgroundColor: "#557754", color: "#ffffff" }}
           className="flex-1 text-center bg-[#557754] hover:bg-[#496848] active:bg-[#3f5a3e] text-white font-extrabold text-sm sm:text-base tracking-wide py-3.5 sm:py-4 px-6 rounded-full shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 uppercase"
         >
           ORDER DELIVERY
@@ -18,6 +19,7 @@ export function StoreOrderCta() {
         {/* Order Pickup Button */}
         <Link
           href="/shop?mode=pickup"
+          style={{ backgroundColor: "#151515", color: "#ffffff" }}
           className="flex-1 text-center bg-[#151515] hover:bg-[#252525] active:bg-black text-white font-extrabold text-sm sm:text-base tracking-wide py-3.5 sm:py-4 px-6 rounded-full shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 uppercase"
         >
           ORDER PICKUP
