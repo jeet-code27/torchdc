@@ -17,8 +17,6 @@ import {
   Sparkles,
   Info,
 } from "lucide-react";
-import { StoreNavbar } from "@/components/storefront/store-navbar";
-import { StoreFooter } from "@/components/storefront/store-footer";
 import { CartAddToOrder } from "@/components/storefront/cart-add-to-order";
 import { useCart } from "@/context/cart-context";
 
@@ -55,10 +53,7 @@ export default function CartPage() {
   const estimatedTotal = Math.max(0, subtotal - discountAmount);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F9FAF9]">
-      <StoreNavbar />
-
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Breadcrumb & Title */}
         <div className="mb-6 sm:mb-8">
           <nav className="flex items-center gap-2 text-xs text-neutral-400 mb-2 font-medium">
@@ -455,9 +450,6 @@ export default function CartPage() {
             </div>
           </div>
         )}
-      </main>
-
-      <StoreFooter />
     </div>
   );
 }

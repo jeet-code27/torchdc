@@ -20,8 +20,6 @@ import {
   ShieldCheck,
   ShoppingBag,
 } from "lucide-react";
-import { StoreNavbar } from "@/components/storefront/store-navbar";
-import { StoreFooter } from "@/components/storefront/store-footer";
 
 interface TrackedOrder {
   _id: string;
@@ -133,10 +131,7 @@ function TrackOrderContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F9FAF9]">
-      <StoreNavbar />
-
-      <main className="flex-1 py-12 px-4 sm:px-6">
+    <div className="py-12 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto space-y-8">
           {/* Header Card */}
           <div className="text-center space-y-3">
@@ -369,9 +364,6 @@ function TrackOrderContent() {
             </div>
           )}
         </div>
-      </main>
-
-      <StoreFooter />
     </div>
   );
 }
@@ -380,12 +372,8 @@ export default function TrackOrderPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="min-h-screen flex flex-col bg-[#F9FAF9]">
-          <StoreNavbar />
-          <main className="flex-1 py-12 px-4 sm:px-6 flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-[#5A805B] border-t-transparent rounded-full animate-spin" />
-          </main>
-          <StoreFooter />
+        <div className="py-12 px-4 sm:px-6 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-[#5A805B] border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >

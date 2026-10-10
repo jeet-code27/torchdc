@@ -3,9 +3,6 @@ import { notFound } from "next/navigation";
 import { connectToDatabase } from "@/lib/db";
 import { Product } from "@/models/Product";
 import { Category } from "@/models/Category";
-import { StoreStatusBar } from "@/components/storefront/store-statusbar";
-import { StoreNavbar } from "@/components/storefront/store-navbar";
-import { StoreFooter } from "@/components/storefront/store-footer";
 import {
   ProductDetailView,
   ProductDetailData,
@@ -270,21 +267,5 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     relatedProducts,
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-[#fafbfa] text-neutral-900 selection:bg-[#557754]/20 selection:text-[#557754]">
-      {/* 1. Top Announcement Status Bar */}
-      <StoreStatusBar />
-
-      {/* 2. Main Store Navbar */}
-      <StoreNavbar />
-
-      {/* 3. Product Detail View */}
-      <div className="flex-1">
-        <ProductDetailView product={productData} />
-      </div>
-
-      {/* 4. Footer */}
-      <StoreFooter />
-    </div>
-  );
+  return <ProductDetailView product={productData} />;
 }

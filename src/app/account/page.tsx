@@ -21,8 +21,6 @@ import {
   ExternalLink,
   ShieldCheck,
 } from "lucide-react";
-import { StoreNavbar } from "@/components/storefront/store-navbar";
-import { StoreFooter } from "@/components/storefront/store-footer";
 import { CustomerAuthModal } from "@/components/storefront/customer-auth-modal";
 
 interface CustomerOrder {
@@ -123,10 +121,7 @@ export default function CustomerAccountPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F9FAF9]">
-      <StoreNavbar />
-
-      <main className="flex-1 py-12 px-4 sm:px-6">
+    <div className="py-12 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto space-y-8">
           {status === "loading" ? (
             <div className="py-24 text-center">
@@ -339,15 +334,12 @@ export default function CustomerAccountPage() {
             </>
           )}
         </div>
-      </main>
 
       {/* Auth Modal if triggered */}
       <CustomerAuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
       />
-
-      <StoreFooter />
     </div>
   );
 }

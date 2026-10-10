@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { connectToDatabase } from "@/lib/db";
 import { Product } from "@/models/Product";
-import { StoreStatusBar } from "@/components/storefront/store-statusbar";
-import { StoreNavbar } from "@/components/storefront/store-navbar";
-import { StoreFooter } from "@/components/storefront/store-footer";
 import { AboutStorefrontView } from "@/components/storefront/about-storefront-view";
 
 export const metadata: Metadata = {
@@ -53,21 +50,5 @@ export default async function AboutPage() {
     // Fallback to client screenshot values
   }
 
-  return (
-    <div className="min-h-screen flex flex-col bg-[#fafbfa] text-neutral-900 selection:bg-[#5A805B]/20 selection:text-[#5A805B]">
-      {/* 1. Announcement Status Bar */}
-      <StoreStatusBar />
-
-      {/* 2. Global Unified Navbar */}
-      <StoreNavbar />
-
-      {/* 3. Main About Us View */}
-      <main className="flex-1">
-        <AboutStorefrontView counts={counts} />
-      </main>
-
-      {/* 4. Deep Brand Green Footer */}
-      <StoreFooter />
-    </div>
-  );
+  return <AboutStorefrontView counts={counts} />;
 }

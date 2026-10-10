@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Phone, MapPin, Clock, ArrowRight } from "lucide-react";
-import { StoreStatusBar } from "@/components/storefront/store-statusbar";
-import { StoreNavbar } from "@/components/storefront/store-navbar";
-import { StoreFooter } from "@/components/storefront/store-footer";
 
 export const metadata: Metadata = {
   title: "Contact Us | Torch Dispensary Washington DC",
@@ -13,11 +10,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white text-neutral-900 selection:bg-[#5A805B]/20 selection:text-[#5A805B]">
-      <StoreStatusBar />
-      <StoreNavbar />
-
-      <main className="flex-1 max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 space-y-10 sm:space-y-12">
+    <div className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 space-y-10 sm:space-y-12">
         {/* ================= HEADER SECTION ================= */}
         <div className="text-center space-y-3 max-w-2xl mx-auto">
           <span className="inline-block px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#EEF5EE] text-[#5A805B]">
@@ -120,9 +113,6 @@ export default function ContactPage() {
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-      </main>
-
-      <StoreFooter />
     </div>
   );
 }

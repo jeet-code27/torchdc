@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { StoreStatusBar } from "@/components/storefront/store-statusbar";
-import { StoreFooter } from "@/components/storefront/store-footer";
 import { ShopCatalog } from "@/components/storefront/shop-catalog";
 import { getShopProducts } from "@/lib/get-shop-products";
 
@@ -44,17 +42,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const products = await getShopProducts();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafbfa] text-neutral-900 selection:bg-[#5A805B]/20 selection:text-[#5A805B]">
-      {/* 1. Top Announcement Status Bar */}
-      <StoreStatusBar />
-
-      {/* 2. Shop Catalog with category pre-filtered */}
-      <div className="flex-1">
-        <ShopCatalog initialProducts={products} initialCategory={normalizedSlug} />
-      </div>
-
-      {/* 3. Footer */}
-      <StoreFooter />
-    </div>
+    <ShopCatalog initialProducts={products} initialCategory={normalizedSlug} />
   );
 }

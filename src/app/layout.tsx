@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/context/cart-context";
 import { StoreAgeGate } from "@/components/storefront/store-age-gate";
+import { StorefrontShell } from "@/components/storefront/storefront-shell";
 
 import { SessionProvider } from "@/components/auth/session-provider";
 
@@ -43,7 +44,7 @@ export default function RootLayout({
             <CartProvider>
               {/* Immediate 21+ Age Gate Modal */}
               <StoreAgeGate />
-              {children}
+              <StorefrontShell>{children}</StorefrontShell>
             </CartProvider>
           </ThemeProvider>
         </SessionProvider>
