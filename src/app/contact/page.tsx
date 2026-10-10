@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Phone, MapPin, Clock, Mail, MessageSquare, ArrowRight } from "lucide-react";
+import { Phone, MapPin, Clock, ArrowRight } from "lucide-react";
 import { StoreStatusBar } from "@/components/storefront/store-statusbar";
 import { StoreNavbar } from "@/components/storefront/store-navbar";
 import { StoreFooter } from "@/components/storefront/store-footer";
@@ -13,86 +13,108 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafbfa] text-neutral-900 selection:bg-[#5A805B]/20 selection:text-[#5A805B]">
+    <div className="min-h-screen flex flex-col bg-white text-neutral-900 selection:bg-[#5A805B]/20 selection:text-[#5A805B]">
       <StoreStatusBar />
       <StoreNavbar />
 
-      <main className="flex-1 max-w-[1200px] w-full mx-auto px-4 sm:px-6 py-10 sm:py-16 space-y-12">
-        <div className="text-center space-y-3 max-w-xl mx-auto">
-          <span className="inline-block px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#5A805B]/15 text-[#5A805B]">
-            Get In Touch
+      <main className="flex-1 max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 space-y-10 sm:space-y-12">
+        {/* ================= HEADER SECTION ================= */}
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <span className="inline-block px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#EEF5EE] text-[#5A805B]">
+            GET IN TOUCH
           </span>
-          <h1 className="text-3xl sm:text-4xl font-black text-neutral-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#111111] tracking-tight">
             We&apos;re Here to Help
           </h1>
-          <p className="text-sm text-neutral-600">
+          <p className="text-xs sm:text-sm md:text-base text-neutral-500 max-w-xl mx-auto leading-relaxed">
             Have a question about your delivery, DC gifting laws, or product recommendations? Reach out anytime.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Phone */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-neutral-200/80 shadow-2xs space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#5A805B]/10 text-[#5A805B] flex items-center justify-center">
-              <Phone className="w-6 h-6" />
-            </div>
+        {/* ================= 3 INFO CARDS GRID ================= */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+          {/* 1. Phone Card */}
+          <div className="bg-white rounded-3xl p-7 sm:p-8 border border-neutral-200/80 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between">
             <div>
-              <h3 className="text-lg font-bold text-neutral-900">Call or Text</h3>
-              <p className="text-xs text-neutral-500 mt-1">Live dispatchers ready daily</p>
+              <div className="w-12 h-12 rounded-2xl bg-[#EEF5EE] text-[#5A805B] flex items-center justify-center mb-5">
+                <Phone className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-[#111111]">
+                Call or Text
+              </h3>
+              <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+                Live dispatchers ready daily
+              </p>
             </div>
-            <a
-              href="tel:+12024681966"
-              className="inline-block text-base font-extrabold text-[#5A805B] hover:underline"
-            >
-              (202) 468-1966
-            </a>
+            <div className="pt-5 mt-auto">
+              <a
+                href="tel:+12024681966"
+                className="inline-block text-base sm:text-lg font-black text-[#5A805B] hover:underline tracking-tight"
+              >
+                (202) 468-1966
+              </a>
+            </div>
           </div>
 
-          {/* Location */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-neutral-200/80 shadow-2xs space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
-              <MapPin className="w-6 h-6" />
-            </div>
+          {/* 2. Pickup Location Card */}
+          <div className="bg-white rounded-3xl p-7 sm:p-8 border border-neutral-200/80 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between">
             <div>
-              <h3 className="text-lg font-bold text-neutral-900">Pickup Location</h3>
-              <p className="text-xs text-neutral-500 mt-1">Curbside & in-store pickup</p>
+              <div className="w-12 h-12 rounded-2xl bg-[#FFF4E5] text-[#E88A1E] flex items-center justify-center mb-5">
+                <MapPin className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-[#111111]">
+                Pickup Location
+              </h3>
+              <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+                Curbside & in-store pickup
+              </p>
             </div>
-            <a
-              href="https://maps.google.com/?q=1025+F+St+NW,+Washington,+DC+20004"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block text-sm font-semibold text-neutral-800 hover:text-[#5A805B] hover:underline"
-            >
-              1025 F St NW, Washington, DC 20004
-            </a>
+            <div className="pt-5 mt-auto">
+              <a
+                href="https://maps.google.com/?q=1025+F+St+NW,+Washington,+DC+20004"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-sm sm:text-base font-bold text-[#111111] hover:text-[#5A805B] transition-colors leading-snug"
+              >
+                1025 F St NW, Washington, DC 20004
+              </a>
+            </div>
           </div>
 
-          {/* Hours */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-neutral-200/80 shadow-2xs space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 flex items-center justify-center">
-              <Clock className="w-6 h-6" />
-            </div>
+          {/* 3. Store Hours Card */}
+          <div className="bg-white rounded-3xl p-7 sm:p-8 border border-neutral-200/80 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between">
             <div>
-              <h3 className="text-lg font-bold text-neutral-900">Store Hours</h3>
-              <p className="text-xs text-neutral-500 mt-1">365 days a year</p>
+              <div className="w-12 h-12 rounded-2xl bg-[#F6EEFF] text-[#8C52FF] flex items-center justify-center mb-5">
+                <Clock className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-[#111111]">
+                Store Hours
+              </h3>
+              <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+                365 days a year
+              </p>
             </div>
-            <p className="text-sm font-extrabold text-neutral-800">
-              Open Daily 7:00 AM – 11:00 PM
-            </p>
+            <div className="pt-5 mt-auto">
+              <p className="text-sm sm:text-base font-bold text-[#111111] leading-snug">
+                Open Daily 7:00 AM – 11:00 PM
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Quick Help Banner */}
-        <div className="rounded-3xl bg-[#5A805B]/10 border border-[#5A805B]/20 p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="space-y-1 text-center sm:text-left">
-            <h3 className="text-lg font-bold text-neutral-900">Ready to place your order?</h3>
-            <p className="text-xs text-neutral-600">
+        {/* ================= BOTTOM CALLOUT BANNER ================= */}
+        <div className="rounded-3xl bg-[#EEF5EE] p-6 sm:p-8 md:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 sm:gap-6">
+          <div className="space-y-1 text-left max-w-xl">
+            <h3 className="text-lg sm:text-xl font-bold text-[#111111]">
+              Ready to place your order?
+            </h3>
+            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
               Average delivery time across DC is 35 to 45 minutes with cash on delivery.
             </p>
           </div>
           <Link
             href="/shop"
-            className="px-6 py-3 rounded-full bg-[#5A805B] hover:bg-[#4a6b4b] text-white text-xs font-bold transition-all flex items-center gap-2 shadow-xs shrink-0"
+            className="px-6 sm:px-7 py-3 rounded-full bg-[#5A805B] hover:bg-[#4a6b4b] text-white text-xs sm:text-sm font-bold transition-all flex items-center gap-2 shadow-sm shrink-0 active:scale-95"
           >
             <span>Shop All Products</span>
             <ArrowRight className="w-4 h-4" />
