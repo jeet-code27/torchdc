@@ -65,8 +65,7 @@ export default function AdminLoginPage() {
       toast.success("Welcome back! Redirecting to dashboard...", {
         id: toastId,
       });
-      router.push("/admin");
-      router.refresh();
+      window.location.href = "/admin";
     } catch {
       toast.error("An unexpected error occurred during login", {
         id: toastId,

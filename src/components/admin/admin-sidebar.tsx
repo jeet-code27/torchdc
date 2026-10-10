@@ -126,7 +126,7 @@ const navItems: NavEntry[] = [
 
 export function AdminSidebar({ isOpenMobile, onCloseMobile }: SidebarProps) {
   const pathname = usePathname();
-  const { hasPermission } = usePermissions();
+  const { hasPermission, isLoading } = usePermissions();
   const [catalogOpen, setCatalogOpen] = React.useState(true);
 
   // Auto-expand catalog if currently viewing a catalog route
@@ -177,11 +177,27 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: SidebarProps) {
 
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-        {navItems.map((item) => {
-          // If top-level permission check fails, hide
-          if (item.permission && !hasPermission(item.permission)) {
-            return null;
-          }
+        {isLoading ? (
+          <div className="space-y-1.5 px-1 py-1 animate-pulse">
+            {[...Array(7)].map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-neutral-200/50 dark:bg-neutral-800/50"
+              >
+                <div className="w-4 h-4 rounded bg-neutral-300 dark:bg-neutral-700 shrink-0" />
+                <div
+                  className="h-3.5 rounded bg-neutral-300 dark:bg-neutral-700"
+                  style={{ width: `${60 + (i % 3) * 18}%` }}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          navItems.map((item) => {
+            // If top-level permission check fails, hide
+            if (item.permission && !hasPermission(item.permission)) {
+              return null;
+            }
 
           // If item has children (Catalog)
           if (item.children) {
@@ -272,7 +288,8 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: SidebarProps) {
               <span>{item.title}</span>
             </Link>
           );
-        })}
+        })
+      )}
       </div>
 
       {/* Footer Info */}
