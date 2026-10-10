@@ -103,6 +103,7 @@ export function ShopProductCard({
               src={product.image}
               alt={product.name}
               fill
+              sizes="64px"
               className="object-contain mix-blend-multiply transition-transform group-hover:scale-105"
             />
           </div>

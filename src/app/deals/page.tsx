@@ -6,39 +6,23 @@ import { ShopCatalog } from "@/components/storefront/shop-catalog";
 import { getShopProducts } from "@/lib/get-shop-products";
 
 export const metadata: Metadata = {
-  title: "Shop All Cannabis Products | Torch Dispensary Washington DC",
+  title: "Today's Cannabis Deals & Specials | Torch Dispensary Washington DC",
   description:
-    "Explore Torch's curated dispensary menu: Midshelf, Topshelf, and Private Reserve flower, pre-rolls, disposables, concentrates, edibles, and mushrooms. Fast DC delivery.",
+    "Check out today's exclusive specials at Torch Dispensary: Wake & Bake morning discounts, ounce bundles, and daily dispensary deals with fast DC delivery.",
 };
 
 export const revalidate = 60;
 
-export default async function ShopPage({
-  searchParams,
-}: {
-  searchParams?: Promise<{ category?: string; q?: string }>;
-}) {
-  const resolvedParams = searchParams ? await searchParams : {};
+export default async function DealsPage() {
   const products = await getShopProducts();
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fafbfa] text-neutral-900 selection:bg-[#5A805B]/20 selection:text-[#5A805B]">
-      {/* 1. Top Announcement Status Bar */}
       <StoreStatusBar />
-
-      {/* 2. Unified Global Navbar */}
       <StoreNavbar />
-
-      {/* 3. Shop Catalog with live products from MongoDB */}
       <div className="flex-1">
-        <ShopCatalog
-          initialProducts={products}
-          initialCategory={resolvedParams.category}
-          initialQuery={resolvedParams.q}
-        />
+        <ShopCatalog initialProducts={products} initialCategory="best-sellers" />
       </div>
-
-      {/* 4. Footer */}
       <StoreFooter />
     </div>
   );

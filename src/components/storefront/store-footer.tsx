@@ -17,6 +17,7 @@ export function StoreFooter() {
   const companyLinks = [
     { name: "About Us", href: "/about" },
     { name: "Deals", href: "/deals" },
+    { name: "Track Order", href: "/track-order" },
     { name: "Blog", href: "/blog" },
     { name: "Contact Us", href: "/contact" },
     { name: "FAQ", href: "/faq" },

@@ -143,6 +143,7 @@ export default async function OrderSuccessPage({
                     src={it.image || "/images/placeholder-product.png"}
                     alt={it.name}
                     fill
+                    sizes="48px"
                     className="object-contain mix-blend-multiply"
                   />
                 </div>

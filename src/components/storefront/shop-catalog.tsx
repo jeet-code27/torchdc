@@ -6,23 +6,13 @@ import Link from "next/link";
 import {
   Search,
   SlidersHorizontal,
-  ArrowLeft,
-  ShoppingBag,
-  Flame,
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  Phone,
-  Menu,
-  X,
   Tag,
   Filter,
-  Home,
-  Info,
-  HelpCircle,
-  ArrowRight,
 } from "lucide-react";
-import { useCart, FulfillmentType } from "@/context/cart-context";
+import { useCart } from "@/context/cart-context";
 import { ShopSidebar, STORE_CATEGORIES } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopFlowerTiers } from "./shop-flower-tiers";
@@ -80,9 +70,14 @@ function getPageNumbers(currentPage: number, totalPages: number): (number | stri
 interface ShopCatalogProps {
   initialProducts?: ShopProduct[];
   initialCategory?: string;
+  initialQuery?: string;
 }
 
-export function ShopCatalog({ initialProducts = [], initialCategory }: ShopCatalogProps) {
+export function ShopCatalog({
+  initialProducts = [],
+  initialCategory,
+  initialQuery = "",
+}: ShopCatalogProps) {
   const { fulfillment, setFulfillment, totalCount } = useCart();
   const [products, setProducts] = React.useState<ShopProduct[]>(initialProducts);
 
@@ -103,10 +98,16 @@ export function ShopCatalog({ initialProducts = [], initialCategory }: ShopCatal
 
   const [activeTier, setActiveTier] = React.useState("all");
   const [activeStrain, setActiveStrain] = React.useState("all");
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchQuery, setSearchQuery] = React.useState(initialQuery || "");
+
+  React.useEffect(() => {
+    if (initialQuery !== undefined) {
+      setSearchQuery(initialQuery);
+    }
+  }, [initialQuery]);
+
   const [sortBy, setSortBy] = React.useState("popular");
   const [showTierModal, setShowTierModal] = React.useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState(1);
 
   // Filter products
@@ -171,374 +172,11 @@ export function ShopCatalog({ initialProducts = [], initialCategory }: ShopCatal
 
   return (
     <div className="min-h-screen bg-[#fafbfa] text-neutral-900">
-      {/* ================= DESKTOP HEADER (Screenshot 1) ================= */}
-      <div className="hidden lg:block border-b border-neutral-200/70 bg-white">
-        <div className="max-w-[1340px] mx-auto px-6 py-4 flex items-center justify-between gap-6">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0" aria-label="Torch Home">
-            <div className="relative w-36 h-12">
-              <Image
-                src="/images/torch-logo.svg"
-                alt="Torch Dispensary"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-          </Link>
 
-          {/* Large Search Pill */}
-          <div className="flex-1 max-w-xl relative">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="What are you looking for today?"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-neutral-100/80 hover:bg-neutral-100 focus:bg-white text-sm text-neutral-800 placeholder-neutral-400 rounded-full pl-11 pr-4 py-3 outline-none border border-transparent focus:border-neutral-300 transition-all"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-neutral-700"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-
-          {/* Links & Phone */}
-          <div className="flex items-center gap-6 text-sm font-bold text-neutral-700">
-            <Link href="/" className="hover:text-[#557754] transition-colors">
-              Home
-            </Link>
-            <Link href="/shop" className="text-[#557754] font-black transition-colors">
-              Shop All
-            </Link>
-            <Link href="/deals" className="hover:text-[#557754] transition-colors">
-              Deals
-            </Link>
-            <Link href="/about" className="hover:text-[#557754] transition-colors">
-              About
-            </Link>
-            <Link href="/contact" className="hover:text-[#557754] transition-colors">
-              Contact
-            </Link>
-
-            <a
-              href="tel:+12024681966"
-              className="inline-flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 px-4 py-2.5 rounded-full text-xs font-bold transition-all"
-            >
-              <Phone className="w-3.5 h-3.5 text-[#557754]" />
-              <span>(202) 468-1966</span>
-            </a>
-
-            <Link
-              href="/cart"
-              className="inline-flex items-center gap-2 bg-[#557754] hover:bg-[#466645] text-white font-bold text-xs px-4 py-2.5 rounded-full shadow-xs hover:shadow transition-all group"
-            >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              <span>Cart</span>
-              <span className="w-4 h-4 rounded-full bg-white/25 text-white text-[10px] flex items-center justify-center font-bold">
-                {totalCount}
-              </span>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* ================= MOBILE HEADER (Matching Home page header layout) ================= */}
-      <div className="lg:hidden bg-white border-b border-neutral-100 sticky top-0 z-30">
-        <div className="px-4 py-3 flex items-center justify-between">
-          {/* Left: Phone Call button */}
-          <div className="flex items-center">
-            <a
-              href="tel:+12024681966"
-              className="w-10 h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-700 flex items-center justify-center transition-colors"
-              aria-label="Call Torch"
-              title="Call (202) 468-1966"
-            >
-              <Phone className="w-4 h-4 text-[#5A805B]" />
-            </a>
-          </div>
-
-          {/* Centered Logo (links to Home) */}
-          <Link href="/" className="relative w-32 h-10">
-            <Image
-              src="/images/torch-logo.svg"
-              alt="Torch"
-              fill
-              className="object-contain"
-              priority
-            />
-          </Link>
-
-          {/* Right: Cart Icon Circle + Hamburger Menu (Matching Home page!) */}
-          <div className="flex items-center gap-2">
-            <Link
-              href="/cart"
-              className="relative w-10 h-10 rounded-full bg-[#557754] text-white flex items-center justify-center shadow-xs"
-              aria-label="Cart"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              {totalCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#E8561E] text-white text-[11px] font-black flex items-center justify-center shadow-xs">
-                  {totalCount}
-                </span>
-              )}
-            </Link>
-
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="w-10 h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 flex items-center justify-center transition-all cursor-pointer shadow-2xs"
-              aria-label="Open navigation menu"
-              title="Menu"
-            >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* ================= MOBILE SLIDE-OVER SIDEBAR DRAWER (Slides from LEFT) ================= */}
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 z-50 flex justify-start">
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-
-            {/* Drawer Panel (Slides from LEFT) */}
-            <div className="relative w-[85%] max-w-sm bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-left duration-300">
-              {/* Top Bar */}
-              <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
-                <div className="relative w-32 h-10">
-                  <Image
-                    src="/images/torch-logo.svg"
-                    alt="Torch Dispensary"
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center justify-center cursor-pointer transition-colors"
-                  aria-label="Close menu"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Scrollable Body */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-5">
-                {/* 1. PRIMARY SITE NAVIGATION (Home, Shop, Deals, About, Contact) */}
-                <div>
-                  <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-1">
-                    Navigation
-                  </span>
-                  <nav className="space-y-1">
-                    <Link
-                      href="/"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-neutral-800 hover:bg-neutral-50 transition-all"
-                    >
-                      <span className="flex items-center gap-3">
-                        <Home className="w-4 h-4 text-[#557754]" />
-                        <span>Home</span>
-                      </span>
-                      <ArrowRight className="w-4 h-4 text-neutral-300" />
-                    </Link>
-
-                    <Link
-                      href="/shop"
-                      onClick={() => {
-                        setActiveCategory("all");
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-neutral-800 hover:bg-neutral-50 transition-all"
-                    >
-                      <span className="flex items-center gap-3">
-                        <ShoppingBag className="w-4 h-4 text-[#557754]" />
-                        <span>Shop All</span>
-                      </span>
-                      <ArrowRight className="w-4 h-4 text-neutral-300" />
-                    </Link>
-
-                    <Link
-                      href="/deals"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-[#2F4F30] bg-[#edf4ed] hover:bg-[#e4ede4] transition-all"
-                    >
-                      <span className="flex items-center gap-3">
-                        <Flame className="w-4 h-4 text-[#E8561E]" />
-                        <span>Today&apos;s Deals</span>
-                      </span>
-                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#E8561E] text-white">
-                        HOT
-                      </span>
-                    </Link>
-
-                    <Link
-                      href="/about"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-neutral-800 hover:bg-neutral-50 transition-all"
-                    >
-                      <span className="flex items-center gap-3">
-                        <Info className="w-4 h-4 text-[#557754]" />
-                        <span>About Us</span>
-                      </span>
-                      <ArrowRight className="w-4 h-4 text-neutral-300" />
-                    </Link>
-
-                    <Link
-                      href="/contact"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-neutral-800 hover:bg-neutral-50 transition-all"
-                    >
-                      <span className="flex items-center gap-3">
-                        <Phone className="w-4 h-4 text-[#557754]" />
-                        <span>Contact</span>
-                      </span>
-                      <ArrowRight className="w-4 h-4 text-neutral-300" />
-                    </Link>
-
-                    <Link
-                      href="/#faq"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-neutral-800 hover:bg-neutral-50 transition-all"
-                    >
-                      <span className="flex items-center gap-3">
-                        <HelpCircle className="w-4 h-4 text-[#557754]" />
-                        <span>FAQs & Help</span>
-                      </span>
-                      <ArrowRight className="w-4 h-4 text-neutral-300" />
-                    </Link>
-                  </nav>
-                </div>
-
-                {/* 2. DISPENSARY MENU CATEGORIES */}
-                <div className="pt-3 border-t border-neutral-100">
-                  <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-1">
-                    Shop Categories
-                  </span>
-                  <nav className="space-y-1">
-                    {STORE_CATEGORIES.map((cat) => {
-                      const isActive = activeCategory === cat.slug;
-                      return (
-                        <button
-                          key={cat.slug}
-                          type="button"
-                          onClick={() => {
-                            setActiveCategory(cat.slug);
-                            if (cat.slug !== "flowers") setActiveTier("all");
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all text-left cursor-pointer ${
-                            isActive
-                              ? "bg-[#edf4ed] text-[#2F4F30] font-black"
-                              : "text-neutral-800 hover:bg-neutral-50"
-                          }`}
-                        >
-                          <span className="flex items-center gap-2.5">
-                            {cat.icon}
-                            <span>{cat.name}</span>
-                          </span>
-                          <ChevronRight className="w-4 h-4 text-neutral-400" />
-                        </button>
-                      );
-                    })}
-                  </nav>
-                </div>
-
-                {/* 3. ORDER MODE SWITCH */}
-                <div className="pt-3 border-t border-neutral-100">
-                  <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-1">
-                    Order Mode
-                  </span>
-                  <div className="bg-neutral-100 p-1 rounded-full flex text-xs font-bold">
-                    <button
-                      type="button"
-                      onClick={() => setFulfillment("delivery")}
-                      className={`flex-1 py-2 text-center rounded-full transition-all ${
-                        fulfillment === "delivery"
-                          ? "bg-[#557754] text-white font-black shadow-xs"
-                          : "text-neutral-600"
-                      }`}
-                    >
-                      Delivery
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFulfillment("pickup")}
-                      className={`flex-1 py-2 text-center rounded-full transition-all ${
-                        fulfillment === "pickup"
-                          ? "bg-[#557754] text-white font-black shadow-xs"
-                          : "text-neutral-600"
-                      }`}
-                    >
-                      Pickup
-                    </button>
-                  </div>
-                </div>
-
-                {/* 4. CALL SUPPORT BUTTON & INFO */}
-                <div className="pt-3 border-t border-neutral-100 space-y-2">
-                  <a
-                    href="tel:+12024681966"
-                    className="w-full bg-[#557754] hover:bg-[#466645] text-white font-bold text-xs py-3 rounded-full flex items-center justify-center gap-2 transition-all shadow-xs"
-                  >
-                    <Phone className="w-3.5 h-3.5" />
-                    <span>Call (202) 468-1966</span>
-                  </a>
-                  <p className="text-[11px] text-neutral-400 text-center leading-normal">
-                    1025 F St NW, Washington, DC · Open daily 7AM - 11PM
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Mobile Fulfillment Segmented Switch */}
-        <div className="px-4 pb-2.5 pt-1">
-          <div className="bg-neutral-100 p-1 rounded-full flex items-center text-xs font-bold">
-            <button
-              type="button"
-              onClick={() => setFulfillment("delivery")}
-              className={`flex-1 py-2 text-center rounded-full transition-all cursor-pointer ${
-                fulfillment === "delivery"
-                  ? "bg-[#557754] text-white shadow-xs font-black"
-                  : "text-neutral-600 hover:text-neutral-900"
-              }`}
-            >
-              Delivery
-            </button>
-            <button
-              type="button"
-              onClick={() => setFulfillment("pickup")}
-              className={`flex-1 py-2 text-center rounded-full transition-all cursor-pointer ${
-                fulfillment === "pickup"
-                  ? "bg-[#557754] text-white shadow-xs font-black"
-                  : "text-neutral-600 hover:text-neutral-900"
-              }`}
-            >
-              Pickup
-            </button>
-          </div>
-          <p className="text-[11px] text-neutral-500 text-center mt-1.5">
-            {fulfillment === "delivery"
-              ? "Free same-day delivery across Washington, DC"
-              : "Curbside pickup at 1025 F St NW, Washington, DC"}
-          </p>
-        </div>
-      </div>
 
       {/* ================= MAIN CONTAINER ================= */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-6">
-        <div className="flex gap-6 xl:gap-8 items-start">
+      <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-5 lg:px-6 py-4 sm:py-6">
+        <div className="flex gap-4 lg:gap-5 xl:gap-6 items-start">
           {/* ================= 1. DESKTOP LEFT RAIL (Sticky Categories & Nav) ================= */}
           <div className="hidden lg:block shrink-0 sticky top-24 self-start">
             <ShopSidebar
@@ -825,8 +463,8 @@ export function ShopCatalog({ initialProducts = [], initialCategory }: ShopCatal
             </div>
           </main>
 
-          {/* ================= 3. DESKTOP RIGHT ORDER DRAWER (Sticky Order Summary) ================= */}
-          <div className="hidden lg:block shrink-0 sticky top-24 self-start">
+          {/* ================= 3. DESKTOP RIGHT RAIL (Sticky Cart Sidebar) ================= */}
+          <div className="hidden xl:block shrink-0 sticky top-24 self-start">
             <ShopCartSidebar />
           </div>
         </div>

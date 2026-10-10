@@ -112,14 +112,14 @@ export async function PATCH(
       updatedOrder = await Order.findByIdAndUpdate(
         id,
         { $set: updates },
-        { new: true }
+        { returnDocument: "after" }
       );
     }
     if (!updatedOrder) {
       updatedOrder = await Order.findOneAndUpdate(
         { orderNumber: id },
         { $set: updates },
-        { new: true }
+        { returnDocument: "after" }
       );
     }
 

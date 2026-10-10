@@ -127,7 +127,7 @@ export async function POST(request: Request) {
     }
 
     const updatedCart = await Cart.findOneAndUpdate(query, updateData, {
-      new: true,
+      returnDocument: "after",
       upsert: true,
       setDefaultsOnInsert: true,
     });

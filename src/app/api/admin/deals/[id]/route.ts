@@ -61,7 +61,7 @@ export async function PUT(
     if (body.usageLimit !== undefined) updateData.usageLimit = body.usageLimit ? Number(body.usageLimit) : undefined;
     if (body.isActive !== undefined) updateData.isActive = Boolean(body.isActive);
 
-    const coupon = await Coupon.findByIdAndUpdate(id, { $set: updateData }, { new: true });
+    const coupon = await Coupon.findByIdAndUpdate(id, { $set: updateData }, { returnDocument: "after" });
     if (!coupon) {
       return NextResponse.json({ success: false, error: "Coupon not found" }, { status: 404 });
     }

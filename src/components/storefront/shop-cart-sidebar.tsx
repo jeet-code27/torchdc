@@ -110,6 +110,7 @@ export function ShopCartSidebar() {
                       src={item.image}
                       alt={item.name}
                       fill
+                      sizes="48px"
                       className="object-contain"
                     />
                   </div>

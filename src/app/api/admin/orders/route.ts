@@ -150,7 +150,7 @@ export async function PATCH(req: NextRequest) {
     const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
       { $set: updates },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!updatedOrder) {
