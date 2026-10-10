@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Flame, Sparkles, Sprout, Wind, Zap, Disc, Cookie, Cherry, Tag, Phone } from "lucide-react";
 
 export interface CategoryOption {
@@ -20,6 +21,7 @@ export const STORE_CATEGORIES: CategoryOption[] = [
   { slug: "concentrates", name: "Concentrates", icon: <Disc className="w-4 h-4 text-amber-600" /> },
   { slug: "edibles", name: "Edibles", icon: <Cookie className="w-4 h-4 text-rose-500" /> },
   { slug: "mushrooms", name: "Mushrooms", icon: <Cherry className="w-4 h-4 text-teal-600" /> },
+  { slug: "deals", name: "Deals", icon: <Tag className="w-4 h-4 text-[#5A805B]" /> },
 ];
 
 interface ShopSidebarProps {
@@ -33,7 +35,13 @@ export function ShopSidebar({
   onSelectCategory,
   scrollLinks = false,
 }: ShopSidebarProps) {
+  const router = useRouter();
+
   const handleCategoryClick = (slug: string) => {
+    if (slug === "deals") {
+      router.push("/deals");
+      return;
+    }
     if (onSelectCategory) {
       onSelectCategory(slug);
     }
