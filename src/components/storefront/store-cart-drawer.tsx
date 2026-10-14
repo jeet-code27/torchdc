@@ -217,7 +217,7 @@ export function StoreCartDrawer() {
 
             <p className="text-[10px] text-neutral-400 text-center flex items-center justify-center gap-1">
               <ShieldCheck className="w-3 h-3 text-[#5A805B]" />
-              Initiative 71 Compliant • Cash On Delivery
+              21+ ID Required • Cash On Delivery
             </p>
           </div>
         )}

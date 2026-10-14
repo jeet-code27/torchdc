@@ -47,7 +47,7 @@ export async function generateMetadata({
       title: `${cleanTitle} | Order Cannabis Delivery & Pickup in Washington DC`,
       description:
         product.shortDescription ||
-        `Order ${cleanTitle} online from Torch. Fast 35-45 minute cannabis delivery across Washington D.C. Initiative 71 compliant.`,
+        `Order ${cleanTitle} online from Torch. Fast cannabis delivery across Washington D.C. 21+ only.`,
       openGraph: {
         title: `${cleanTitle} | Torch Dispensary`,
         description:

@@ -507,7 +507,7 @@ export function CustomerAuthModal({
           <div className="mt-4 pt-4 border-t border-zinc-100 text-center">
             <p className="text-[11px] text-zinc-400 flex items-center justify-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5 text-[#5A805B]" />
-              <span>Initiative 71 Compliant · 21+ Age Verification Required</span>
+              <span>21+ Age Verification Required · Valid ID Required</span>
             </p>
           </div>
         </div>

@@ -70,7 +70,7 @@ export async function sendOrderConfirmationEmail(order: IOrder) {
     const fulfillmentText =
       order.fulfillment === "delivery"
         ? `🚚 Delivery to: <strong>${order.deliveryAddress?.street || ""}${order.deliveryAddress?.apartment ? `, Apt ${order.deliveryAddress.apartment}` : ""}, ${order.deliveryAddress?.city || "Washington"}, DC ${order.deliveryAddress?.zip || "20005"}</strong>`
-        : `🏪 Counter Pickup at: <strong>1025 F St NW, Washington, DC 20004</strong>`;
+        : `🏪 Counter Pickup at: <strong>1000 G St NW, Washington, DC 20001</strong>`;
 
     const html = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
@@ -126,7 +126,7 @@ export async function sendOrderConfirmationEmail(order: IOrder) {
 
           <!-- Compliance Notice -->
           <div style="background-color: #f7f9f7; border: 1px solid #e2ebe3; border-radius: 8px; padding: 12px; margin: 20px 0; text-align: center; font-size: 12px; color: ${BRAND_GREEN}; font-weight: 500;">
-            🌿 <strong>Initiative 71 Compliant</strong> · Please have your 21+ valid government ID ready at the door.
+            🌿 <strong>21+ Valid ID Required</strong> · Please have your government-issued photo ID ready at the door.
           </div>
 
           <!-- Professional Footer with info@torchdc.co -->
@@ -135,7 +135,7 @@ export async function sendOrderConfirmationEmail(order: IOrder) {
               Have questions about your order? Reply directly to this email or reach us at <a href="mailto:${PUBLIC_REPLY_TO}" style="color: ${BRAND_GREEN}; font-weight: 700; text-decoration: none;">${PUBLIC_REPLY_TO}</a>
             </p>
             <p style="margin: 6px 0 0; color: #9ca3af; font-size: 11px;">
-              Torch Dispensary · 1025 F St NW, Washington, DC 20004 · <a href="https://torchdc.co" style="color: ${BRAND_GREEN}; text-decoration: none;">torchdc.co</a>
+              Torch Dispensary · 1000 G St NW, Washington, DC 20001 · <a href="https://torchdc.co" style="color: ${BRAND_GREEN}; text-decoration: none;">torchdc.co</a>
             </p>
           </div>
         </div>
@@ -192,7 +192,7 @@ export async function sendAdminNewOrderNotification(order: IOrder) {
           ${
             order.fulfillment === "delivery"
               ? `<strong>Delivery Address:</strong> ${order.deliveryAddress?.street || ""}${order.deliveryAddress?.apartment ? `, Apt ${order.deliveryAddress.apartment}` : ""}, ${order.deliveryAddress?.city || "Washington"}, DC ${order.deliveryAddress?.zip || ""}<br/>`
-              : `<strong>Fulfillment:</strong> Store Pickup at 1025 F St NW<br/>`
+              : `<strong>Fulfillment:</strong> Store Pickup at 1000 G St NW<br/>`
           }
           ${order.deliveryNotes ? `<strong>Customer Notes:</strong> "${order.deliveryNotes}"<br/>` : ""}
         </div>

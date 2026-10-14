@@ -148,7 +148,7 @@ export async function POST(request: Request) {
             }
           : undefined,
       deliveryNotes: deliveryNotes?.trim() || "",
-      pickupLocation: "1025 F St NW, Washington, DC",
+      pickupLocation: "1000 G St NW, Washington, DC",
       items: orderItems,
       subtotal,
       deliveryFee,

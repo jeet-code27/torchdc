@@ -201,18 +201,18 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
                 <Info className="w-4 h-4" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-neutral-900">
-                Our Organization and Initiative 71 Delivery
+                Our Organization and Washington D.C. Delivery
               </h3>
             </div>
 
             <div className="text-xs sm:text-sm text-neutral-600 leading-relaxed space-y-3">
               <p>
-                Torch operates in strict compliance with the laws of the District of Columbia under <strong>Initiative 71</strong>. We are a premier Washington D.C. gifting service committed to providing safe, discreet, and reliable delivery of premium cannabis products directly to eligible adults aged 21 and older.
+                Torch operates in strict compliance with Washington D.C. cannabis regulations. We are a premier Washington D.C. delivery service committed to providing safe, discreet, and reliable delivery of premium cannabis products directly to eligible adults aged 21 and older.
               </p>
               {showFullLegalText && (
                 <div className="space-y-3 animate-in fade-in duration-200">
                   <p>
-                    All items are gifted pursuant to D.C. Official Code § 48-904.01. Valid government-issued photo identification (Driver&apos;s License, Passport, or State ID) is required upon delivery or pickup. We do not deliver to federal lands, including the National Mall, military bases, or federal buildings.
+                    Valid government-issued photo identification (Driver&apos;s License, Passport, or State ID) is required upon delivery or pickup. We do not deliver to federal lands, including the National Mall, military bases, or federal buildings.
                   </p>
                   <p>
                     Payment is handled securely via Cash On Delivery (COD) upon inspection of your order. Our dedicated dispatchers ensure average delivery times of 35 to 45 minutes across Dupont Circle, Georgetown, Capitol Hill, Adams Morgan, Navy Yard, and greater Washington D.C.

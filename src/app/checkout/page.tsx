@@ -51,6 +51,14 @@ export default function CheckoutPage() {
   const [isAgeVerified, setIsAgeVerified] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState("");
+  const [fieldErrors, setFieldErrors] = React.useState<{
+    name?: string;
+    phone?: string;
+    email?: string;
+    street?: string;
+    zip?: string;
+    age?: string;
+  }>({});
 
   // Promo code states
   const [promoCode, setPromoCode] = React.useState("");
@@ -122,6 +130,14 @@ export default function CheckoutPage() {
     }
   };
 
+  const clearFieldError = (field: keyof typeof fieldErrors) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      return { ...prev, [field]: undefined };
+    });
+    setErrorMsg("");
+  };
+
   // Live phone formatter for (XXX) XXX-XXXX
   const handlePhoneChange = (val: string) => {
     let digits = val.replace(/\D/g, "");
@@ -138,35 +154,74 @@ export default function CheckoutPage() {
       formatted = `(${digits}`;
     }
     setPhone(formatted);
+    clearFieldError("phone");
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
+    const errors: typeof fieldErrors = {};
 
     if (items.length === 0) {
-      setErrorMsg("Your cart is empty. Please add items from our menu first.");
+      const msg = "Your cart is empty. Please add items from our menu first.";
+      setErrorMsg(msg);
+      toast.error(msg, { id: "checkout-empty-cart" });
       return;
     }
 
-    if (!name.trim() || !email.trim() || !phone.trim()) {
-      setErrorMsg("Please fill in your name, email, and mobile phone number.");
-      return;
+    if (!name.trim()) {
+      errors.name = "Please enter your full name.";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      errors.email = "Please enter your email address for order receipts.";
+    } else if (!emailRegex.test(email.trim())) {
+      errors.email = "Please enter a valid email address (e.g. name@example.com).";
     }
 
     const phoneDigits = phone.replace(/\D/g, "");
-    if (phoneDigits.length < 10) {
-      setErrorMsg("Please enter a valid 10-digit mobile phone number (e.g. (202) 555-0143).");
-      return;
+    if (!phone.trim()) {
+      errors.phone = "Please enter your mobile phone number for delivery SMS.";
+    } else if (phoneDigits.length < 10) {
+      errors.phone = "Please enter a complete 10-digit mobile phone number.";
     }
 
-    if (fulfillment === "delivery" && (!street.trim() || !zip.trim())) {
-      setErrorMsg("Please enter your Washington DC street address and ZIP code.");
-      return;
+    if (fulfillment === "delivery") {
+      if (!street.trim()) {
+        errors.street = "Please enter your Washington DC street address.";
+      }
+      if (!zip.trim()) {
+        errors.zip = "Please enter your DC ZIP code.";
+      } else if (zip.replace(/\D/g, "").length < 5) {
+        errors.zip = "Please enter a valid 5-digit ZIP code.";
+      }
     }
 
     if (!isAgeVerified) {
-      setErrorMsg("You must confirm you are 21 years of age or older.");
+      errors.age = "You must check the box confirming you are 21 years of age or older.";
+    }
+
+    setFieldErrors(errors);
+
+    const errorKeys = Object.keys(errors) as (keyof typeof errors)[];
+    if (errorKeys.length > 0) {
+      const firstKey = errorKeys[0];
+      const firstMsg = errors[firstKey]!;
+      setErrorMsg(firstMsg);
+      toast.error(firstMsg, { duration: 4000, id: "checkout-error-toast" });
+
+      // Smooth scroll to the first invalid field and focus it immediately
+      const inputEl = document.getElementById(`input-${firstKey}`);
+      if (inputEl) {
+        inputEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(() => inputEl.focus(), 300);
+      } else {
+        const topErrorEl = document.getElementById("checkout-top-error");
+        if (topErrorEl) {
+          topErrorEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
       return;
     }
 
@@ -280,11 +335,12 @@ export default function CheckoutPage() {
             {/* ================= LEFT COLUMN: CHECKOUT FORM ================= */}
             <form
               onSubmit={handlePlaceOrder}
+              noValidate
               className="lg:col-span-7 space-y-6"
             >
               {errorMsg && (
-                <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-semibold flex items-center gap-2.5">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+                <div id="checkout-top-error" className="p-4 rounded-2xl bg-red-50 border-2 border-red-300 text-red-700 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-in fade-in duration-200">
+                  <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
                   <span>{errorMsg}</span>
                 </div>
               )}
@@ -338,7 +394,7 @@ export default function CheckoutPage() {
                       </span>
                     </div>
                     <span className="text-[11px] text-neutral-500 font-medium leading-normal">
-                      1025 F St NW, Washington, DC
+                      1000 G St NW, Washington, DC
                     </span>
                   </button>
                 </div>
@@ -351,7 +407,7 @@ export default function CheckoutPage() {
                         Pickup Location:
                       </span>
                       <span className="text-neutral-600">
-                        1025 F St NW, Washington, DC 20004 · Open daily 7AM - 11PM.
+                        1000 G St NW, Washington, DC 20001 · Open daily 7AM - 11PM.
                         Your order will be ready for curbside handoff within 15 minutes.
                       </span>
                     </div>
@@ -386,14 +442,28 @@ export default function CheckoutPage() {
                       Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
+                      id="input-name"
                       type="text"
                       required
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        clearFieldError("name");
+                      }}
                       onBlur={handleBlurCustomerInfo}
                       placeholder="e.g. Alex Morgan"
-                      className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#557754]/30 focus:border-[#557754]"
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-white text-sm font-medium focus:outline-none transition-all ${
+                        fieldErrors.name
+                          ? "border-red-500 bg-red-50/20 ring-2 ring-red-200 focus:border-red-600 focus:ring-red-300"
+                          : "border-neutral-200 focus:ring-2 focus:ring-[#557754]/30 focus:border-[#557754]"
+                      }`}
                     />
+                    {fieldErrors.name && (
+                      <p className="text-[11px] text-red-600 font-bold flex items-center gap-1 mt-1 animate-in fade-in duration-150">
+                        <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                        {fieldErrors.name}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
@@ -416,6 +486,7 @@ export default function CheckoutPage() {
                         <span>+1</span>
                       </div>
                       <input
+                        id="input-phone"
                         type="tel"
                         required
                         value={phone}
@@ -423,9 +494,19 @@ export default function CheckoutPage() {
                         onBlur={handleBlurCustomerInfo}
                         placeholder="(202) 555-0199"
                         maxLength={14}
-                        className="w-full pl-14 pr-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
+                        className={`w-full pl-14 pr-4 py-2.5 rounded-xl border bg-white text-sm font-medium focus:outline-none transition-all ${
+                          fieldErrors.phone
+                            ? "border-red-500 bg-red-50/20 ring-2 ring-red-200 focus:border-red-600 focus:ring-red-300"
+                            : "border-neutral-200 focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
+                        }`}
                       />
                     </div>
+                    {fieldErrors.phone && (
+                      <p className="text-[11px] text-red-600 font-bold flex items-center gap-1 mt-1 animate-in fade-in duration-150">
+                        <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                        {fieldErrors.phone}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
@@ -433,14 +514,28 @@ export default function CheckoutPage() {
                       Email Address (for Receipt) <span className="text-red-500">*</span>
                     </label>
                     <input
+                      id="input-email"
                       type="email"
                       required
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        clearFieldError("email");
+                      }}
                       onBlur={handleBlurCustomerInfo}
                       placeholder="e.g. alex@example.com"
-                      className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#557754]/30 focus:border-[#557754]"
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-white text-sm font-medium focus:outline-none transition-all ${
+                        fieldErrors.email
+                          ? "border-red-500 bg-red-50/20 ring-2 ring-red-200 focus:border-red-600 focus:ring-red-300"
+                          : "border-neutral-200 focus:ring-2 focus:ring-[#557754]/30 focus:border-[#557754]"
+                      }`}
                     />
+                    {fieldErrors.email && (
+                      <p className="text-[11px] text-red-600 font-bold flex items-center gap-1 mt-1 animate-in fade-in duration-150">
+                        <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                        {fieldErrors.email}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -458,14 +553,28 @@ export default function CheckoutPage() {
                         Street Address <span className="text-red-500">*</span>
                       </label>
                       <input
+                        id="input-street"
                         type="text"
                         required
                         value={street}
-                        onChange={(e) => setStreet(e.target.value)}
+                        onChange={(e) => {
+                          setStreet(e.target.value);
+                          clearFieldError("street");
+                        }}
                         onBlur={handleBlurCustomerInfo}
                         placeholder="e.g. 1400 K St NW"
-                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
+                        className={`w-full px-4 py-2.5 rounded-xl border bg-white text-sm font-medium focus:outline-none transition-all ${
+                          fieldErrors.street
+                            ? "border-red-500 bg-red-50/20 ring-2 ring-red-200 focus:border-red-600 focus:ring-red-300"
+                            : "border-neutral-200 focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
+                        }`}
                       />
+                      {fieldErrors.street && (
+                        <p className="text-[11px] text-red-600 font-bold flex items-center gap-1 mt-1 animate-in fade-in duration-150">
+                          <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                          {fieldErrors.street}
+                        </p>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -500,15 +609,29 @@ export default function CheckoutPage() {
                           ZIP Code <span className="text-red-500">*</span>
                         </label>
                         <input
+                          id="input-zip"
                           type="text"
                           required
                           value={zip}
-                          onChange={(e) => setZip(e.target.value)}
+                          onChange={(e) => {
+                            setZip(e.target.value);
+                            clearFieldError("zip");
+                          }}
                           onBlur={handleBlurCustomerInfo}
                           placeholder="20004"
                           maxLength={5}
-                          className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
+                          className={`w-full px-4 py-2.5 rounded-xl border bg-white text-sm font-medium focus:outline-none transition-all ${
+                            fieldErrors.zip
+                              ? "border-red-500 bg-red-50/20 ring-2 ring-red-200 focus:border-red-600 focus:ring-red-300"
+                              : "border-neutral-200 focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
+                          }`}
                         />
+                        {fieldErrors.zip && (
+                          <p className="text-[11px] text-red-600 font-bold flex items-center gap-1 mt-1 animate-in fade-in duration-150">
+                            <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                            {fieldErrors.zip}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -554,19 +677,47 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Age Verification Checkbox */}
-                <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={isAgeVerified}
-                    onChange={(e) => setIsAgeVerified(e.target.checked)}
-                    className="mt-1 w-4 h-4 rounded text-[#5A805B] focus:ring-[#5A805B]"
-                  />
-                  <div className="text-xs leading-relaxed text-neutral-700">
-                    <strong className="text-neutral-900">I am 21+ years old: </strong>
-                    I confirm that I have a valid government-issued photo ID (Driver&apos;s License, State ID, or Passport) to present upon delivery or pickup. Initiative 71 Compliant.
-                  </div>
-                </label>
+                <div id="input-age" className="space-y-1.5">
+                  <label
+                    className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer select-none transition-all ${
+                      fieldErrors.age
+                        ? "border-red-500 bg-red-50/40 ring-2 ring-red-200"
+                        : "bg-neutral-50 border-neutral-200 hover:border-neutral-300"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isAgeVerified}
+                      onChange={(e) => {
+                        setIsAgeVerified(e.target.checked);
+                        if (e.target.checked) clearFieldError("age");
+                      }}
+                      className="mt-1 w-4 h-4 rounded text-[#5A805B] focus:ring-[#5A805B]"
+                    />
+                    <div className="text-xs leading-relaxed text-neutral-700">
+                      <strong className="text-neutral-900">I am 21+ years old: </strong>
+                      I confirm that I have a valid government-issued photo ID (Driver&apos;s License, State ID, or Passport) to present upon delivery or pickup.
+                    </div>
+                  </label>
+                  {fieldErrors.age && (
+                    <p className="text-[11px] text-red-600 font-bold flex items-center gap-1 px-1 animate-in fade-in duration-150">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                      {fieldErrors.age}
+                    </p>
+                  )}
+                </div>
               </div>
+
+              {/* Bottom Error Feedback Banner right above the Place Order button */}
+              {errorMsg && (
+                <div className="p-4 rounded-2xl bg-red-50 border-2 border-red-300 text-red-800 text-xs sm:text-sm font-semibold flex items-start sm:items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                  <AlertCircle className="w-5 h-5 shrink-0 text-red-600 mt-0.5 sm:mt-0" />
+                  <div className="flex-1 leading-snug">
+                    <span className="font-black block text-red-900 mb-0.5">Please check your details before placing order:</span>
+                    <span>{errorMsg}</span>
+                  </div>
+                </div>
+              )}
 
               {/* Submit Button */}
               <button

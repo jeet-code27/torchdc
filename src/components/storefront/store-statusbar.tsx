@@ -59,9 +59,7 @@ export function StoreStatusbar() {
         </span>
         <span className="font-bold">Open now</span>
         <span className="text-emerald-700/60">•</span>
-        <span>Delivering in about 35 to 45 min</span>
-        <span className="text-emerald-700/60">•</span>
-        <span>Until 11PM</span>
+        <span>Delivering Until 11PM</span>
       </div>
     </div>
   );

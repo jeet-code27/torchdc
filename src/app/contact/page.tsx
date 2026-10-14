@@ -5,7 +5,7 @@ import { Phone, MapPin, Clock, ArrowRight } from "lucide-react";
 export const metadata: Metadata = {
   title: "Contact Us | Torch Dispensary Washington DC",
   description:
-    "Contact Torch Dispensary in Washington D.C. Call or text (202) 468-1966. Curbside pickup at 1025 F St NW. Open daily 7AM - 11PM.",
+    "Contact Torch Dispensary in Washington D.C. Call or text (202) 468-1966. Curbside pickup at 1000 G St NW. Open daily 7AM - 11PM.",
 };
 
 export default function ContactPage() {
@@ -20,7 +20,7 @@ export default function ContactPage() {
             We&apos;re Here to Help
           </h1>
           <p className="text-xs sm:text-sm md:text-base text-neutral-500 max-w-xl mx-auto leading-relaxed">
-            Have a question about your delivery, DC gifting laws, or product recommendations? Reach out anytime.
+            Have a question about your delivery, order status, or product recommendations? Reach out anytime.
           </p>
         </div>
 
@@ -64,12 +64,12 @@ export default function ContactPage() {
             </div>
             <div className="pt-5 mt-auto">
               <a
-                href="https://maps.google.com/?q=1025+F+St+NW,+Washington,+DC+20004"
+                href="https://maps.google.com/?q=1000+G+St+NW,+Washington,+DC+20001"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block text-sm sm:text-base font-bold text-[#111111] hover:text-[#5A805B] transition-colors leading-snug"
               >
-                1025 F St NW, Washington, DC 20004
+                1000 G St NW, Washington, DC 20001
               </a>
             </div>
           </div>

@@ -214,7 +214,7 @@ export default function SingleOrderDetailPage() {
       {
         id: isPickup ? "ready" : "out",
         title: isPickup ? "Ready for Pickup" : "Out for Delivery",
-        subtitle: isPickup ? "At 1025 F St NW counter" : "Driver on the road in DC",
+        subtitle: isPickup ? "At 1000 G St NW counter" : "Driver on the road in DC",
         done: status === "out_for_delivery" || status === "ready_for_pickup" || status === "completed",
       },
       {
@@ -302,7 +302,7 @@ export default function SingleOrderDetailPage() {
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-bold text-foreground">TORCH DISPENSARY</h1>
-            <p className="text-xs text-muted-foreground">1025 F St NW, Washington, DC 20004</p>
+            <p className="text-xs text-muted-foreground">1000 G St NW, Washington, DC 20001</p>
             <p className="text-xs text-muted-foreground">Delivery Hotline & Curbside Pickup</p>
           </div>
           <div className="text-right">
@@ -436,7 +436,7 @@ export default function SingleOrderDetailPage() {
                   {order.customer.name}
                 </div>
                 <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1">
-                  <ShieldCheck className="w-3.5 h-3.5" /> 21+ Age Verified (I-71)
+                  <ShieldCheck className="w-3.5 h-3.5" /> 21+ Age Verified
                 </div>
               </div>
 
@@ -504,7 +504,7 @@ export default function SingleOrderDetailPage() {
               ) : (
                 <div className="text-xs space-y-1">
                   <p className="font-bold text-foreground text-sm">TORCH Dispensary Counter</p>
-                  <p className="text-muted-foreground">1025 F St NW, Washington, DC 20004</p>
+                  <p className="text-muted-foreground">1000 G St NW, Washington, DC 20001</p>
                   <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-2 font-medium">
                     Order held securely for customer counter identification & collection.
                   </p>
@@ -594,7 +594,7 @@ export default function SingleOrderDetailPage() {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">I-71 21+ Verified:</span>
+                <span className="text-muted-foreground">21+ Age Verified:</span>
                 <span className="font-bold text-emerald-600 dark:text-emerald-400">YES</span>
               </div>
             </div>

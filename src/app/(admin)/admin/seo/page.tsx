@@ -64,7 +64,7 @@ export default function SeoManagementPage() {
   const [metaSettings, setMetaSettings] = React.useState({
     siteTitle: "Torch | Premium Cannabis Delivery in Washington D.C.",
     metaDescription:
-      "Order premium flower, cartridges, pre-rolls, and edibles for direct delivery across Washington D.C. Initiative 71 Compliant. Fast, discreet delivery.",
+      "Order premium flower, cartridges, pre-rolls, and edibles for direct delivery across Washington D.C. Fast, discreet delivery. 21+ only.",
     canonicalUrl: "https://torchdc.com",
     googleSiteVerification: "google-site-verification=torch-dc-auth-2026",
     ogImage: "https://torchdc.com/og-image.jpg",

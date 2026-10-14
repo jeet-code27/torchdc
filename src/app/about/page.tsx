@@ -6,7 +6,7 @@ import { AboutStorefrontView } from "@/components/storefront/about-storefront-vi
 export const metadata: Metadata = {
   title: "About Us | Torch Dispensary Washington DC",
   description:
-    "DC's cannabis, done right. Hand-picked products, real expertise and fast, discreet delivery from Downtown DC. Initiative 71 compliant.",
+    "DC's cannabis, done right. Hand-picked products, real expertise and fast, discreet delivery from Downtown DC. 21+ only.",
 };
 
 export const revalidate = 60;

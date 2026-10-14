@@ -329,7 +329,7 @@ export default function BlogsManagementPage() {
               <BookOpen className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-40" />
               <h3 className="text-base font-semibold text-foreground">No articles found</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
-                Write educational cannabis strain reviews and Initiative 71 compliance stories to drive SEO traffic.
+                Write educational cannabis strain reviews and dispensary stories to drive SEO traffic.
               </p>
               <Button
                 onClick={openCreateModal}
@@ -460,7 +460,7 @@ export default function BlogsManagementPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. The Complete Guide to Washington D.C. Cannabis Gifting & Delivery"
+                    placeholder="e.g. The Complete Guide to Washington D.C. Cannabis Delivery"
                     value={formData.title}
                     onChange={(e) => handleTitleChange(e.target.value)}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"

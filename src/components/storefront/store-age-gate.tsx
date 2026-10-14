@@ -220,7 +220,7 @@ export function StoreAgeGate() {
             </h2>
 
             <p className="text-[13px] text-neutral-600 leading-relaxed mb-6">
-              Come back when you&apos;re 21. Initiative 71 and Washington D.C. laws
+              Come back when you&apos;re 21. Washington D.C. laws
               strictly require all patrons to be 21+. Thanks for understanding.
             </p>
 

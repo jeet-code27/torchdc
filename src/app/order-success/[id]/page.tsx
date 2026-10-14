@@ -105,7 +105,7 @@ export default async function OrderSuccessPage({
                 </>
               ) : (
                 <>
-                  Pickup Location: <strong>1025 F St NW, Washington, DC 20004</strong>
+                  Pickup Location: <strong>1000 G St NW, Washington, DC 20001</strong>
                 </>
               )}
             </p>

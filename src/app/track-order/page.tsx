@@ -275,7 +275,7 @@ function TrackOrderContent() {
                     <div className="text-sm font-bold text-zinc-900 mt-0.5">
                       {order.fulfillment === "delivery"
                         ? `Washington, DC Metro (${order.deliveryAddress?.zip || "DC Area"})`
-                        : "Torch Dispensary · 1025 F St NW, Washington, DC"}
+                        : "Torch Dispensary · 1000 G St NW, Washington, DC"}
                     </div>
                     {order.deliveryNotes && (
                       <div className="text-xs text-zinc-500 italic mt-1">
@@ -357,9 +357,9 @@ function TrackOrderContent() {
               <div className="text-center pt-2 text-[11px] text-zinc-400 space-y-1">
                 <p className="flex items-center justify-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#5A805B]" />
-                  <span>Initiative 71 Compliant · 21+ Valid Government ID Required upon delivery</span>
+                  <span>21+ Valid Government ID Required upon delivery</span>
                 </p>
-                <p>Torch Dispensary · 1025 F St NW, Washington, DC 20004</p>
+                <p>Torch Dispensary · 1000 G St NW, Washington, DC 20001</p>
               </div>
             </div>
           )}

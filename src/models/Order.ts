@@ -102,7 +102,7 @@ const OrderSchema = new Schema<IOrder>(
     },
     pickupLocation: {
       type: String,
-      default: "1025 F St NW, Washington, DC",
+      default: "1000 G St NW, Washington, DC",
     },
     items: {
       type: [OrderItemSchema],

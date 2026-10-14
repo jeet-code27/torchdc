@@ -11,10 +11,13 @@ import {
   Check,
   Truck,
   Store,
+  Banknote,
   ArrowLeft,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCart } from "@/context/cart-context";
+import { ShopSidebar } from "./shop-sidebar";
+import { ShopCartSidebar } from "./shop-cart-sidebar";
 
 export interface ProductDetailVariant {
   _id?: string;
@@ -57,7 +60,7 @@ interface ProductDetailViewProps {
 }
 
 export function ProductDetailView({ product }: ProductDetailViewProps) {
-  const { addItem } = useCart();
+  const { addItem, setIsCartDrawerOpen } = useCart();
   const sliderRef = React.useRef<HTMLDivElement>(null);
 
   const scrollSlider = (direction: "left" | "right") => {
@@ -67,26 +70,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     }
   };
 
-  // Only use variants if the product actually has multiple variants
-  const variants = React.useMemo(() => {
-    if (product.variants && product.variants.length > 0) {
-      return product.variants;
-    }
-    return [];
-  }, [product.variants]);
-
-  // A product has variants ONLY if it has more than 1 option in the database
-  const hasVariants = variants.length > 1;
-
-  const [selectedVariantIndex, setSelectedVariantIndex] = React.useState(0);
-  const [quantity, setQuantity] = React.useState(1);
-  const [isAdded, setIsAdded] = React.useState(false);
-
-  const activeVariant = variants[selectedVariantIndex] || variants[0];
-  const currentPrice = hasVariants ? activeVariant.price : product.price;
-  const currentSalePrice = hasVariants ? activeVariant.salePrice : product.salePrice;
-
-  // Clean title (remove redundant (Sativa), (Hybrid), etc. for clean heading display)
+  // Clean title (remove redundant (Sativa), (Hybrid), etc.)
   const cleanTitle = React.useMemo(() => {
     return product.name
       .replace(/\s*\((sativa|indica|hybrid|sativa hybrid|indica hybrid)\)/i, "")
@@ -142,13 +126,58 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     ) {
       return true;
     }
-    // If name contains typical flower tier markers
-    if (lowerName.includes("topshelf") || lowerName.includes("midshelf") || lowerName.includes("private reserve")) {
+    if (
+      lowerName.includes("topshelf") ||
+      lowerName.includes("midshelf") ||
+      lowerName.includes("private reserve")
+    ) {
       return true;
     }
-    // Default to flower only if category is flowers
     return catSlug === "flowers";
   }, [isPreRoll, isEdible, isVape, isConcentrate, isMushroom, catSlug, product.tier, lowerName]);
+
+  // Variants calculation: Use DB variants if provided, or standard flower weights
+  const variants = React.useMemo(() => {
+    if (product.variants && product.variants.length > 1) {
+      return product.variants;
+    }
+    if (isFlower) {
+      const p = product.price || 40;
+      let v7 = 60;
+      let v14 = 100;
+      let v28 = 140;
+      if (p <= 30) {
+        v7 = 50;
+        v14 = 80;
+        v28 = 120;
+      } else if (p >= 50) {
+        v7 = 80;
+        v14 = 140;
+        v28 = 220;
+      }
+      return [
+        { name: "3.5g", price: p, inStock: true },
+        { name: "7g", price: v7, inStock: true },
+        { name: "14g", price: v14, inStock: true },
+        { name: "1 oz", price: v28, inStock: true },
+      ];
+    }
+    if (product.variants && product.variants.length === 1) {
+      return product.variants;
+    }
+    return [];
+  }, [product.variants, isFlower, product.price]);
+
+  // A product has variants ONLY if it has more than 1 option
+  const hasVariants = variants.length > 1;
+
+  const [selectedVariantIndex, setSelectedVariantIndex] = React.useState(0);
+  const [quantity, setQuantity] = React.useState(1);
+  const [isAdded, setIsAdded] = React.useState(false);
+
+  const activeVariant = variants[selectedVariantIndex] || variants[0];
+  const currentPrice = hasVariants ? activeVariant.price : product.price;
+  const currentSalePrice = hasVariants ? activeVariant.salePrice : product.salePrice;
 
   // Extract weight or potency from product name (e.g. "200mg", "1000mg", "2g", "1g", "3.5g", "1 oz", "4g")
   const extractedWeightOrPotency = React.useMemo(() => {
@@ -205,6 +234,17 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     return "Anytime";
   }, [strainTag]);
 
+  // Display Title with strain in parentheses if flower (matches screenshot "Strawberry Cough (Sativa)")
+  const displayTitle = React.useMemo(() => {
+    if (product.name.includes("(") && product.name.includes(")")) {
+      return product.name;
+    }
+    if (strainTag && isFlower) {
+      return `${cleanTitle} (${strainTag.charAt(0) + strainTag.slice(1).toLowerCase()})`;
+    }
+    return product.name;
+  }, [product.name, cleanTitle, strainTag, isFlower]);
+
   // Dynamic Specs & Headings strictly tailored to product category
   const { spec1, spec2, spec3, rightBadge, leftBadge, aboutHeading, similarHeading } =
     React.useMemo(() => {
@@ -213,7 +253,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
         return {
           leftBadge: tierTag,
           rightBadge: strainTag || "FLOWER",
-          spec1: { label: "TOP TERPENE", value: topTerpene },
+          spec1: { label: "TOP TERPENE", value: topTerpene || "Myrcene" },
           spec2: {
             label: "TYPE",
             value:
@@ -223,7 +263,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                 ? "Indica"
                 : "Hybrid",
           },
-          spec3: { label: "BEST FOR", value: bestFor },
+          spec3: { label: "BEST FOR", value: bestFor || "Anytime" },
           aboutHeading: "About this strain",
           similarHeading: `More ${
             tierTag.charAt(0) + tierTag.slice(1).toLowerCase()
@@ -510,381 +550,363 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
       `Added ${quantity}x ${cleanTitle} to cart!`,
       { duration: 2500 }
     );
+    // Automatically open the cart drawer so customer sees their updated cart immediately
+    setIsCartDrawerOpen(true);
     setTimeout(() => setIsAdded(false), 1500);
   };
 
   return (
-    <div className="min-h-screen bg-[#fafbfa] text-neutral-900 pb-28 lg:pb-16">
-      {/* Top Navigation Bar: Back to Menu */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-2">
-        <div className="flex items-center justify-between">
-          <Link
-            href="/shop"
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-neutral-700 hover:text-neutral-950 transition-colors py-2 px-4 rounded-full bg-white border border-neutral-200/90 shadow-2xs hover:shadow-xs"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Menu</span>
-          </Link>
-
-          {/* Desktop Breadcrumb on right side */}
-          <nav aria-label="Breadcrumb" className="hidden sm:flex items-center gap-1.5 text-xs text-neutral-400 font-medium">
-            <Link href="/" className="hover:text-neutral-700">Home</Link>
-            <ChevronRight className="w-3 h-3 text-neutral-300" />
-            <Link href="/shop" className="hover:text-neutral-700">Shop</Link>
-            <ChevronRight className="w-3 h-3 text-neutral-300" />
-            <Link href={`/shop?category=${product.category?.slug || "flowers"}`} className="hover:text-neutral-700">
-              {product.category?.name || "Flowers"}
-            </Link>
-            <ChevronRight className="w-3 h-3 text-neutral-300" />
-            <span className="text-neutral-700 font-semibold">{leftBadge}</span>
-          </nav>
+    <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-5 lg:px-6 py-4 sm:py-6 text-neutral-900 pb-28 lg:pb-16">
+      <div className="flex gap-4 lg:gap-5 xl:gap-6 items-start">
+        {/* ================= 1. DESKTOP LEFT RAIL (Category Navigation) ================= */}
+        <div className="hidden lg:block shrink-0 sticky top-24 self-start">
+          <ShopSidebar activeCategory={catSlug || "flowers"} />
         </div>
-      </div>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-4 space-y-10 lg:space-y-14">
-        {/* ================= 2-COLUMN LAYOUT ON DESKTOP ================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          
-          {/* ================= LEFT COLUMN: PRODUCT IMAGE CARD & FULFILLMENT ================= */}
-          <div className="lg:col-span-6 lg:sticky lg:top-28 space-y-4">
-            {/* Main Product Image Card */}
-            <div className="relative bg-[#edf4ec] rounded-[28px] sm:rounded-[36px] p-6 sm:p-10 lg:p-12 flex items-center justify-center border border-[#deebd9] shadow-xs overflow-hidden aspect-square w-full">
-              {/* Top-Left Badge */}
-              <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
-                <span className="bg-white/95 backdrop-blur-xs text-[#2F4F30] font-black text-[11px] sm:text-xs uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-2xs border border-emerald-100">
-                  {leftBadge}
-                </span>
+        {/* ================= 2. MAIN CENTER CONTENT (Product Detail View) ================= */}
+        <main className="flex-1 min-w-0 space-y-8">
+          {/* 2-Column layout on desktop */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
+            {/* Left Sub-column: Product Image Card & Fulfillment */}
+            <div className="lg:col-span-6 space-y-4">
+              {/* Product Image Card */}
+              <div className="relative bg-[#F6F8F6] rounded-[28px] sm:rounded-[36px] p-6 sm:p-8 lg:p-10 flex items-center justify-center border border-neutral-100 shadow-xs overflow-hidden aspect-square w-full">
+                {/* Badges grouped in top-left like screenshot */}
+                <div className="absolute top-4 left-4 sm:top-5 sm:left-5 z-10 flex items-center gap-2 flex-wrap">
+                  {leftBadge && (
+                    <span className="bg-[#2D4A2B] text-white font-extrabold text-[11px] sm:text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs">
+                      {leftBadge}
+                    </span>
+                  )}
+                  {rightBadge && (
+                    <span className="bg-white/95 backdrop-blur-xs text-neutral-800 font-extrabold text-[11px] sm:text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs border border-neutral-200/60">
+                      {rightBadge}
+                    </span>
+                  )}
+                </div>
+
+                {/* Product Photo */}
+                <div className="relative w-full h-full max-w-[320px] max-h-[320px] sm:max-w-[380px] sm:max-h-[380px]">
+                  <Image
+                    src={primaryImage}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 640px) 320px, 380px"
+                    className="object-contain mix-blend-multiply drop-shadow-sm transition-transform duration-300 hover:scale-105"
+                    priority
+                  />
+                </div>
               </div>
 
-              {/* Top-Right Badge */}
-              <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
-                <span className="bg-[#fdf1ea] text-[#E8561E] font-black text-[11px] sm:text-xs uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-2xs border border-orange-100">
-                  {rightBadge}
-                </span>
-              </div>
+              {/* Fulfillment Badges */}
+              <div className="grid grid-cols-2 gap-2.5 pt-1">
+                <div className="bg-white border border-neutral-200/80 rounded-2xl p-3 flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-[#edf4ed] text-[#557754] flex items-center justify-center shrink-0">
+                    <Truck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="block font-black text-xs text-neutral-900 leading-tight">
+                      Free delivery
+                    </span>
+                    <span className="block text-[10px] text-neutral-500 font-medium">
+                      Across DC
+                    </span>
+                  </div>
+                </div>
 
-              {/* Center Product Photo */}
-              <div className="relative w-full h-full max-w-[340px] max-h-[340px] sm:max-w-[400px] sm:max-h-[400px]">
-                <Image
-                  src={primaryImage}
-                  alt={product.name}
-                  fill
-                  sizes="(max-width: 640px) 340px, (max-width: 1024px) 400px, 480px"
-                  className="object-contain mix-blend-multiply drop-shadow-sm transition-transform duration-300 hover:scale-105"
-                  priority
-                />
+                <div className="bg-white border border-neutral-200/80 rounded-2xl p-3 flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-[#edf4ed] text-[#557754] flex items-center justify-center shrink-0">
+                    <Banknote className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="block font-black text-xs text-neutral-900 leading-tight">
+                      Cash On Delivery
+                    </span>
+                    <span className="block text-[10px] text-neutral-500 font-medium">
+                      Pay cash at your door
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Desktop Fulfillment Badges */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              <div className="bg-white border border-neutral-200/80 rounded-2xl p-3.5 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-[#edf4ed] text-[#557754] flex items-center justify-center shrink-0">
-                  <Truck className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="block font-extrabold text-xs sm:text-sm text-neutral-900">
-                    Free delivery
-                  </span>
-                  <span className="block text-[11px] text-neutral-500 font-medium">
-                    Across DC · 35-45 min
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-white border border-neutral-200/80 rounded-2xl p-3.5 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-neutral-100 text-neutral-700 flex items-center justify-center shrink-0">
-                  <Store className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="block font-extrabold text-xs sm:text-sm text-neutral-900">
-                    Curbside pickup
-                  </span>
-                  <span className="block text-[11px] text-neutral-500 font-medium">
-                    1025 F St NW
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ================= RIGHT COLUMN: TITLE, PRICE, VARIANTS, SPECS, ACTIONS ================= */}
-          <div className="lg:col-span-6 space-y-6">
-            {/* Title, Tagline & Pricing */}
-            <div className="space-y-3">
-              {/* Mobile Breadcrumb */}
-              <nav aria-label="Mobile Breadcrumb" className="sm:hidden flex items-center gap-1.5 text-xs text-neutral-400 font-medium">
+            {/* Right Sub-column: Info, Variants, Specs, Description, Action */}
+            <div className="lg:col-span-6 space-y-4">
+              {/* Breadcrumb directly above title */}
+              <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-neutral-400 font-medium">
                 <Link href="/shop" className="hover:text-neutral-700">Shop</Link>
-                <ChevronRight className="w-3 h-3 text-neutral-300" />
-                <Link href={`/shop?category=${product.category?.slug || "flowers"}`} className="hover:text-neutral-700">
+                <span>/</span>
+                <Link href={`/shop?category=${catSlug || "flowers"}`} className="hover:text-neutral-700">
                   {product.category?.name || "Flowers"}
                 </Link>
-                <ChevronRight className="w-3 h-3 text-neutral-300" />
-                <span className="text-neutral-700 font-semibold">{leftBadge}</span>
+                {tierTag && (
+                  <>
+                    <span>/</span>
+                    <span className="text-neutral-600 font-medium capitalize">
+                      {tierTag.toLowerCase()}
+                    </span>
+                  </>
+                )}
               </nav>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-black text-neutral-900 tracking-tight leading-tight">
-                {cleanTitle}
+              {/* Title */}
+              <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-black text-neutral-900 tracking-tight leading-tight">
+                {displayTitle}
               </h1>
 
-              <p className="text-sm sm:text-base text-neutral-600 font-medium leading-normal">
-                {tagline}
-              </p>
-
-              <div className="flex items-baseline gap-3 pt-1">
-                <span className="text-3xl sm:text-4xl font-black text-neutral-900 tracking-tight">
+              {/* Price */}
+              <div className="flex items-baseline gap-3">
+                <span className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
                   ${currentPrice}
                 </span>
                 {currentSalePrice && currentSalePrice < currentPrice && (
-                  <span className="text-lg font-bold text-neutral-400 line-through">
+                  <span className="text-base font-bold text-neutral-400 line-through">
                     ${currentSalePrice}
                   </span>
                 )}
               </div>
-            </div>
 
-            {/* ONLY SHOW CHOOSE WEIGHT / VARIANT SELECTOR IF PRODUCT HAS MULTIPLE VARIANTS */}
-            {hasVariants && (
-              <div className="space-y-2.5">
-                <label className="block text-sm font-extrabold text-neutral-900">
-                  {variantLabel}
-                </label>
+              {/* Choose weight */}
+              {hasVariants && (
+                <div className="space-y-2 pt-1">
+                  <label className="block text-xs font-bold text-neutral-700">
+                    {variantLabel}
+                  </label>
+                  <div className="grid grid-cols-4 gap-2 sm:gap-2.5">
+                    {variants.map((v, idx) => {
+                      const isSelected = selectedVariantIndex === idx;
+                      return (
+                        <button
+                          key={v.name + idx}
+                          type="button"
+                          onClick={() => setSelectedVariantIndex(idx)}
+                          className={`p-2.5 sm:p-3 rounded-xl text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                            isSelected
+                              ? "bg-[#f0f5f0] border-2 border-[#5A805B] text-neutral-900 shadow-2xs"
+                              : "bg-white border border-neutral-200 text-neutral-700 hover:border-neutral-300"
+                          }`}
+                        >
+                          <span className="font-bold text-xs sm:text-sm leading-tight">
+                            {v.name}
+                          </span>
+                          <span className="text-[11px] font-medium text-neutral-500 mt-0.5">
+                            ${v.price}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-                  {variants.map((v, idx) => {
-                    const isSelected = selectedVariantIndex === idx;
-                    return (
-                      <button
-                        key={v.name + idx}
-                        type="button"
-                        onClick={() => setSelectedVariantIndex(idx)}
-                        className={`p-3 sm:p-3.5 rounded-2xl text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
-                          isSelected
-                            ? "bg-[#edf4ec] border-2 border-[#557754] text-neutral-900 shadow-2xs"
-                            : "bg-white border border-neutral-200/90 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50"
-                        }`}
-                      >
-                        <span className="font-black text-sm sm:text-base">
-                          {v.name}
-                        </span>
-                        <span className="text-xs font-bold text-neutral-500">
-                          ${v.price}
-                        </span>
-                      </button>
-                    );
-                  })}
+              {/* 3-Column Spec Box in single bordered container */}
+              <div className="border border-neutral-200/90 rounded-2xl bg-white p-3 sm:p-3.5 grid grid-cols-3 divide-x divide-neutral-200/80 text-center my-3 shadow-2xs">
+                <div className="px-1 sm:px-2">
+                  <span className="block text-[10px] font-black uppercase text-neutral-400 tracking-wider">
+                    {spec1.label}
+                  </span>
+                  <span className="block font-black text-xs sm:text-[13px] text-neutral-900 mt-1 truncate">
+                    {spec1.value}
+                  </span>
+                </div>
+                <div className="px-1 sm:px-2">
+                  <span className="block text-[10px] font-black uppercase text-neutral-400 tracking-wider">
+                    {spec2.label}
+                  </span>
+                  <span className="block font-black text-xs sm:text-[13px] text-neutral-900 mt-1 truncate">
+                    {spec2.value}
+                  </span>
+                </div>
+                <div className="px-1 sm:px-2">
+                  <span className="block text-[10px] font-black uppercase text-neutral-400 tracking-wider">
+                    {spec3.label}
+                  </span>
+                  <span className="block font-black text-xs sm:text-[13px] text-neutral-900 mt-1 truncate">
+                    {spec3.value}
+                  </span>
                 </div>
               </div>
-            )}
 
-            {/* 3 Spec Cards (Category Aware) */}
-            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-              {/* Card 1 */}
-              <div className="bg-[#f8faf8] border border-neutral-200/80 rounded-2xl p-3 sm:p-3.5 text-center sm:text-left">
-                <span className="block text-[10px] font-black uppercase text-neutral-400 tracking-wider">
-                  {spec1.label}
-                </span>
-                <span className="block font-black text-xs sm:text-sm text-neutral-900 mt-0.5 truncate">
-                  {spec1.value}
-                </span>
+              {/* About this strain / product */}
+              <div className="space-y-1.5 pt-1">
+                <h3 className="text-sm font-extrabold text-neutral-900">
+                  {aboutHeading}
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
+                  {cleanDescription}
+                </p>
               </div>
 
-              {/* Card 2 */}
-              <div className="bg-[#f8faf8] border border-neutral-200/80 rounded-2xl p-3 sm:p-3.5 text-center sm:text-left">
-                <span className="block text-[10px] font-black uppercase text-neutral-400 tracking-wider">
-                  {spec2.label}
-                </span>
-                <span className="block font-black text-xs sm:text-sm text-neutral-900 mt-0.5 truncate">
-                  {spec2.value}
-                </span>
-              </div>
+              {/* Quantity selector & Add to order button */}
+              <div className="flex items-center gap-3 pt-2">
+                <div
+                  className="flex items-center justify-between border border-neutral-200/90 rounded-full h-11 px-3.5 w-28 bg-white shadow-2xs"
+                  data-np-intersection-skip="true"
+                  data-1p-ignore="true"
+                  data-lpignore="true"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
+                    disabled={quantity <= 1}
+                    className="text-neutral-500 hover:text-neutral-900 disabled:opacity-30 p-1 cursor-pointer transition-colors"
+                    aria-label="Decrease quantity"
+                    data-np-intersection-skip="true"
+                    data-1p-ignore="true"
+                  >
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="font-black text-sm text-neutral-900 select-none">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((prev) => prev + 1)}
+                    className="text-neutral-500 hover:text-neutral-900 p-1 cursor-pointer transition-colors"
+                    aria-label="Increase quantity"
+                    data-np-intersection-skip="true"
+                    data-1p-ignore="true"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
 
-              {/* Card 3 */}
-              <div className="bg-[#f8faf8] border border-neutral-200/80 rounded-2xl p-3 sm:p-3.5 text-center sm:text-left">
-                <span className="block text-[10px] font-black uppercase text-neutral-400 tracking-wider">
-                  {spec3.label}
-                </span>
-                <span className="block font-black text-xs sm:text-sm text-neutral-900 mt-0.5 truncate">
-                  {spec3.value}
-                </span>
-              </div>
-            </div>
-
-            {/* Desktop In-Page Add to Cart Action */}
-            <div className="hidden lg:flex items-center gap-3 pt-2">
-              <div className="flex items-center justify-between border border-neutral-200/90 rounded-full h-13 px-4 w-32 bg-white shadow-2xs">
                 <button
                   type="button"
-                  onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
-                  disabled={quantity <= 1}
-                  className="text-neutral-500 hover:text-neutral-900 disabled:opacity-30 disabled:pointer-events-none p-1 cursor-pointer transition-colors"
-                  aria-label="Decrease quantity"
+                  onClick={handleAddToCart}
+                  className={`flex-1 h-11 rounded-full font-black text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-[0.99] ${
+                    isAdded
+                      ? "bg-emerald-600 text-white"
+                      : "bg-[#5A805B] hover:bg-[#4a6b4b] text-white"
+                  }`}
                 >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="font-black text-base text-neutral-900 select-none">
-                  {quantity}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setQuantity((prev) => prev + 1)}
-                  className="text-neutral-500 hover:text-neutral-900 p-1 cursor-pointer transition-colors"
-                  aria-label="Increase quantity"
-                >
-                  <Plus className="w-4 h-4" />
+                  {isAdded ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Added to cart!</span>
+                    </>
+                  ) : (
+                    <span>Add to order · ${currentPrice * quantity}</span>
+                  )}
                 </button>
               </div>
 
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                className={`flex-1 h-13 rounded-full font-black text-base flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-[0.99] ${
-                  isAdded
-                    ? "bg-emerald-600 text-white"
-                    : "bg-[#557754] hover:bg-[#466645] text-white"
-                }`}
-              >
-                {isAdded ? (
-                  <>
-                    <Check className="w-5 h-5" />
-                    <span>Added to cart!</span>
-                  </>
-                ) : (
-                  <span>Add to cart · ${currentPrice * quantity}</span>
-                )}
-              </button>
-            </div>
-
-            {/* Effects */}
-            <div className="space-y-2 pt-1">
-              <h3 className="text-sm font-extrabold text-neutral-900">
-                Effects
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {effects.map((effect) => (
+              {/* Effects & Flavors tags */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-2">
+                {effects.slice(0, 4).map((effect) => (
                   <span
                     key={effect}
-                    className="bg-[#edf4ed] text-[#2F4F30] font-bold text-xs px-3.5 py-1.5 rounded-full"
+                    className="bg-[#edf4ed] text-[#2F4F30] font-bold text-[11px] px-2.5 py-1 rounded-full"
                   >
                     {effect}
                   </span>
                 ))}
-              </div>
-            </div>
-
-            {/* Flavor */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-extrabold text-neutral-900">
-                Flavor
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {flavors.map((flavor) => (
+                {flavors.slice(0, 3).map((flavor) => (
                   <span
                     key={flavor}
-                    className="bg-[#fdf1ea] text-[#E8561E] font-bold text-xs px-3.5 py-1.5 rounded-full"
+                    className="bg-[#fdf1ea] text-[#E8561E] font-bold text-[11px] px-2.5 py-1 rounded-full"
                   >
                     {flavor}
                   </span>
                 ))}
               </div>
             </div>
-
-            {/* About this product / strain */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-extrabold text-neutral-900">
-                {aboutHeading}
-              </h3>
-              <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed">
-                {cleanDescription}
-              </p>
-            </div>
           </div>
+
+          {/* Related Products Section */}
+          {product.relatedProducts && product.relatedProducts.length > 0 && (
+            <div className="pt-8 border-t border-neutral-200/80 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-black text-neutral-900 tracking-tight">
+                    {similarHeading}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-0.5">
+                    Popular recommendations hand-picked for you
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => scrollSlider("left")}
+                    className="w-9 h-9 rounded-full bg-white border border-neutral-200/80 flex items-center justify-center text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50 hover:border-neutral-300 shadow-2xs transition-colors cursor-pointer"
+                    aria-label="Previous suggestions"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollSlider("right")}
+                    className="w-9 h-9 rounded-full bg-white border border-neutral-200/80 flex items-center justify-center text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50 hover:border-neutral-300 shadow-2xs transition-colors cursor-pointer"
+                    aria-label="Next suggestions"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div
+                ref={sliderRef}
+                className="flex gap-4 overflow-x-auto scroll-smooth pb-4 pt-1 snap-x scrollbar-none"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
+                {product.relatedProducts.map((rel) => (
+                  <Link
+                    key={rel.id}
+                    href={`/product/${rel.slug}`}
+                    className="w-48 sm:w-56 shrink-0 snap-start bg-white border border-neutral-200/80 rounded-2xl p-3 hover:border-[#5A805B]/40 hover:shadow-xs transition-all flex flex-col group"
+                  >
+                    <div className="relative aspect-square w-full rounded-xl bg-[#F6F8F6] overflow-hidden mb-2.5 flex items-center justify-center">
+                      <Image
+                        src={rel.image || "/images/placeholder-product.png"}
+                        alt={rel.name}
+                        fill
+                        sizes="(max-width: 640px) 192px, 224px"
+                        className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform p-2"
+                      />
+                    </div>
+                    <h4 className="font-bold text-xs sm:text-sm text-neutral-900 truncate">
+                      {rel.name.replace(/\s*\(.*\)/, "")}
+                    </h4>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-[11px] text-neutral-500 font-medium">
+                        {rel.strain ? rel.strain.charAt(0).toUpperCase() + rel.strain.slice(1) : "Flower"}
+                      </span>
+                      <span className="text-xs sm:text-sm font-black text-neutral-900">
+                        from ${rel.price}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </main>
+
+        {/* ================= 3. DESKTOP RIGHT RAIL (Sticky Cart Sidebar) ================= */}
+        <div className="hidden xl:block shrink-0 sticky top-24 self-start">
+          <ShopCartSidebar />
         </div>
-
-        {/* ================= SIMILAR PRODUCTS SUGGESTION SLIDER ================= */}
-        {product.relatedProducts && product.relatedProducts.length > 0 && (
-          <div className="pt-10 border-t border-neutral-200/80 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl sm:text-2xl font-black text-neutral-900 tracking-tight">
-                  {similarHeading}
-                </h3>
-                <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-0.5">
-                  Popular recommendations hand-picked for you
-                </p>
-              </div>
-
-              {/* Slider Arrow Controls */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => scrollSlider("left")}
-                  className="w-9 h-9 rounded-full bg-white border border-neutral-200/80 flex items-center justify-center text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50 hover:border-neutral-300 shadow-2xs transition-colors cursor-pointer"
-                  aria-label="Previous suggestions"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scrollSlider("right")}
-                  className="w-9 h-9 rounded-full bg-white border border-neutral-200/80 flex items-center justify-center text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50 hover:border-neutral-300 shadow-2xs transition-colors cursor-pointer"
-                  aria-label="Next suggestions"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Scrollable Slider */}
-            <div
-              ref={sliderRef}
-              className="flex gap-4 overflow-x-auto scroll-smooth pb-4 pt-1 snap-x scrollbar-none"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {product.relatedProducts.map((rel) => (
-                <Link
-                  key={rel.id}
-                  href={`/product/${rel.slug}`}
-                  className="w-48 sm:w-56 shrink-0 snap-start bg-white border border-neutral-200/80 rounded-2xl p-3 hover:border-[#557754]/40 hover:shadow-sm transition-all flex flex-col group"
-                >
-                  <div className="relative aspect-square w-full rounded-xl bg-[#edf4ec] overflow-hidden mb-2.5 flex items-center justify-center">
-                    <Image
-                      src={rel.image || "/images/placeholder-product.png"}
-                      alt={rel.name}
-                      fill
-                      sizes="(max-width: 640px) 192px, 224px"
-                      className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform p-2"
-                    />
-                  </div>
-                  <h4 className="font-bold text-xs sm:text-sm text-neutral-900 truncate">
-                    {rel.name.replace(/\s*\(.*\)/, "")}
-                  </h4>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-[11px] text-neutral-500 font-medium">
-                      {rel.strain ? rel.strain.charAt(0).toUpperCase() + rel.strain.slice(1) : "Flower"}
-                    </span>
-                    <span className="text-xs sm:text-sm font-black text-neutral-900">
-                      from ${rel.price}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </main>
+      </div>
 
       {/* ================= MOBILE FLOATING STICKY ACTION BAR ================= */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-neutral-200/80 p-3 z-40 shadow-lg">
         <div className="max-w-xl mx-auto flex items-center gap-3">
-          {/* Quantity Selector: [ - 1 + ] */}
-          <div className="flex items-center justify-between border border-neutral-200/90 rounded-full h-12 px-3.5 w-28 bg-white shadow-2xs">
+          <div
+            className="flex items-center justify-between border border-neutral-200/90 rounded-full h-12 px-3.5 w-28 bg-white shadow-2xs"
+            data-np-intersection-skip="true"
+            data-1p-ignore="true"
+            data-lpignore="true"
+          >
             <button
               type="button"
               onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
               disabled={quantity <= 1}
-              className="text-neutral-500 hover:text-neutral-900 disabled:opacity-30 disabled:pointer-events-none p-1 cursor-pointer transition-colors"
+              className="text-neutral-500 hover:text-neutral-900 disabled:opacity-30 p-1 cursor-pointer transition-colors"
               aria-label="Decrease quantity"
+              data-np-intersection-skip="true"
+              data-1p-ignore="true"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
@@ -896,19 +918,20 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
               onClick={() => setQuantity((prev) => prev + 1)}
               className="text-neutral-500 hover:text-neutral-900 p-1 cursor-pointer transition-colors"
               aria-label="Increase quantity"
+              data-np-intersection-skip="true"
+              data-1p-ignore="true"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* Add to Cart Primary Button */}
           <button
             type="button"
             onClick={handleAddToCart}
             className={`flex-1 h-12 rounded-full font-black text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-[0.99] ${
               isAdded
                 ? "bg-emerald-600 text-white"
-                : "bg-[#557754] hover:bg-[#466645] text-white"
+                : "bg-[#5A805B] hover:bg-[#4a6b4b] text-white"
             }`}
           >
             {isAdded ? (
@@ -917,7 +940,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                 <span>Added to cart!</span>
               </>
             ) : (
-              <span>Add to cart · ${currentPrice * quantity}</span>
+              <span>Add to order · ${currentPrice * quantity}</span>
             )}
           </button>
         </div>

@@ -210,7 +210,7 @@ export default function CartPage() {
                       </span>
                     </div>
                     <span className="text-[11px] text-neutral-500 font-medium leading-normal">
-                      1025 F St NW, Washington, DC
+                      1000 G St NW, Washington, DC
                     </span>
                   </button>
                 </div>
@@ -443,7 +443,7 @@ export default function CartPage() {
                   </div>
                   <div className="flex items-center gap-2 font-medium">
                     <ShieldCheck className="w-3.5 h-3.5 text-[#5A805B] shrink-0" />
-                    <span>Initiative 71 Compliant · 21+ ID Required</span>
+                    <span>21+ Valid Government ID Required</span>
                   </div>
                 </div>
               </div>

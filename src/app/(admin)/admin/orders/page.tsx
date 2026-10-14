@@ -724,7 +724,7 @@ export default function AdminOrdersPage() {
                 </div>
                 <div className="pt-2 border-t border-border">
                   <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> 21+ Age Verified (I-71)
+                    <CheckCircle2 className="w-3.5 h-3.5" /> 21+ Age Verified
                   </span>
                 </div>
               </div>
@@ -763,7 +763,7 @@ export default function AdminOrdersPage() {
                 ) : (
                   <div className="text-xs text-foreground space-y-1">
                     <p className="font-semibold text-foreground">TORCH Dispensary</p>
-                    <p className="text-muted-foreground">1025 F St NW, Washington, DC 20004</p>
+                    <p className="text-muted-foreground">1000 G St NW, Washington, DC 20001</p>
                     <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-2 font-medium">
                       Ready for counter collection upon arrival
                     </p>

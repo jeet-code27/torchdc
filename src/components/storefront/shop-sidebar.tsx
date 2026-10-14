@@ -44,6 +44,8 @@ export function ShopSidebar({
     }
     if (onSelectCategory) {
       onSelectCategory(slug);
+    } else if (!scrollLinks) {
+      router.push(slug === "all" ? "/shop" : `/shop?category=${slug}`);
     }
     if (scrollLinks) {
       const el = document.getElementById(`section-${slug}`);
@@ -65,6 +67,7 @@ export function ShopSidebar({
           <nav className="flex flex-col gap-0.5" aria-label="Dispensary menu">
             {STORE_CATEGORIES.map((cat) => {
               const isActive = activeCategory === cat.slug;
+              const isDeals = cat.slug === "deals";
               return (
                 <button
                   key={cat.slug}
@@ -73,6 +76,8 @@ export function ShopSidebar({
                   className={`w-full text-left px-3.5 py-2.5 rounded-xl text-[14px] font-bold transition-all cursor-pointer ${
                     isActive
                       ? "bg-[#5A805B]/10 text-[#5A805B] font-extrabold shadow-2xs"
+                      : isDeals
+                      ? "text-[#E8561E] hover:bg-orange-50 font-black"
                       : "text-neutral-700 hover:bg-neutral-100/70 hover:text-neutral-900"
                   }`}
                 >
@@ -101,7 +106,7 @@ export function ShopSidebar({
             <span>Open Daily 7AM - 11PM</span>
           </div>
           <p className="text-[11px] text-neutral-500 font-medium">
-            1025 F St NW, Washington, DC
+            1000 G St NW, Washington, DC
           </p>
           <a
             href="tel:+12024681966"

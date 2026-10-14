@@ -14,7 +14,6 @@ import {
   LogOut,
   Package,
   MapPin,
-  ChevronDown,
   Home,
   Tag,
   Info,
@@ -35,10 +34,7 @@ export function StoreNavbar() {
 
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [authModalOpen, setAuthModalOpen] = React.useState(false);
-  const [userDropdownOpen, setUserDropdownOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
-
-  const userDropdownRef = React.useRef<HTMLDivElement>(null);
 
   const isCustomer = Boolean(session?.user && session.user.role === "customer");
   const isAdminStaff = Boolean(
@@ -53,25 +49,10 @@ export function StoreNavbar() {
   };
 
   const handleSignOut = async () => {
-    setUserDropdownOpen(false);
     setMobileMenuOpen(false);
     await signOut({ redirect: false });
     window.location.href = "/";
   };
-
-  // Close dropdown on outside click
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        userDropdownRef.current &&
-        !userDropdownRef.current.contains(event.target as Node)
-      ) {
-        setUserDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return (
     <>
@@ -81,7 +62,7 @@ export function StoreNavbar() {
           <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-6">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0" aria-label="Torch Home">
-              <div className="relative w-36 h-11">
+              <div className="relative w-40 sm:w-44 h-12 sm:h-14">
                 <Image
                   src="/images/torch-logo.svg"
                   alt="Torch Dispensary"
@@ -113,8 +94,8 @@ export function StoreNavbar() {
               )}
             </form>
 
-            {/* Links, Sign In, Phone & Cart (Exact Screenshot Match) */}
-            <div className="flex items-center gap-4 xl:gap-5 text-sm font-bold text-neutral-800">
+            {/* Links, Phone & Cart (Exact Screenshot Match - Dropdown removed) */}
+            <div className="flex items-center gap-5 xl:gap-6 text-sm font-bold text-neutral-800">
               <Link href="/shop" className="hover:text-[#5A805B] transition-colors">
                 Shop
               </Link>
@@ -127,76 +108,6 @@ export function StoreNavbar() {
               <Link href="/contact" className="hover:text-[#5A805B] transition-colors">
                 Contact
               </Link>
-
-              {/* User Account / Sign In */}
-              {session?.user ? (
-                <div className="relative" ref={userDropdownRef}>
-                  <button
-                    type="button"
-                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-neutral-100 text-neutral-800 transition-colors cursor-pointer"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-[#5A805B]/15 text-[#5A805B] flex items-center justify-center font-black text-xs uppercase">
-                      {session.user.name ? session.user.name.charAt(0) : "U"}
-                    </div>
-                    <span className="text-xs font-bold max-w-[90px] truncate">
-                      {session.user.name?.split(" ")[0] || "Account"}
-                    </span>
-                    <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-                  </button>
-
-                  {userDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-neutral-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
-                      <div className="px-3.5 py-2 border-b border-neutral-100">
-                        <p className="text-xs font-bold text-neutral-900 truncate">
-                          {session.user.name}
-                        </p>
-                        <p className="text-[11px] text-neutral-400 truncate">
-                          {session.user.email}
-                        </p>
-                      </div>
-
-                      <Link
-                        href="/account"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-neutral-700 hover:bg-neutral-50"
-                      >
-                        <Package className="w-3.5 h-3.5 text-[#5A805B]" />
-                        <span>My Orders & Profile</span>
-                      </Link>
-
-                      {isAdminStaff && (
-                        <Link
-                          href="/admin"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
-                        >
-                          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                          <span>Admin Portal</span>
-                        </Link>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={handleSignOut}
-                        className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-red-600 hover:bg-red-50 text-left border-t border-neutral-100 mt-1 cursor-pointer"
-                      >
-                        <LogOut className="w-3.5 h-3.5" />
-                        <span>Sign Out</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setAuthModalOpen(true)}
-                  className="hover:text-[#5A805B] transition-colors text-sm font-bold text-neutral-800 flex items-center gap-1.5 cursor-pointer"
-                >
-                  <User className="w-4 h-4 text-neutral-600" />
-                  <span>Sign In</span>
-                </button>
-              )}
 
               {/* Phone Button (Circle icon + number) */}
               <a
@@ -240,8 +151,8 @@ export function StoreNavbar() {
             <Phone className="w-4 h-4 text-[#5A805B]" />
           </a>
 
-          {/* Centered Logo */}
-          <Link href="/" className="relative w-32 h-9">
+          {/* Centered Logo (Increased size for mobile prominence) */}
+          <Link href="/" className="relative w-36 h-11">
             <Image
               src="/images/torch-logo.svg"
               alt="Torch"

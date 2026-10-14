@@ -32,7 +32,7 @@ export async function generateMetadata({
 
   return {
     title: `${displayName} | Order Online with Fast DC Delivery | Torch Dispensary`,
-    description: `Shop premium ${displayName} at Torch Dispensary in Washington DC. Fast 35-45 min delivery and 15-min curbside pickup. Initiative 71 compliant.`,
+    description: `Shop premium ${displayName} at Torch Dispensary in Washington DC. Fast DC delivery. 21+ only.`,
   };
 }
 

@@ -73,12 +73,12 @@ export function StoreFooter() {
                   <MapPin className="w-3.5 h-3.5" />
                 </span>
                 <a
-                  href="https://maps.google.com/?q=1025+F+St+NW,+Washington,+DC+20004"
+                  href="https://maps.google.com/?q=1000+G+St+NW,+Washington,+DC+20001"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:underline text-white/95 transition-colors"
                 >
-                  1025 F St NW, Washington, DC 20004
+                  1000 G St NW, Washington, DC 20001
                 </a>
               </div>
 
@@ -181,12 +181,12 @@ export function StoreFooter() {
                   <MapPin className="w-3.5 h-3.5" />
                 </span>
                 <a
-                  href="https://maps.google.com/?q=1025+F+St+NW,+Washington,+DC+20004"
+                  href="https://maps.google.com/?q=1000+G+St+NW,+Washington,+DC+20001"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-white/95"
                 >
-                  1025 F St NW, Washington, DC 20004
+                  1000 G St NW, Washington, DC 20001
                 </a>
               </div>
 
@@ -267,7 +267,7 @@ export function StoreFooter() {
         {/* ================= BOTTOM BAR (BORDER & COPYRIGHT & SOCIALS) ================= */}
         <div className="border-t border-white/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-white/90">
           <p className="text-center sm:text-left">
-            © 2026 Torch · 1025 F St NW, Washington, DC 20004 · For adults 21+ only.
+            © 2026 Torch · 1000 G St NW, Washington, DC 20001 · (202) 468-1966 · For adults 21+ only.
           </p>
 
           {/* Social circular pill buttons */}

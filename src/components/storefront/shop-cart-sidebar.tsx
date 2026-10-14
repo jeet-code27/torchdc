@@ -64,7 +64,7 @@ export function ShopCartSidebar() {
         <p className="text-[12px] text-neutral-500 text-center mb-4 leading-normal">
           {fulfillment === "delivery"
             ? "Free delivery across DC · about 35 to 45 min"
-            : "Curbside pickup at 1025 F St NW · Ready in 15 min"}
+            : "Curbside pickup at 1000 G St NW · Ready in 15 min"}
         </p>
 
         {/* Cart items list or empty state */}
