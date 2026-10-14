@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Flame, Sparkles, Sprout, Wind, Zap, Disc, Cookie, Cherry, Tag, Phone } from "lucide-react";
 
 export interface CategoryOption {
@@ -35,19 +34,18 @@ export function ShopSidebar({
   onSelectCategory,
   scrollLinks = false,
 }: ShopSidebarProps) {
-  const router = useRouter();
+  const getCategoryHref = (slug: string) => {
+    if (slug === "deals") return "/deals";
+    return slug === "all" ? "/shop" : `/shop?category=${slug}`;
+  };
 
-  const handleCategoryClick = (slug: string) => {
-    if (slug === "deals") {
-      router.push("/deals");
-      return;
-    }
+  const handleCategoryClick = (e: React.MouseEvent, slug: string) => {
     if (onSelectCategory) {
+      e.preventDefault();
       onSelectCategory(slug);
-    } else if (!scrollLinks) {
-      router.push(slug === "all" ? "/shop" : `/shop?category=${slug}`);
     }
     if (scrollLinks) {
+      e.preventDefault();
       const el = document.getElementById(`section-${slug}`);
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -68,12 +66,15 @@ export function ShopSidebar({
             {STORE_CATEGORIES.map((cat) => {
               const isActive = activeCategory === cat.slug;
               const isDeals = cat.slug === "deals";
+              const href = getCategoryHref(cat.slug);
+
               return (
-                <button
+                <Link
                   key={cat.slug}
-                  type="button"
-                  onClick={() => handleCategoryClick(cat.slug)}
-                  className={`w-full text-left px-3.5 py-2.5 rounded-xl text-[14px] font-bold transition-all cursor-pointer ${
+                  href={href}
+                  prefetch={true}
+                  onClick={(e) => handleCategoryClick(e, cat.slug)}
+                  className={`w-full text-left px-3.5 py-2.5 rounded-xl text-[14px] font-bold transition-all block ${
                     isActive
                       ? "bg-[#5A805B]/10 text-[#5A805B] font-extrabold shadow-2xs"
                       : isDeals
@@ -82,7 +83,7 @@ export function ShopSidebar({
                   }`}
                 >
                   <span>{cat.name}</span>
-                </button>
+                </Link>
               );
             })}
           </nav>
