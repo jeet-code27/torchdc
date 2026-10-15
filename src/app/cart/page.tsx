@@ -321,7 +321,7 @@ export default function CartPage() {
                   <div key={`${item.id}-${item.weight || "def"}`} className="cline">
                     <span className="cline__img">
                       <Image
-                        src={item.image || "/assets/img/logo.webp"}
+                        src={item.image || "/assets/img/flower.webp"}
                         alt={item.name}
                         width={48}
                         height={48}

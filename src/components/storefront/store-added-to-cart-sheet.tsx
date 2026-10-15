@@ -25,19 +25,19 @@ const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
       name: "Tangie (Sativa)",
       slug: "tangie-sativa",
       type: "Sativa",
-      image: "https://torchdc.co/wp-content/uploads/2025/09/Tangie-strain-Sativa.png",
+      image: "/assets/img/flower.webp",
     },
     {
       name: "Acapulco Gold (Sativa)",
       slug: "acapulco-gold-sativa",
       type: "Sativa",
-      image: "https://torchdc.co/wp-content/uploads/2025/09/Acapulco-Gold-Sativa.png",
+      image: "/assets/img/flower.webp",
     },
     {
       name: "Death Star (Indica)",
       slug: "death-star-indica",
       type: "Indica",
-      image: "https://torchdc.co/wp-content/uploads/2025/09/Death-Star-Indica.png",
+      image: "/assets/img/flower.webp",
     },
   ],
   Topshelf: [
@@ -45,19 +45,19 @@ const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
       name: "Super Silver Haze (Sativa)",
       slug: "super-silver-haze-sativa",
       type: "Sativa",
-      image: "https://torchdc.co/wp-content/uploads/2025/09/Super-Silver-Haze-Sativa.png",
+      image: "/assets/img/flower.webp",
     },
     {
       name: "Sour Diesel (Sativa)",
       slug: "sour-diesel-sativa",
       type: "Sativa",
-      image: "https://torchdc.co/wp-content/uploads/2025/09/Sour-Diesel-Sativa.png",
+      image: "/assets/img/flower.webp",
     },
     {
       name: "Gorilla Glue (Hybrid)",
       slug: "gorilla-glue-hybrid",
       type: "Hybrid",
-      image: "https://torchdc.co/wp-content/uploads/2025/09/Gorilla-Glue-Hybrid.png",
+      image: "/assets/img/flower.webp",
     },
   ],
   "Private Reserve": [
@@ -65,19 +65,19 @@ const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
       name: "Rainbow Belts (Hybrid)",
       slug: "rainbow-belts-hybrid",
       type: "Hybrid",
-      image: "https://torchdc.co/wp-content/uploads/2025/09/Rainbow-Belts-Hybrid.png",
+      image: "/assets/img/flower.webp",
     },
     {
       name: "Cereal Milk (Hybrid)",
       slug: "cereal-milk-hybrid",
       type: "Hybrid",
-      image: "https://torchdc.co/wp-content/uploads/2025/09/Cereal-Milk-Hybrid.png",
+      image: "/assets/img/flower.webp",
     },
     {
       name: "Ice Cream Cake (Indica)",
       slug: "ice-cream-cake-indica",
       type: "Indica",
-      image: "https://torchdc.co/wp-content/uploads/2025/09/Ice-Cream-Cake-Indica.png",
+      image: "/assets/img/flower.webp",
     },
   ],
 };
@@ -95,7 +95,7 @@ const ADDONS = [
     slug: "top-shelf-1g-pre-rolls",
     price: 10,
     weight: "1g",
-    image: "https://i0.wp.com/torchdc.co/wp-content/uploads/2025/11/new-torch-pre-rolls.jpg?fit=2082%2C1249&ssl=1",
+    image: "/assets/img/preroll.webp",
     category: "pre-rolls",
   },
   {
@@ -104,7 +104,7 @@ const ADDONS = [
     slug: "exotic-1g-pre-rolls",
     price: 15,
     weight: "1g",
-    image: "https://i0.wp.com/torchdc.co/wp-content/uploads/2025/11/new-torch-pre-rolls.jpg?fit=2082%2C1249&ssl=1",
+    image: "/assets/img/preroll.webp",
     category: "pre-rolls",
   },
 ];
@@ -284,7 +284,7 @@ export function StoreAddedToCartSheet() {
                     width={42}
                     height={42}
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/assets/img/logo.webp";
+                      (e.target as HTMLImageElement).src = "/assets/img/flower.webp";
                     }}
                   />
                   <span>

@@ -64,7 +64,7 @@ export function ShopCartSidebar() {
                 <span className="dline__img">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={item.image || "/assets/img/logo.webp"}
+                    src={item.image || "/assets/img/flower.webp"}
                     alt={item.name}
                   />
                 </span>
