@@ -17,6 +17,7 @@ interface FlowerBase {
   slug: string;
   type: string;
   image: string;
+  tier?: FlowerTier;
 }
 
 const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
@@ -39,6 +40,18 @@ const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
       type: "Indica",
       image: "/assets/img/flower.webp",
     },
+    {
+      name: "Jack Herer (Sativa)",
+      slug: "jack-herer-sativa",
+      type: "Sativa",
+      image: "/assets/img/flower.webp",
+    },
+    {
+      name: "Blue Dream (Hybrid)",
+      slug: "blue-dream-hybrid",
+      type: "Hybrid",
+      image: "/assets/img/flower.webp",
+    },
   ],
   Topshelf: [
     {
@@ -56,6 +69,24 @@ const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
     {
       name: "Gorilla Glue (Hybrid)",
       slug: "gorilla-glue-hybrid",
+      type: "Hybrid",
+      image: "/assets/img/flower.webp",
+    },
+    {
+      name: "OG Kush (Indica)",
+      slug: "og-kush-indica",
+      type: "Indica",
+      image: "/assets/img/flower.webp",
+    },
+    {
+      name: "Wedding Cake (Hybrid)",
+      slug: "wedding-cake-hybrid",
+      type: "Hybrid",
+      image: "/assets/img/flower.webp",
+    },
+    {
+      name: "Gelato 41 (Hybrid)",
+      slug: "gelato-41-hybrid",
       type: "Hybrid",
       image: "/assets/img/flower.webp",
     },
@@ -77,6 +108,18 @@ const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
       name: "Ice Cream Cake (Indica)",
       slug: "ice-cream-cake-indica",
       type: "Indica",
+      image: "/assets/img/flower.webp",
+    },
+    {
+      name: "Runtz (Hybrid)",
+      slug: "runtz-hybrid",
+      type: "Hybrid",
+      image: "/assets/img/flower.webp",
+    },
+    {
+      name: "Jealousy (Hybrid)",
+      slug: "jealousy-hybrid",
+      type: "Hybrid",
       image: "/assets/img/flower.webp",
     },
   ],
@@ -120,6 +163,11 @@ export function StoreAddedToCartSheet() {
     finalTotal,
   } = useCart();
 
+  // Dynamic store flowers loaded from database
+  const [dbFlowers, setDbFlowers] = React.useState<FlowerBase[]>([]);
+  // Touch swipe down tracking for mobile
+  const [touchStartY, setTouchStartY] = React.useState<number | null>(null);
+
   // Close on Escape key
   React.useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -130,6 +178,65 @@ export function StoreAddedToCartSheet() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isAddedSheetOpen, setIsAddedSheetOpen]);
+
+  // Fetch real active flowers from store database
+  React.useEffect(() => {
+    let mounted = true;
+    fetch("/api/products?limit=80")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.products) && mounted) {
+          const flowers: FlowerBase[] = data.products
+            .filter((p: any) => {
+              const nameLower = (p.name || "").toLowerCase();
+              const catSlug = (
+                p.categoryIds?.[0]?.slug ||
+                p.category?.slug ||
+                ""
+              ).toLowerCase();
+              return (
+                catSlug.includes("flower") ||
+                /(\bsativa|\bindica|\bhybrid|\bmidshelf|\btopshelf|\bprivate reserve|\bexotic)/i.test(
+                  nameLower
+                )
+              );
+            })
+            .map((p: any) => {
+              let type = "Hybrid";
+              const lower = (p.name || "").toLowerCase();
+              if (lower.includes("sativa")) type = "Sativa";
+              else if (lower.includes("indica")) type = "Indica";
+
+              let tier: FlowerTier = "Topshelf";
+              if (lower.includes("midshelf")) tier = "Midshelf";
+              else if (lower.includes("private") || lower.includes("exotic"))
+                tier = "Private Reserve";
+
+              const resolvedImg =
+                p.images?.find((img: any) => img?.isPrimary && img?.url)?.url ||
+                p.images?.[0]?.url ||
+                "/assets/img/flower.webp";
+
+              return {
+                name: p.name,
+                slug: p.slug,
+                type,
+                tier,
+                image: resolvedImg,
+              };
+            });
+
+          if (flowers.length > 0) {
+            setDbFlowers(flowers);
+          }
+        }
+      })
+      .catch(() => null);
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   if (!isAddedSheetOpen || !lastAddedItem) {
     return null;
@@ -150,7 +257,8 @@ export function StoreAddedToCartSheet() {
   if (!effectiveTier && isFlower) {
     const lower = lastAddedItem.name.toLowerCase();
     if (lower.includes("midshelf")) effectiveTier = "Midshelf";
-    else if (lower.includes("private") || lower.includes("exotic")) effectiveTier = "Private Reserve";
+    else if (lower.includes("private") || lower.includes("exotic"))
+      effectiveTier = "Private Reserve";
     else effectiveTier = "Topshelf";
   }
 
@@ -174,42 +282,116 @@ export function StoreAddedToCartSheet() {
     });
   }
 
-  const activeCount = isOzDeal ? ozCount : halfCount;
-  const pickPrice = effectiveTier ? TIER_PRICES[effectiveTier][targetUnit] : (isOzDeal ? 140 : 70);
+  const pickPrice = effectiveTier
+    ? TIER_PRICES[effectiveTier][targetUnit]
+    : isOzDeal
+    ? 140
+    : 70;
 
-  // Available strain picks for this tier (exclude current product)
-  const currentFirstWord = lastAddedItem.name.toLowerCase().split(/[\s(]+/)[0] || "";
-  const availablePicks = effectiveTier
-    ? TIER_BASE_FLOWERS[effectiveTier].filter(
-        (p) => !p.name.toLowerCase().startsWith(currentFirstWord)
-      )
-    : [];
+  // Dynamically select and shuffle 3 flower strains for recommendations
+  const currentFirstWord =
+    lastAddedItem.name.toLowerCase().split(/[\s(]+/)[0] || "";
+
+  const availablePicks = React.useMemo(() => {
+    if (!effectiveTier) return [];
+
+    // Filter database flowers for this tier
+    const matchingDb = dbFlowers.filter(
+      (f) =>
+        f.tier === effectiveTier &&
+        !f.name.toLowerCase().startsWith(currentFirstWord)
+    );
+
+    // Curated fallback flowers for this tier
+    const fallbackList = TIER_BASE_FLOWERS[effectiveTier].filter(
+      (f) => !f.name.toLowerCase().startsWith(currentFirstWord)
+    );
+
+    // Merge unique by slug or cleaned name
+    const combinedMap = new Map<string, FlowerBase>();
+    matchingDb.forEach((f) => combinedMap.set(f.slug || f.name, f));
+    fallbackList.forEach((f) => {
+      if (!combinedMap.has(f.slug || f.name)) {
+        combinedMap.set(f.slug || f.name, f);
+      }
+    });
+
+    const pool = Array.from(combinedMap.values());
+    // Random shuffle on every addition
+    const shuffled = [...pool].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 3);
+  }, [effectiveTier, currentFirstWord, dbFlowers, lastAddedItem]);
+
+  // Touch handlers for mobile swipe down to close
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartY === null) return;
+    const touchEndY = e.changedTouches[0].clientY;
+    // Swipe down threshold: > 60px
+    if (touchEndY - touchStartY > 60) {
+      setIsAddedSheetOpen(false);
+    }
+    setTouchStartY(null);
+  };
 
   return (
-    <div className="sheet" role="dialog" aria-modal="true" aria-label="Added to cart">
-      {/* Dimmed backdrop */}
+    <div
+      className="sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Added to cart"
+    >
+      {/* 1. Dimmed backdrop (click to close) */}
       <div
         className="sheet__bg"
         onClick={() => setIsAddedSheetOpen(false)}
         aria-hidden="true"
       />
 
-      {/* Sheet card modal */}
-      <div className="sheet__card">
-        {/* Grip handle */}
-        <div className="sheet__grip" />
+      {/* 2. Sheet card modal */}
+      <div
+        className="sheet__card"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Grip handle (click or drag down to close) */}
+        <button
+          type="button"
+          className="sheet__grip"
+          onClick={() => setIsAddedSheetOpen(false)}
+          title="Drag down or tap to close"
+          aria-label="Close sheet"
+        />
 
-        {/* Confirmation row */}
-        <div className="sheet__ok">
-          <span className="okdot">✓</span>
-          <span>
-            <strong>Added to cart</strong>
+        {/* Topbar with confirmation & X close button */}
+        <div className="sheet__topbar">
+          <div className="sheet__ok">
+            <span className="okdot">✓</span>
             <span>
-              {lastAddedItem.name}
-              {lastAddedItem.weight ? ` · ${lastAddedItem.weight}` : ""}
-              {lastAddedItem.quantity > 1 ? ` x ${lastAddedItem.quantity}` : ""}
+              <strong>Added to cart</strong>
+              <span>
+                {lastAddedItem.name}
+                {lastAddedItem.weight ? ` · ${lastAddedItem.weight}` : ""}
+                {lastAddedItem.quantity > 1
+                  ? ` x ${lastAddedItem.quantity}`
+                  : ""}
+              </span>
             </span>
-          </span>
+          </div>
+
+          {/* Quick Close 'X' Button */}
+          <button
+            type="button"
+            className="sheet__close"
+            onClick={() => setIsAddedSheetOpen(false)}
+            title="Close"
+            aria-label="Close dialog"
+          >
+            ✕
+          </button>
         </div>
 
         {/* ================= FLOWER DEAL BOX (LIVE INTERACTIVE PROGRESS) ================= */}
@@ -256,14 +438,16 @@ export function StoreAddedToCartSheet() {
                 style={{
                   width: `${Math.min(
                     100,
-                    (isOzDeal ? Math.min(ozCount, 4) : Math.min(halfCount, 4)) * 25
+                    (isOzDeal
+                      ? Math.min(ozCount, 4)
+                      : Math.min(halfCount, 4)) * 25
                   )}%`,
                 }}
               />
             </div>
 
             {/* Recommended Strain Picks with Live + Add */}
-            {availablePicks.slice(0, 3).map((base) => {
+            {availablePicks.map((base) => {
               const pickId = `${base.slug}-${targetWeight.replace(/\s+/g, "")}`;
               const baseKeyword = base.name.toLowerCase().split(/[\s(]+/)[0];
 
@@ -279,12 +463,13 @@ export function StoreAddedToCartSheet() {
                 <div key={base.slug} className="pickrow">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={base.image}
+                    src={base.image || "/assets/img/flower.webp"}
                     alt={base.name}
                     width={42}
                     height={42}
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/assets/img/flower.webp";
+                      (e.target as HTMLImageElement).src =
+                        "/assets/img/flower.webp";
                     }}
                   />
                   <span>
@@ -318,7 +503,7 @@ export function StoreAddedToCartSheet() {
                             weight: targetWeight,
                             tier: effectiveTier,
                             category: "flowers",
-                            image: base.image,
+                            image: base.image || "/assets/img/flower.webp",
                           },
                           1,
                           { showSheet: false }
@@ -343,7 +528,12 @@ export function StoreAddedToCartSheet() {
             return (
               <div key={addon.id} className="addon">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={addon.image} alt={addon.name} width={68} height={68} />
+                <img
+                  src={addon.image}
+                  alt={addon.name}
+                  width={68}
+                  height={68}
+                />
                 <span>{addon.name}</span>
                 <span className="addon__row">
                   <b>${addon.price}</b>

@@ -842,8 +842,12 @@ body:has(.cartbar.is-on) .footer { padding-bottom: 100px; }
 .sheet[hidden] { display: none; }
 .sheet__bg { position: absolute; inset: 0; background: rgba(17,17,17,0.55); backdrop-filter: blur(2px); }
 .sheet__card { position: relative; width: 100%; max-width: 480px; max-height: 88vh; overflow-y: auto; background: #FFFFFF; border-radius: 28px 28px 0 0; padding: 12px 18px 24px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 -8px 30px rgba(0,0,0,0.18); z-index: 2; }
-.sheet__grip { align-self: center; width: 44px; height: 5px; border-radius: 3px; background: #DDE2DD; margin-bottom: 4px; }
-.sheet__ok { display: flex; align-items: center; gap: 12px; }
+.sheet__grip { align-self: center; width: 44px; height: 5px; border-radius: 3px; background: #DDE2DD; margin-bottom: 4px; cursor: pointer; border: 0; padding: 0; transition: background-color 0.15s ease; }
+.sheet__grip:hover { background: #B8C2B8; }
+.sheet__topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sheet__close { flex: none; width: 34px; height: 34px; border-radius: 17px; background: #F2F4F2; border: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #4F5A50; cursor: pointer; transition: all 0.15s ease; }
+.sheet__close:hover { background: #E2ECE1; color: #111111; transform: scale(1.05); }
+.sheet__ok { display: flex; align-items: center; gap: 12px; flex: 1; }
 .sheet__ok > span:last-child { display: flex; flex-direction: column; }
 .sheet__ok > span:last-child strong { font-size: 17px; font-weight: 800; color: #111111; }
 .sheet__ok > span:last-child span { font-size: 13.5px; color: #4F5A50; }
