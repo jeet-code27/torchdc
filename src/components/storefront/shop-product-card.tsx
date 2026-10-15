@@ -33,8 +33,11 @@ export function ShopProductCard({
   product,
   layout = "grid",
 }: ShopProductCardProps) {
-  const { addItem } = useCart();
+  const { addItem, items } = useCart();
   const [justAdded, setJustAdded] = React.useState(false);
+
+  const cartItem = items.find((i) => i.id === product.id || i.slug === product.slug);
+  const cartQty = cartItem ? cartItem.quantity : 0;
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -45,7 +48,7 @@ export function ShopProductCard({
       name: product.name,
       slug: product.slug,
       price: product.price,
-      image: product.image,
+      image: product.image || "/assets/img/flower.webp",
       weight: product.weight || "3.5g",
       tier: product.tier,
       category: product.category,
@@ -56,37 +59,38 @@ export function ShopProductCard({
   };
 
   // Determine badge
-  let badgeContent: React.ReactNode = null;
-  if (product.badge) {
-    badgeContent = (
-      <span className="inline-block bg-[#E8561E] text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shadow-xs">
-        {product.badge}
+  let badgeEl: React.ReactNode = null;
+  const bLow = (product.badge || "").toLowerCase();
+  if (
+    bLow === "hot" ||
+    bLow === "best seller" ||
+    bLow === "best sellers" ||
+    (!product.badge && product.isBestSeller)
+  ) {
+    badgeEl = (
+      <span className="pcard__flame" aria-label="Best seller">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 1.5c1.2 3.6 5.5 5.6 5.5 11.2A5.5 5.5 0 0 1 6.5 13c0-2.6 1.2-4.4 2.8-5.6.2 2.2 1.2 3.4 2.6 3.4.1-3.6-1.4-6.2.1-9.3z"
+            fill="#FF7A1F"
+          />
+          <path
+            d="M12 22a3 3 0 0 1-3-3c0-1.6 1-2.6 2-3.4.2 1 .8 1.6 1.6 1.6 0-1 .1-1.8.7-2.6C14.2 15.6 15 17 15 19a3 3 0 0 1-3 3z"
+            fill="#FFC23D"
+          />
+        </svg>
       </span>
     );
-  } else if (product.isBestSeller) {
-    badgeContent = (
-      <span className="inline-block bg-[#E8561E] text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-xs">
-        BEST SELLER
-      </span>
-    );
-  } else if (product.isNewArrival) {
-    badgeContent = (
-      <span className="inline-block bg-[#E8561E] text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shadow-xs">
-        NEW
-      </span>
-    );
-  } else if (product.tier === "exotic") {
-    badgeContent = (
-      <span className="inline-block bg-[#2F4F30] text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shadow-xs">
-        EXOTIC
-      </span>
-    );
+  } else if (bLow === "new" || (!product.badge && product.isNewArrival)) {
+    badgeEl = <span className="pcard__new">NEW</span>;
+  } else if (product.badge) {
+    badgeEl = <span className="pcard__new pcard__new--dark">{product.badge}</span>;
   }
 
   // Display subtitle or strain
   const metaText =
     product.subtitle ||
-    [product.tier ? capitalize(product.tier) : "", product.strain ? capitalize(product.strain) : "", product.weight]
+    [product.strain ? capitalize(product.strain) : "", product.tier ? capitalize(product.tier) : "", product.weight]
       .filter(Boolean)
       .join(" · ") ||
     "Washington, DC Local";
@@ -98,24 +102,21 @@ export function ShopProductCard({
           href={`/product/${product.slug}`}
           className="flex items-center gap-3.5 flex-1 min-w-0"
         >
-          <div className="relative w-16 h-16 rounded-xl bg-white border border-neutral-100/90 p-2 flex-shrink-0 overflow-hidden">
-            <Image
-              src={product.image}
+          <div className="relative w-16 h-16 rounded-xl bg-[#F6F8F6] p-2 flex-shrink-0 overflow-hidden flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={product.image || "/assets/img/flower.webp"}
               alt={product.name}
-              fill
-              sizes="64px"
-              className="object-contain mix-blend-multiply transition-transform group-hover:scale-105"
+              className="w-12 h-12 object-contain mix-blend-multiply transition-transform group-hover:scale-105"
             />
           </div>
           <div className="min-w-0 flex-1">
             <h4 className="font-bold text-[15px] text-neutral-900 truncate">
               {product.name}
             </h4>
-            {product.strain && (
-              <span className="inline-block bg-[#eef5ee] text-[#2F4F30] text-[11px] font-bold px-2 py-0.5 rounded-md mt-1">
-                {capitalize(product.strain)}
-              </span>
-            )}
+            <span className="text-xs text-neutral-500 block truncate mt-0.5">
+              {metaText}
+            </span>
           </div>
         </Link>
         <div className="flex items-center gap-3 pl-3">
@@ -128,81 +129,59 @@ export function ShopProductCard({
           <button
             type="button"
             onClick={handleAdd}
-            className="w-9 h-9 rounded-full bg-[#5A805B] hover:bg-[#4a6b4b] text-white flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95 ${
+              cartQty > 0 || justAdded
+                ? "bg-[#5A805B] text-white"
+                : "bg-white text-neutral-900 border border-neutral-200 hover:bg-[#5A805B] hover:text-white"
+            }`}
             aria-label={`Add ${product.name} to cart`}
           >
-            {justAdded ? <Check className="w-4 h-4 stroke-[3]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
+            {justAdded || cartQty > 0 ? (
+              <Check className="w-4 h-4 stroke-[3]" />
+            ) : (
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+            )}
           </button>
         </div>
       </div>
     );
   }
 
+  const isIn = justAdded || cartQty > 0;
+
   return (
-    <article className="flex flex-col h-full bg-transparent group">
-      {/* Product Image Box - #F6F8F6 soft rounded background */}
-      <div
-        style={{ backgroundColor: "#F6F8F6" }}
-        className="relative aspect-square w-full rounded-2xl p-3 sm:p-3.5 flex items-center justify-center overflow-hidden mb-2.5"
-      >
-        {/* Badges */}
-        {badgeContent && (
-          <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10">
-            {badgeContent}
-          </div>
-        )}
-
-        {/* Product Image Link */}
-        <Link
-          href={`/product/${product.slug}`}
-          style={{ backgroundColor: "#F6F8F6" }}
-          className="relative w-full h-full flex items-center justify-center"
-        >
-          <div
-            style={{ backgroundColor: "#F6F8F6" }}
-            className="relative w-[82%] h-[82%] transition-transform duration-300 group-hover:scale-105"
-          >
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-contain mix-blend-multiply"
-              style={{ mixBlendMode: "multiply" }}
-            />
-          </div>
+    <div className="pcard">
+      <div className="pcard__img">
+        <Link href={`/product/${product.slug}`} tabIndex={-1} aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={product.image || "/assets/img/flower.webp"}
+            alt={product.name}
+            loading="lazy"
+          />
         </Link>
-
-        {/* Floating Circular Plus Button in Bottom Right of Image Box */}
+        {badgeEl}
         <button
+          className={`add ${isIn ? "is-in" : ""}`}
           type="button"
           onClick={handleAdd}
-          className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 z-20 w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white text-neutral-900 hover:bg-[#5A805B] hover:text-white shadow-sm flex items-center justify-center transition-all cursor-pointer active:scale-95"
           aria-label={`Add ${product.name} to cart`}
         >
           {justAdded ? (
-            <Check className="w-4 h-4 stroke-[3] text-[#5A805B]" />
+            <Check className="w-4 h-4 stroke-[3]" />
+          ) : cartQty > 0 ? (
+            cartQty
           ) : (
-            <Plus className="w-4 h-4 stroke-[2.5]" />
+            "+"
           )}
         </button>
       </div>
-
-      {/* Title & Metadata & Price below image container */}
-      <div className="flex-1 flex flex-col pt-0.5">
-        <h3 className="font-bold text-[14px] sm:text-[15px] text-neutral-900 leading-snug line-clamp-1 group-hover:text-[#5A805B] transition-colors">
-          <Link href={`/product/${product.slug}`}>{product.name}</Link>
-        </h3>
-        <p className="text-[12px] sm:text-[13px] text-neutral-500 line-clamp-1 mt-0.5">
-          {metaText}
-        </p>
-
-        {/* Plain bold price */}
-        <div className="mt-1.5 text-[16px] sm:text-[17px] font-extrabold text-neutral-900 leading-tight">
-          ${product.price}
-        </div>
-      </div>
-    </article>
+      <Link className="pcard__name" href={`/product/${product.slug}`}>
+        {product.name}
+      </Link>
+      <span className="pcard__meta">{metaText}</span>
+      <span className="pcard__price">${product.price}</span>
+    </div>
   );
 }
 

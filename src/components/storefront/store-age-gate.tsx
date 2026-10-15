@@ -1,10 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShieldAlert, Check, RefreshCw } from "lucide-react";
 
 const STORAGE_KEY = "torch_age_verified";
 const COOKIE_NAME = "torch_21";
@@ -110,135 +108,107 @@ export function StoreAgeGate() {
     <div
       role="dialog"
       aria-modal="true"
-      aria-labelledby="agegate-title"
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#3d593e]/95 backdrop-blur-md animate-in fade-in duration-300"
+      aria-labelledby="age-title"
+      id="agegate"
+      className={`agegate ${isOpen ? "is-open" : ""}`}
     >
-      {/* Background Decorative Weed Pattern Overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-10 bg-repeat"
-        style={{
-          backgroundImage: `radial-gradient(circle at 50% 50%, #ffffff 1px, transparent 1px)`,
-          backgroundSize: "28px 28px",
-        }}
-      />
+      <div className="agegate__card">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/assets/img/logo.webp" alt="Torch" />
 
-      <div className="relative z-10 w-full max-w-[390px] flex flex-col items-center">
         {step === "ask" ? (
-          /* STEP 1: VERIFICATION PROMPT */
-          <div className="w-full bg-white rounded-[28px] p-7 md:p-8 text-center shadow-2xl flex flex-col items-center border border-emerald-100/40 animate-in zoom-in-95 duration-200">
-            {/* 1. Torch Logo */}
-            <div className="relative w-36 h-12 mb-3">
-              <Image
-                src="/images/torch-logo.svg"
-                alt="Torch Dispensary"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-
-            {/* 2. Solid Orange 21+ Badge */}
-            <span className="inline-block bg-[#E8561E] text-white text-[11px] font-black tracking-wider uppercase px-3.5 py-1 rounded-full mb-3 shadow-sm">
-              21+ ONLY
-            </span>
-
-            {/* 3. Heading */}
-            <h2
-              id="agegate-title"
-              className="text-[25px] md:text-[27px] font-black text-neutral-900 tracking-tight leading-tight mb-2.5"
-            >
-              Are you 21 or older?
-            </h2>
-
-            {/* 4. Subtitle */}
-            <p className="text-[13px] md:text-[14px] text-neutral-600 leading-relaxed max-w-[290px] mb-6">
+          <div
+            className="agegate__ask"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "12px",
+              width: "100%",
+            }}
+          >
+            <span className="tag">21+ ONLY</span>
+            <h1 id="age-title">Are you 21 or older?</h1>
+            <p>
               You must be 21+ to shop Torch. A valid government ID is checked at
               delivery or pickup.
             </p>
-
-            {/* 5. Primary Confirmation Button */}
             <button
+              className="btn-wide"
               type="button"
               onClick={handleConfirmAge}
-              className="w-full bg-[#557754] hover:bg-[#466645] active:scale-[0.99] text-white font-black py-3.5 px-6 rounded-full text-[14px] uppercase tracking-wider transition-all shadow-md shadow-[#557754]/20 hover:shadow-lg hover:shadow-[#557754]/30 cursor-pointer"
+              style={{ cursor: "pointer" }}
             >
               YES, I&apos;M 21+
             </button>
-
-            {/* 6. Secondary Rejection Button */}
             <button
+              className="btn-wide btn-wide--ghost"
               type="button"
               onClick={handleRejectAge}
-              className="w-full bg-white hover:bg-neutral-50 active:scale-[0.99] text-neutral-800 font-bold py-3 px-6 rounded-full border border-neutral-300 text-[14px] transition-all cursor-pointer mt-2.5"
+              style={{ cursor: "pointer" }}
             >
               No, I&apos;m under 21
             </button>
-
-            {/* 7. Remember me for 30 days */}
-            <label className="flex items-center justify-center gap-2.5 mt-4 cursor-pointer text-[13px] text-neutral-700 select-none group">
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "14px",
+                color: "#4F5A50",
+                minHeight: "44px",
+                cursor: "pointer",
+              }}
+            >
               <input
+                id="age-remember"
                 type="checkbox"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                className="w-4 h-4 rounded text-[#557754] accent-[#557754] cursor-pointer"
-              />
-              <span className="group-hover:text-neutral-900 transition-colors">
-                Remember me for 30 days
-              </span>
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  accentColor: "#5A805B",
+                  cursor: "pointer",
+                }}
+              />{" "}
+              Remember me for 30 days
             </label>
-
-            {/* 8. Fine legal notice */}
-            <p className="text-[11px] text-neutral-400 mt-4 leading-normal">
+            <small>
               By entering you agree to our{" "}
-              <Link
-                href="/terms-conditions"
-                className="underline hover:text-neutral-700 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
+              <Link href="/terms-conditions" onClick={() => setIsOpen(false)}>
                 Terms
               </Link>{" "}
               and{" "}
-              <Link
-                href="/privacy-policy"
-                className="underline hover:text-neutral-700 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
+              <Link href="/privacy-policy" onClick={() => setIsOpen(false)}>
                 Privacy Policy
               </Link>
               .
-            </p>
+            </small>
           </div>
         ) : (
-          /* STEP 2: REJECTION PROMPT */
-          <div className="w-full bg-white rounded-[28px] p-7 md:p-8 text-center shadow-2xl flex flex-col items-center border border-red-100 animate-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
-              <ShieldAlert className="w-6 h-6" />
-            </div>
-
-            <h2 className="text-[22px] font-black text-neutral-900 tracking-tight mb-2">
-              Sorry, you must be 21 or older
-            </h2>
-
-            <p className="text-[13px] text-neutral-600 leading-relaxed mb-6">
-              Come back when you&apos;re 21. Washington D.C. laws
-              strictly require all patrons to be 21+. Thanks for understanding.
-            </p>
-
+          <div
+            className="agegate__no"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "12px",
+              width: "100%",
+            }}
+          >
+            <h1>Sorry, you must be 21 or older</h1>
+            <p>Come back when you&apos;re 21. Thanks for understanding.</p>
             <button
+              className="btn-wide btn-wide--ghost"
               type="button"
               onClick={handleRetry}
-              className="w-full bg-neutral-100 hover:bg-neutral-200 active:scale-[0.99] text-neutral-800 font-bold py-3 px-6 rounded-full border border-neutral-300 text-[14px] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              style={{ cursor: "pointer" }}
             >
-              <RefreshCw className="w-4 h-4" />
               I entered the wrong answer
             </button>
           </div>
         )}
-
-        {/* Bottom Banner Outside Card */}
-        <p className="text-white/85 text-[12px] font-medium mt-6 drop-shadow text-center">
-          Free same-day delivery across Washington, DC
-        </p>
       </div>
     </div>
   );

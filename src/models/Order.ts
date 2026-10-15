@@ -14,7 +14,7 @@ export interface IOrderItem {
 
 export interface IOrderCustomer {
   name: string;
-  email: string;
+  email?: string;
   phone: string;
 }
 
@@ -32,6 +32,10 @@ export interface IOrder extends Document {
   fulfillment: "delivery" | "pickup";
   deliveryAddress?: IOrderDeliveryAddress;
   deliveryNotes?: string;
+  changeFor?: string;
+  firstOrder?: boolean;
+  prerollBonus?: boolean;
+  dealsBreakdown?: Array<{ label: string; amount: number }>;
   pickupLocation?: string;
   items: IOrderItem[];
   subtotal: number;
@@ -81,7 +85,7 @@ const OrderSchema = new Schema<IOrder>(
     },
     customer: {
       name: { type: String, required: true, trim: true },
-      email: { type: String, required: true, trim: true, lowercase: true },
+      email: { type: String, default: "", trim: true, lowercase: true },
       phone: { type: String, required: true, trim: true },
     },
     fulfillment: {
@@ -100,6 +104,24 @@ const OrderSchema = new Schema<IOrder>(
       type: String,
       default: "",
     },
+    changeFor: {
+      type: String,
+      default: "",
+    },
+    firstOrder: {
+      type: Boolean,
+      default: false,
+    },
+    prerollBonus: {
+      type: Boolean,
+      default: false,
+    },
+    dealsBreakdown: [
+      {
+        label: { type: String, default: "" },
+        amount: { type: Number, default: 0 },
+      },
+    ],
     pickupLocation: {
       type: String,
       default: "1000 G St NW, Washington, DC",

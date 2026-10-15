@@ -15,6 +15,11 @@ export interface CartItem {
 }
 
 import { PickupPausedModal } from "@/components/storefront/pickup-paused-modal";
+import {
+  computeDeals,
+  unitOf,
+  DealComputationResult,
+} from "@/lib/deals";
 
 export type FulfillmentType = "delivery" | "pickup";
 
@@ -34,6 +39,11 @@ interface CartContextType {
   deliveryZip: string;
   totalCount: number;
   subtotal: number;
+  deals: DealComputationResult;
+  discount: number;
+  finalTotal: number;
+  hasPrerollBonus: boolean;
+  setHasPrerollBonus: (val: boolean) => void;
   isCartDrawerOpen: boolean;
   isPickupEnabled: boolean;
   isPickupPausedModalOpen: boolean;
@@ -83,6 +93,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isCartDrawerOpen, setIsCartDrawerOpen] = React.useState(false);
   const [isInitialized, setIsInitialized] = React.useState(false);
 
+  const [hasPrerollBonus, setHasPrerollBonusState] = React.useState<boolean>(false);
+
   // Store fulfillment settings (Admin can pause or enable store pickup)
   const [isPickupEnabled, setIsPickupEnabled] = React.useState<boolean>(false);
   const [isPickupPausedModalOpen, setIsPickupPausedModalOpen] = React.useState<boolean>(false);
@@ -93,6 +105,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     title: "Pickup is paused right now",
     message: "We'll deliver it free, with a pre-roll on us.",
   });
+
+  const setHasPrerollBonus = React.useCallback((val: boolean) => {
+    setHasPrerollBonusState(val);
+    try {
+      if (val) {
+        localStorage.setItem("torch_preroll_bonus", "true");
+      } else {
+        localStorage.removeItem("torch_preroll_bonus");
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Fetch store fulfillment settings
   React.useEffect(() => {
@@ -148,6 +173,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const storedFulfillment = localStorage.getItem(FULFILLMENT_STORAGE_KEY);
       if (storedFulfillment === "delivery" || storedFulfillment === "pickup") {
         setFulfillmentState(storedFulfillment);
+      }
+      const storedPreroll = localStorage.getItem("torch_preroll_bonus");
+      if (storedPreroll === "true") {
+        setHasPrerollBonusState(true);
       }
     } catch (e) {
       console.warn("Could not load cart from storage", e);
@@ -278,6 +307,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = React.useCallback(() => {
     setItems([]);
+    setHasPrerollBonusState(false);
+    try {
+      localStorage.removeItem("torch_preroll_bonus");
+    } catch {}
     if (sessionId) {
       fetch(`/api/cart/sync?sessionId=${encodeURIComponent(sessionId)}`, {
         method: "DELETE",
@@ -328,6 +361,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }, [items]);
 
+  const deals = React.useMemo(() => {
+    const dealLines = items.map((item) => ({
+      tier: item.tier || (item as any).flowerTier,
+      unit: unitOf(item.weight),
+      price: item.price,
+      qty: item.quantity,
+    }));
+    return computeDeals(dealLines);
+  }, [items]);
+
+  const discount = deals.total;
+  const finalTotal = Math.max(0, subtotal - discount);
+
   return (
     <CartContext.Provider
       value={{
@@ -337,6 +383,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         deliveryZip,
         totalCount,
         subtotal,
+        deals,
+        discount,
+        finalTotal,
+        hasPrerollBonus,
+        setHasPrerollBonus,
         isCartDrawerOpen,
         isPickupEnabled,
         isPickupPausedModalOpen,

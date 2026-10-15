@@ -1,425 +1,756 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
-export type BannerSlide =
-  | {
-      id: string;
-      type: "text";
-      badge: string;
-      badgeColor?: string;
-      title: string;
-      subtitle: string;
-      secondaryText?: string;
-      ctaText: string;
-      ctaLink: string;
-      image: string;
-      imageAlt: string;
-      bgColor?: string;
-    }
-  | {
-      id: string;
-      type: "image";
-      image: string;
-      alt: string;
-      link?: string;
-    }
-  | {
-      id: string;
-      type: "night-sky";
-      badge: string;
-      title: string;
-      subtitle: string;
-      ctaText: string;
-      ctaLink: string;
-    };
-
-const slides: BannerSlide[] = [
-  {
-    id: "wake-and-bake",
-    type: "text",
-    badge: "9AM TO 12PM DAILY",
-    badgeColor: "bg-[#E8561E]",
-    title: "WAKE &\nBAKE",
-    subtitle: "Half ounce from $50.",
-    secondaryText: "Limit 1 per customer daily.",
-    ctaText: "Grab it",
-    ctaLink: "/deals",
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png",
-    imageAlt: "Torch Wake and Bake Cannabis Special",
-    bgColor: "bg-[#557754]",
-  },
-  {
-    id: "light-up-late",
-    type: "night-sky",
-    badge: "OPEN LATE",
-    title: "LIGHT UP\nLATE",
-    subtitle: "We deliver till 11PM.",
-    ctaText: "Order now",
-    ctaLink: "/shop",
-  },
-  {
-    id: "free-delivery-graphic",
-    type: "image",
-    image: "/images/banner4.jpeg",
-    alt: "Torch Free Delivery - Fast, reliable and discreet delivery straight to your door. Open Daily 7AM-11PM",
-    link: "/#shop",
-  },
-  {
-    id: "exotic-indoor",
-    type: "text",
-    badge: "TOP SHELF SPECIAL",
-    badgeColor: "bg-[#10b981]",
-    title: "EXOTIC\nINDOOR",
-    subtitle: "Private Reserve strains.",
-    secondaryText: "Tested for purity & max potency.",
-    ctaText: "Shop Exotics",
-    ctaLink: "/category/flowers",
-    image:
-      "https://res.cloudinary.com/omtao1np/image/upload/v1791362264/torch/products/n8bcomkhkmu2d4aliuei.png",
-    imageAlt: "Torch Exotic Indoor Flower Special",
-    bgColor: "bg-[#557754]",
-  },
-];
-
-interface StoreHeroCarouselProps {
-  className?: string;
-  compact?: boolean;
-}
-
-export function StoreHeroCarousel({
-  className = "",
-  compact = false,
-}: StoreHeroCarouselProps = {}) {
+export function StoreHeroCarousel() {
   const [currentSlide, setCurrentSlide] = React.useState(0);
-  const [isPaused, setIsPaused] = React.useState(false);
+  const n = 2;
 
-  const touchStartX = React.useRef<number | null>(null);
-  const touchEndX = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % n);
+    }, 7500);
+    return () => clearInterval(timer);
+  }, [n]);
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  const goToSlide = (idx: number) => {
+    setCurrentSlide(idx);
   };
 
-  const nextSlide = React.useCallback(() => {
-    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-  }, []);
-
-  // Autoplay every 5.5 seconds (pauses on hover)
-  React.useEffect(() => {
-    if (isPaused || slides.length <= 1) return;
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 5500);
-    return () => clearInterval(interval);
-  }, [isPaused, nextSlide]);
+  // Touch handlers for mobile swipe
+  const [touchStart, setTouchStart] = React.useState<number | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.targetTouches[0].clientX;
+    setTouchStart(e.touches[0].clientX);
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX;
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStartX.current === null || touchEndX.current === null) return;
-    const diff = touchStartX.current - touchEndX.current;
-    if (diff > 50) {
-      nextSlide();
-    } else if (diff < -50) {
-      prevSlide();
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStart === null) return;
+    const diff = e.changedTouches[0].clientX - touchStart;
+    if (Math.abs(diff) > 40) {
+      if (diff < 0) {
+        setCurrentSlide((prev) => (prev + 1) % n);
+      } else {
+        setCurrentSlide((prev) => (prev - 1 + n) % n);
+      }
     }
-    touchStartX.current = null;
-    touchEndX.current = null;
+    setTouchStart(null);
   };
-
-  const heightClass = "h-[260px] sm:h-[340px] lg:h-[390px]";
 
   return (
-    <div className={`w-full ${className}`}>
-      {/* ================= HERO SLIDER CONTAINER ================= */}
+    <>
+      {/* ================= MOBILE HERO (236px) ================= */}
       <div
-        className="relative overflow-hidden rounded-[22px] sm:rounded-[32px] lg:rounded-[36px] bg-[#557754] shadow-md group select-none"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
+        className="hero hero--mobile"
+        data-slider
+        aria-roledescription="carousel"
         onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Slides Track */}
         <div
-          className="flex transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          className="hero__track"
+          style={{
+            transform: `translateX(-${currentSlide * 100}%)`,
+            display: "flex",
+            transition: "transform 0.45s ease",
+          }}
         >
-          {slides.map((slide, index) => {
-            if (slide.type === "image") {
-              return (
-                <div
-                  key={slide.id}
-                  className={`min-w-full w-full ${heightClass} relative bg-white flex items-center justify-center overflow-hidden`}
-                >
-                  {slide.link ? (
-                    <Link
-                      href={slide.link}
-                      className="block w-full h-full relative cursor-pointer"
-                    >
-                      <Image
-                        src={slide.image}
-                        alt={slide.alt}
-                        fill
-                        priority={index === 0}
-                        loading={index === 0 ? "eager" : "lazy"}
-                        className="object-contain object-center"
-                        sizes="(max-width: 1200px) 100vw, 1200px"
-                      />
-                    </Link>
-                  ) : (
-                    <div className="w-full h-full relative">
-                      <Image
-                        src={slide.image}
-                        alt={slide.alt}
-                        fill
-                        priority={index === 0}
-                        loading={index === 0 ? "eager" : "lazy"}
-                        className="object-contain object-center"
-                        sizes="(max-width: 1200px) 100vw, 1200px"
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            }
-
-            // Night Sky / Light Up Late Slide
-            if (slide.type === "night-sky") {
-              return (
-                <div
-                  key={slide.id}
-                  className={`min-w-full w-full ${heightClass} relative text-white flex items-center px-6 sm:px-10 lg:px-12 overflow-hidden`}
-                  style={{
-                    background: "linear-gradient(165deg, #0B0C0B 0%, #1A1B1A 55%, #2C2E2C 100%)",
-                  }}
-                >
-                  {/* Background Panoramic Night Sky SVG */}
-                  <svg
-                    viewBox="-300 0 658 236"
-                    preserveAspectRatio="xMaxYMax slice"
-                    aria-hidden="true"
-                    className="absolute inset-0 w-full h-full pointer-events-none z-0"
-                  >
-                    <defs>
-                      <radialGradient id="mglowL" cx="0.5" cy="0.5" r="0.5">
-                        <stop offset="0" stopColor="#FFF4DE" stopOpacity="0.45" />
-                        <stop offset="1" stopColor="#E9DFC9" stopOpacity="0" />
-                      </radialGradient>
-                      <radialGradient id="hazeL" cx="0.75" cy="1" r="0.8">
-                        <stop offset="0" stopColor="#E9DFC9" stopOpacity="0.10" />
-                        <stop offset="1" stopColor="#E9DFC9" stopOpacity="0" />
-                      </radialGradient>
-                      <linearGradient id="shoot2L" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0" stopColor="#FFFFFF" stopOpacity="0" />
-                        <stop offset="1" stopColor="#FFFFFF" stopOpacity="0.9" />
-                      </linearGradient>
-                      <mask id="moonCutL">
-                        <rect x="0" y="0" width="358" height="236" fill="#FFFFFF" />
-                        <circle cx="312" cy="48" r="24" fill="#000000" />
-                      </mask>
-                    </defs>
-                    <rect x="-300" y="0" width="658" height="236" fill="url(#hazeL)" />
-                    <g>
-                      <circle cx="-9.2" cy="189.9" r="0.8" fill="#FFFFFF" opacity="0.31" />
-                      <circle cx="-84.6" cy="78.3" r="1" fill="#FFFFFF" opacity="0.37" />
-                      <circle cx="-12.0" cy="24.8" r="1.2" fill="#FFFFFF" opacity="0.57" />
-                      <circle cx="-63.1" cy="159.1" r="1.2" fill="#FFFFFF" opacity="0.65" />
-                      <circle cx="162.3" cy="91.3" r="1.2" fill="#FFFFFF" opacity="0.62" />
-                      <circle cx="303.3" cy="33.6" r="1.6" fill="#FFFFFF" opacity="0.64" />
-                      <circle cx="218.9" cy="33.0" r="1.2" fill="#FFFFFF" opacity="0.53" />
-                      <circle cx="35.7" cy="130.3" r="0.8" fill="#FFFFFF" opacity="0.71" />
-                      <circle cx="142.7" cy="74.7" r="1.6" fill="#FFFFFF" opacity="0.74" />
-                      <circle cx="70.6" cy="41.7" r="0.8" fill="#FFFFFF" opacity="0.82" />
-                      <circle cx="118.2" cy="96.2" r="1" fill="#FFFFFF" opacity="0.66" />
-                      <circle cx="228.1" cy="82.0" r="0.8" fill="#FFFFFF" opacity="0.62" />
-                      <circle cx="101.4" cy="159.6" r="0.8" fill="#FFFFFF" opacity="0.77" />
-                      <circle cx="328.5" cy="12.2" r="1.2" fill="#FFFFFF" opacity="0.94" />
-                      <circle cx="199.8" cy="73.8" r="1" fill="#FFFFFF" opacity="0.94" />
-                      <circle cx="273.3" cy="69.4" r="1.2" fill="#FFFFFF" opacity="0.42" />
-                      <circle cx="345.2" cy="96.5" r="0.8" fill="#FFFFFF" opacity="0.48" />
-                      <circle cx="350.3" cy="37.3" r="1" fill="#FFFFFF" opacity="0.36" />
-                      <circle cx="133.0" cy="101.1" r="1" fill="#FFFFFF" opacity="0.93" />
-                      <circle cx="70.4" cy="119.4" r="1.6" fill="#FFFFFF" opacity="0.47" />
-                      <circle cx="256.1" cy="14.7" r="1" fill="#FFFFFF" opacity="0.64" />
-                      <circle cx="325.1" cy="35.8" r="0.8" fill="#FFFFFF" opacity="0.39" />
-                      <circle cx="52.4" cy="74.3" r="1" fill="#FFFFFF" opacity="0.74" />
-                      <circle cx="245.9" cy="95.2" r="1" fill="#FFFFFF" opacity="0.70" />
-                      <circle cx="327.3" cy="78.1" r="1" fill="#FFFFFF" opacity="0.77" />
-                      <circle cx="324.3" cy="58.9" r="1.2" fill="#FFFFFF" opacity="0.89" />
-                      <circle cx="204.5" cy="101.5" r="1.2" fill="#FFFFFF" opacity="0.58" />
-                      <circle cx="261.3" cy="94.6" r="1.2" fill="#FFFFFF" opacity="0.63" />
-                    </g>
-                    <path d="M168 22 L212 38" stroke="url(#shoot2L)" strokeWidth="2" strokeLinecap="round" />
-                    <circle cx="300" cy="56" r="58" fill="url(#mglowL)" />
-                    <circle cx="300" cy="56" r="26" fill="#FFF4DE" mask="url(#moonCutL)" />
-                    <g fill="none" stroke="#E9DFC9" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" opacity="0.75">
-                      <path d="M-300 234 H0 M-124 234 V222 H-104 V216 H-90 V222 H-76 V212 H-60 V234 M-40 234 V224 H-20 V234" />
-                      <path d="M0 234 H358" />
-                      <path d="M0 234 V220 H16 V214 H30 V220 H42 V212 H58 V234" />
-                      <path d="M176 234 V204 H188 V198 L194 192 L200 198 V204 H212 V196 H226 V234 M188 204 V234 M212 204 V234" />
-                      <path d="M234 234 V106 L240 92 L246 106 V234" />
-                      <path d="M254 234 V200 H262 V188 H274 V200 H280 V234" />
-                      <path d="M284 234 V206 H358 M292 206 V198 H350 V206 M298 198 V190 H344 V198 M301 190 A20 20 0 0 1 341 190 M316 170 H326 V164 L321 156 L316 164 Z" />
-                      <path d="M300 206 V234 M312 206 V234 M330 206 V234 M342 206 V234" />
-                    </g>
-                    <g fill="#FFC56B" opacity="0.9">
-                      <rect x="182" y="210" width="3" height="4" />
-                      <rect x="204" y="212" width="3" height="4" />
-                      <rect x="218" y="202" width="3" height="4" />
-                      <rect x="218" y="214" width="3" height="4" />
-                      <rect x="258" y="206" width="3" height="4" />
-                      <rect x="268" y="194" width="3" height="4" />
-                      <rect x="304" y="214" width="3" height="4" />
-                      <rect x="334" y="214" width="3" height="4" />
-                      <rect x="20" y="224" width="3" height="4" />
-                      <rect x="48" y="218" width="3" height="4" />
-                    </g>
-                  </svg>
-
-                  {/* Left / Text Side */}
-                  <div className="z-10 max-w-xs sm:max-w-md flex flex-col items-start space-y-1.5 sm:space-y-3">
-                    <span className="bg-[#E8561E] text-white text-[10px] sm:text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-xs">
-                      {slide.badge}
-                    </span>
-
-                    <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] whitespace-pre-line uppercase drop-shadow-xs text-white">
-                      {slide.title}
-                    </h2>
-
-                    <div className="flex flex-col space-y-0.5 sm:space-y-1 text-white">
-                      <p className="text-xs sm:text-sm font-semibold leading-normal">
-                        {slide.subtitle}
-                      </p>
-                    </div>
-
-                    <div className="pt-1 sm:pt-2">
-                      <Link
-                        href={slide.ctaLink}
-                        className="inline-flex items-center gap-2 bg-white hover:bg-neutral-100 text-neutral-900 font-extrabold text-xs sm:text-sm px-5 sm:px-6 py-2 sm:py-2.5 rounded-full shadow-md transition-transform hover:scale-105 active:scale-95 group/btn cursor-pointer"
-                      >
-                        <span>{slide.ctaText}</span>
-                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              );
-            }
-
-            // Text Banner Slide
-            return (
-              <div
-                key={slide.id}
-                className={`min-w-full w-full ${heightClass} relative ${
-                  slide.bgColor || "bg-[#557754]"
-                } text-white flex items-center px-6 sm:px-10 lg:px-12 overflow-hidden`}
+          {/* Mobile Slide 1: Free Delivery */}
+          <div
+            style={{
+              flex: "none",
+              width: "100%",
+              height: "236px",
+              boxSizing: "border-box",
+              overflow: "hidden",
+              background: "#EEF5EE",
+              color: "#2F4F30",
+              display: "flex",
+              alignItems: "center",
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                flex: 1,
+                padding: "14px 0 14px 20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+                position: "relative",
+                zIndex: 1,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "56px",
+                  fontWeight: 800,
+                  lineHeight: 0.92,
+                  letterSpacing: "-1px",
+                  color: "#E8561E",
+                }}
               >
-                {/* Left / Text Side */}
-                <div className="z-10 max-w-xs sm:max-w-md flex flex-col items-start space-y-1.5 sm:space-y-3">
-                  <span
-                    className={`${
-                      slide.badgeColor || "bg-[#E8561E]"
-                    } text-white text-[10px] sm:text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-xs`}
-                  >
-                    {slide.badge}
-                  </span>
+                FREE
+              </span>
+              <span
+                style={{
+                  fontSize: "30px",
+                  fontWeight: 800,
+                  lineHeight: 0.95,
+                  letterSpacing: "-0.5px",
+                  color: "#2F4F30",
+                }}
+              >
+                DELIVERY
+              </span>
+              <span
+                style={{
+                  fontSize: "14px",
+                  lineHeight: 1.3,
+                  maxWidth: "160px",
+                  marginTop: "2px",
+                }}
+              >
+                Delivering to <b>all four quadrants</b> of DC.
+              </span>
+              <Link
+                href="/shop"
+                style={{
+                  alignSelf: "flex-start",
+                  marginTop: "6px",
+                  height: "38px",
+                  padding: "0 18px",
+                  borderRadius: "19px",
+                  background: "#5A805B",
+                  color: "#FFFFFF",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  textDecoration: "none",
+                }}
+              >
+                Order now
+              </Link>
+            </div>
 
-                  <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] whitespace-pre-line uppercase drop-shadow-xs">
-                    {slide.title}
-                  </h2>
+            <svg
+              width="176"
+              height="220"
+              viewBox="0 0 176 220"
+              aria-hidden="true"
+              style={{ flex: "none", position: "relative", zIndex: 1 }}
+            >
+              <circle cx="96" cy="112" r="80" fill="#DCEBDB" />
+              <g
+                fill="none"
+                stroke="#5A805B"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                opacity="0.5"
+              >
+                <path d="M-6 150 H182" />
+                <path d="M2 150 V60 L6 50 L10 60 V150" />
+                <path d="M14 150 V128 H26 V122 L32 117 L38 122 V128 H48 V150" />
+                <path d="M60 150 V104 H72 V98 H80 V104 H92 V150" />
+                <path d="M170 150 V106 H182" />
+                <path d="M126 150 V124 H180 M132 124 V118 H174 V124 M137 118 V113 H169 V118 M139 113 A14 14 0 0 1 167 113 M150 99 H156 V95 L153 90 L150 95 Z" />
+              </g>
+              <path
+                d="M-4 190 C30 188 52 180 76 176 L78 186 C52 190 28 196 -4 196 Z"
+                fill="#5A805B"
+                opacity="0.25"
+              />
+              <path
+                d="M-2 120 C18 122 6 160 26 172"
+                fill="none"
+                stroke="#5A805B"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray="1 10"
+                opacity="0.9"
+              />
+              <ellipse cx="152" cy="80" rx="22" ry="7" fill="#E8561E" opacity="0.12" />
+              <ellipse cx="152" cy="80" rx="12" ry="4" fill="#E8561E" opacity="0.25" />
+              <path
+                d="M152 80 C142 66 134 58 134 46 A18 18 0 0 1 170 46 C170 58 162 66 152 80 Z"
+                fill="#E8561E"
+              />
+              <circle cx="152" cy="46" r="7" fill="#FFFFFF" />
+              <ellipse cx="86" cy="190" rx="62" ry="5" fill="#2F4F30" opacity="0.18" />
+              <g transform="translate(0 4)">
+                <circle cx="42" cy="168" r="17" fill="#111111" />
+                <circle cx="42" cy="168" r="6.5" fill="#C9CFC9" />
+                <circle cx="128" cy="168" r="17" fill="#111111" />
+                <circle cx="128" cy="168" r="6.5" fill="#C9CFC9" />
+                <path
+                  d="M121 112 L128 168"
+                  stroke="#2B2B2B"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M14 156 C11 136 26 120 50 120 H84 C91 120 93 127 91 134 L87 150 C86 155 82 158 77 158 H20 C17 158 14 158 14 156 Z"
+                  fill="#FFFFFF"
+                  stroke="#C9D8C8"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M30 146 H74"
+                  stroke="#E9DFD0"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <path d="M77 150 H112 L110 160 H74 Z" fill="#EADFCE" />
+                <path
+                  d="M104 160 C104 134 108 110 114 88 L124 90 C119 112 116 136 114 160 Z"
+                  fill="#FFFFFF"
+                  stroke="#C9D8C8"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M109 162 A19 19 0 0 1 147 162 L139 162 A11 11 0 0 0 117 162 Z"
+                  fill="#2F4F30"
+                />
+                <rect x="40" y="111" width="46" height="11" rx="5.5" fill="#2B2B2B" />
+                <rect x="11" y="136" width="6" height="10" rx="2" fill="#B8391A" />
+                <path
+                  d="M58 106 L86 110 C95 111 99 117 97 123 L95 128 L64 125 C57 123 55 114 58 106 Z"
+                  fill="#383838"
+                />
+                <path d="M87 121 L98 119 L100 147 L90 147 Z" fill="#383838" />
+                <path
+                  d="M87 145 H102 C106 145 107 150 104 152 H87 C86 150 86 147 87 145 Z"
+                  fill="#111111"
+                />
+                <path
+                  d="M55 114 C52 100 55 88 63 81 C70 76 81 76 85 83 C89 91 87 104 83 114 Z"
+                  fill="#1E1E1E"
+                />
+                <path
+                  d="M66 80 C70 84 78 84 82 79"
+                  stroke="#FBF6EE"
+                  strokeWidth="3"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M64 65 C64 53 74 47 84 49 C93 51 97 59 95 68 L93 74 C91 77 87 78 81 78 H70 C66 78 64 73 64 65 Z"
+                  fill="#FFFFFF"
+                  stroke="#C9D8C8"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M80 57 H95 C96 62 95 67 93 69 H83 C80 69 78 66 78 62 C78 59 78 57 80 57 Z"
+                  fill="#1F1F1F"
+                />
+                <rect x="110" y="84" width="20" height="12" rx="5" fill="#FBF6EE" />
+                <path
+                  d="M99 91 H124"
+                  stroke="#111111"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M70 87 C73 82 81 81 85 85 L93 96 L100 88 L106 92 L97 104 C94 108 89 108 87 105 Z"
+                  fill="#1E1E1E"
+                />
+                <circle
+                  cx="130"
+                  cy="94"
+                  r="6"
+                  fill="#FFE7C2"
+                  stroke="#FBF6EE"
+                  strokeWidth="3"
+                />
+                <rect x="14" y="78" width="30" height="32" rx="3" fill="#FBF6EE" />
+                <path d="M44 78 V110 H34 V78 Z" fill="#F1E8DA" />
+                <path
+                  d="M12 72 L16 68 L20 72 L24 68 L28 72 L32 68 L36 72 L40 68 L44 72 L46 72 L45 82 H13 L12 72 Z"
+                  fill="#2F4F30"
+                />
+                <path
+                  d="M29 88c1.5 3.4 4.6 4.5 4.6 8.5a4.6 4.6 0 0 1-9.2 0c0-2.2 1-3.4 2.3-4.4.2 1.8.9 2.7 1.9 2.7 0-2.7-1.1-4.3.4-6.8z"
+                  fill="#E8561E"
+                />
+              </g>
+            </svg>
+          </div>
 
-                  <div className="flex flex-col space-y-0.5 sm:space-y-1 text-white">
-                    <p className="text-xs sm:text-sm font-semibold leading-normal">
-                      {slide.subtitle}
-                    </p>
-                    {slide.secondaryText && (
-                      <p className="text-[10px] sm:text-xs font-medium text-white/80">
-                        {slide.secondaryText}
-                      </p>
-                    )}
-                  </div>
+          {/* Mobile Slide 2: Open Late */}
+          <div
+            style={{
+              flex: "none",
+              width: "100%",
+              height: "236px",
+              boxSizing: "border-box",
+              overflow: "hidden",
+              background:
+                "linear-gradient(180deg, #0F2217 0%, #1B3523 45%, #2A4A31 80%, #36593C 100%)",
+              color: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                flex: "none",
+                width: "200px",
+                padding: "14px 0 14px 20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "5px",
+                position: "relative",
+                zIndex: 2,
+              }}
+            >
+              <span
+                style={{
+                  alignSelf: "flex-start",
+                  margin: "-12px 0 8px",
+                  background: "#E8561E",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.8px",
+                  padding: "4px 10px",
+                  borderRadius: "999px",
+                }}
+              >
+                OPEN LATE
+              </span>
+              <span
+                style={{
+                  fontSize: "36px",
+                  fontWeight: 800,
+                  lineHeight: 0.95,
+                  letterSpacing: "-1px",
+                }}
+              >
+                LIGHT UP
+                <br />
+                LATE
+              </span>
+              <span style={{ fontSize: "13px", lineHeight: 1.35, opacity: 0.9 }}>
+                We deliver till 11PM.
+              </span>
+              <Link
+                href="/shop"
+                style={{
+                  alignSelf: "flex-start",
+                  marginTop: "6px",
+                  height: "38px",
+                  padding: "0 18px",
+                  borderRadius: "19px",
+                  background: "#FFFFFF",
+                  color: "#2F4F30",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  textDecoration: "none",
+                }}
+              >
+                Order now
+              </Link>
+            </div>
 
-                  <div className="pt-1 sm:pt-2">
-                    <Link
-                      href={slide.ctaLink}
-                      className="inline-flex items-center gap-2 bg-white hover:bg-neutral-100 text-neutral-900 font-extrabold text-xs sm:text-sm px-5 sm:px-6 py-2 sm:py-2.5 rounded-full shadow-md transition-transform hover:scale-105 active:scale-95 group/btn cursor-pointer"
-                    >
-                      <span>{slide.ctaText}</span>
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Right / Product Jar/Flower Cutout Graphic */}
-                <div className="absolute right-2 sm:right-6 lg:right-12 bottom-0 top-0 flex items-center justify-end w-1/2 sm:w-7/12 pointer-events-none select-none">
-                  <div className="relative w-full h-[85%] max-h-[340px]">
-                    <Image
-                      src={slide.image}
-                      alt={slide.imageAlt}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 450px"
-                      className="object-contain object-right drop-shadow-2xl"
-                      priority={index === 0}
-                      loading={index === 0 ? "eager" : "lazy"}
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 358 236"
+              preserveAspectRatio="xMaxYMax meet"
+              aria-hidden="true"
+              style={{ position: "absolute", inset: 0, zIndex: 1 }}
+            >
+              <circle cx="300" cy="56" r="26" fill="#FFF4DE" />
+              <g
+                fill="none"
+                stroke="#E9DFC9"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                opacity="0.75"
+              >
+                <path d="M0 234 H358" />
+                <path d="M176 234 V204 H188 V198 L194 192 L200 198 V204 H212 V196 H226 V234" />
+                <path d="M234 234 V106 L240 92 L246 106 V234" />
+                <path d="M284 234 V206 H358 M292 206 V198 H350 V206 M298 198 V190 H344 V198" />
+              </g>
+              <g fill="#FFC56B" opacity="0.9">
+                <rect x="182" y="210" width="3" height="4" />
+                <rect x="204" y="212" width="3" height="4" />
+                <rect x="258" y="206" width="3" height="4" />
+                <rect x="304" y="214" width="3" height="4" />
+              </g>
+            </svg>
+          </div>
         </div>
-
-        {/* Navigation Arrows */}
-        {slides.length > 1 && (
-          <>
-            <button
-              onClick={prevSlide}
-              aria-label="Previous slide"
-              className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 hover:bg-white text-gray-800 flex items-center justify-center shadow-md border border-gray-100 transition-all hover:scale-105 active:scale-95 opacity-0 group-hover:opacity-100 z-20 cursor-pointer backdrop-blur-xs"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-
-            <button
-              onClick={nextSlide}
-              aria-label="Next slide"
-              className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 hover:bg-white text-gray-800 flex items-center justify-center shadow-md border border-gray-100 transition-all hover:scale-105 active:scale-95 opacity-0 group-hover:opacity-100 z-20 cursor-pointer backdrop-blur-xs"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </>
-        )}
       </div>
 
-      {/* Pagination Indicators (Dots) */}
-      {slides.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 sm:gap-2 pt-2.5 pb-1">
-          {slides.map((slide, index) => (
-            <button
-              key={slide.id}
-              onClick={() => setCurrentSlide(index)}
-              aria-label={`Go to slide ${index + 1}`}
-              className={`h-2 transition-all duration-300 rounded-full cursor-pointer ${
-                currentSlide === index
-                  ? "w-6 bg-[#557754]"
-                  : "w-2 bg-[#d1ddd1] hover:bg-[#b0c4b0]"
-              }`}
-            />
-          ))}
+      {/* Mobile Dots */}
+      <div className="dots hero--mobile-dots">
+        {[0, 1].map((idx) => (
+          <button
+            key={idx}
+            type="button"
+            aria-label={`Go to slide ${idx + 1}`}
+            aria-current={currentSlide === idx ? "true" : "false"}
+            onClick={() => goToSlide(idx)}
+          >
+            <span />
+          </button>
+        ))}
+      </div>
+
+      {/* ================= DESKTOP HERO (400px) ================= */}
+      <div
+        className="hero hero--desktop"
+        data-slider
+        aria-roledescription="carousel"
+      >
+        <div
+          className="hero__track"
+          style={{
+            transform: `translateX(-${currentSlide * 100}%)`,
+            display: "flex",
+            transition: "transform 0.45s ease",
+          }}
+        >
+          {/* Desktop Slide 1: Free Delivery */}
+          <div
+            style={{
+              flex: "none",
+              width: "100%",
+              height: "400px",
+              boxSizing: "border-box",
+              background: "#EEF5EE",
+              color: "#2F4F30",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 30px 0 56px",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+                position: "relative",
+                zIndex: 1,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "104px",
+                  fontWeight: 800,
+                  lineHeight: 0.9,
+                  letterSpacing: "-2px",
+                  color: "#E8561E",
+                }}
+              >
+                FREE
+              </span>
+              <span
+                style={{
+                  fontSize: "62px",
+                  fontWeight: 800,
+                  lineHeight: 0.95,
+                  letterSpacing: "-1px",
+                  color: "#2F4F30",
+                }}
+              >
+                DELIVERY
+              </span>
+              <span
+                style={{
+                  fontSize: "19px",
+                  lineHeight: 1.35,
+                  color: "#2F4F30",
+                  marginTop: "4px",
+                }}
+              >
+                Delivering to <b>all four quadrants</b> of DC.
+              </span>
+              <Link
+                href="/shop"
+                style={{
+                  alignSelf: "flex-start",
+                  marginTop: "12px",
+                  height: "50px",
+                  padding: "0 26px",
+                  borderRadius: "25px",
+                  background: "#5A805B",
+                  color: "#FFFFFF",
+                  fontWeight: 700,
+                  fontSize: "16px",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                Order now
+              </Link>
+            </div>
+
+            <svg
+              width="330"
+              height="400"
+              viewBox="-6 0 188 228"
+              aria-hidden="true"
+              style={{ flex: "none", position: "relative", zIndex: 1 }}
+            >
+              <circle cx="96" cy="112" r="80" fill="#DCEBDB" />
+              <g
+                fill="none"
+                stroke="#5A805B"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                opacity="0.5"
+              >
+                <path d="M-6 150 H182" />
+                <path d="M2 150 V60 L6 50 L10 60 V150" />
+                <path d="M14 150 V128 H26 V122 L32 117 L38 122 V128 H48 V150" />
+                <path d="M60 150 V104 H72 V98 H80 V104 H92 V150" />
+                <path d="M170 150 V106 H182" />
+                <path d="M126 150 V124 H180 M132 124 V118 H174 V124 M137 118 V113 H169 V118 M139 113 A14 14 0 0 1 167 113 M150 99 H156 V95 L153 90 L150 95 Z" />
+              </g>
+              <path
+                d="M-4 190 C30 188 52 180 76 176 L78 186 C52 190 28 196 -4 196 Z"
+                fill="#5A805B"
+                opacity="0.25"
+              />
+              <path
+                d="M-2 120 C18 122 6 160 26 172"
+                fill="none"
+                stroke="#5A805B"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray="1 10"
+                opacity="0.9"
+              />
+              <ellipse cx="152" cy="80" rx="22" ry="7" fill="#E8561E" opacity="0.12" />
+              <ellipse cx="152" cy="80" rx="12" ry="4" fill="#E8561E" opacity="0.25" />
+              <path
+                d="M152 80 C142 66 134 58 134 46 A18 18 0 0 1 170 46 C170 58 162 66 152 80 Z"
+                fill="#E8561E"
+              />
+              <circle cx="152" cy="46" r="7" fill="#FFFFFF" />
+              <ellipse cx="86" cy="190" rx="62" ry="5" fill="#2F4F30" opacity="0.18" />
+              <g transform="translate(0 4)">
+                <circle cx="42" cy="168" r="17" fill="#111111" />
+                <circle cx="42" cy="168" r="6.5" fill="#C9CFC9" />
+                <circle cx="128" cy="168" r="17" fill="#111111" />
+                <circle cx="128" cy="168" r="6.5" fill="#C9CFC9" />
+                <path
+                  d="M121 112 L128 168"
+                  stroke="#2B2B2B"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M14 156 C11 136 26 120 50 120 H84 C91 120 93 127 91 134 L87 150 C86 155 82 158 77 158 H20 C17 158 14 158 14 156 Z"
+                  fill="#FFFFFF"
+                  stroke="#C9D8C8"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M30 146 H74"
+                  stroke="#E9DFD0"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <path d="M77 150 H112 L110 160 H74 Z" fill="#EADFCE" />
+                <path
+                  d="M104 160 C104 134 108 110 114 88 L124 90 C119 112 116 136 114 160 Z"
+                  fill="#FFFFFF"
+                  stroke="#C9D8C8"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M109 162 A19 19 0 0 1 147 162 L139 162 A11 11 0 0 0 117 162 Z"
+                  fill="#2F4F30"
+                />
+                <rect x="40" y="111" width="46" height="11" rx="5.5" fill="#2B2B2B" />
+                <rect x="11" y="136" width="6" height="10" rx="2" fill="#B8391A" />
+                <path
+                  d="M58 106 L86 110 C95 111 99 117 97 123 L95 128 L64 125 C57 123 55 114 58 106 Z"
+                  fill="#383838"
+                />
+                <path d="M87 121 L98 119 L100 147 L90 147 Z" fill="#383838" />
+                <path
+                  d="M87 145 H102 C106 145 107 150 104 152 H87 C86 150 86 147 87 145 Z"
+                  fill="#111111"
+                />
+                <path
+                  d="M55 114 C52 100 55 88 63 81 C70 76 81 76 85 83 C89 91 87 104 83 114 Z"
+                  fill="#1E1E1E"
+                />
+                <path
+                  d="M66 80 C70 84 78 84 82 79"
+                  stroke="#FBF6EE"
+                  strokeWidth="3"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M64 65 C64 53 74 47 84 49 C93 51 97 59 95 68 L93 74 C91 77 87 78 81 78 H70 C66 78 64 73 64 65 Z"
+                  fill="#FFFFFF"
+                  stroke="#C9D8C8"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M80 57 H95 C96 62 95 67 93 69 H83 C80 69 78 66 78 62 C78 59 78 57 80 57 Z"
+                  fill="#1F1F1F"
+                />
+                <rect x="110" y="84" width="20" height="12" rx="5" fill="#FBF6EE" />
+                <path
+                  d="M99 91 H124"
+                  stroke="#111111"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M70 87 C73 82 81 81 85 85 L93 96 L100 88 L106 92 L97 104 C94 108 89 108 87 105 Z"
+                  fill="#1E1E1E"
+                />
+                <circle
+                  cx="130"
+                  cy="94"
+                  r="6"
+                  fill="#FFE7C2"
+                  stroke="#FBF6EE"
+                  strokeWidth="3"
+                />
+                <rect x="14" y="78" width="30" height="32" rx="3" fill="#FBF6EE" />
+                <path d="M44 78 V110 H34 V78 Z" fill="#F1E8DA" />
+                <path
+                  d="M12 72 L16 68 L20 72 L24 68 L28 72 L32 68 L36 72 L40 68 L44 72 L46 72 L45 82 H13 L12 72 Z"
+                  fill="#2F4F30"
+                />
+                <path
+                  d="M29 88c1.5 3.4 4.6 4.5 4.6 8.5a4.6 4.6 0 0 1-9.2 0c0-2.2 1-3.4 2.3-4.4.2 1.8.9 2.7 1.9 2.7 0-2.7-1.1-4.3.4-6.8z"
+                  fill="#E8561E"
+                />
+              </g>
+            </svg>
+          </div>
+
+          {/* Desktop Slide 2: Open Late */}
+          <div
+            style={{
+              flex: "none",
+              width: "100%",
+              height: "400px",
+              boxSizing: "border-box",
+              overflow: "hidden",
+              background:
+                "linear-gradient(180deg, #0F2217 0%, #1B3523 45%, #2A4A31 80%, #36593C 100%)",
+              color: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              padding: "0 56px",
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                position: "relative",
+                zIndex: 2,
+              }}
+            >
+              <span
+                style={{
+                  alignSelf: "flex-start",
+                  background: "#E8561E",
+                  color: "#FFFFFF",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  letterSpacing: "1px",
+                  padding: "6px 14px",
+                  borderRadius: "999px",
+                }}
+              >
+                OPEN LATE
+              </span>
+              <span
+                style={{
+                  fontSize: "80px",
+                  fontWeight: 800,
+                  lineHeight: 0.92,
+                  letterSpacing: "-2px",
+                }}
+              >
+                LIGHT UP
+                <br />
+                LATE
+              </span>
+              <span style={{ fontSize: "19px", opacity: 0.95 }}>
+                We deliver till 11PM.
+              </span>
+              <Link
+                href="/shop"
+                style={{
+                  alignSelf: "flex-start",
+                  marginTop: "8px",
+                  height: "50px",
+                  padding: "0 26px",
+                  borderRadius: "25px",
+                  background: "#FFFFFF",
+                  color: "#2F4F30",
+                  fontWeight: 700,
+                  fontSize: "16px",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                Order now
+              </Link>
+            </div>
+
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="-340 0 698 236"
+              preserveAspectRatio="xMaxYMax slice"
+              aria-hidden="true"
+              style={{ position: "absolute", inset: 0, zIndex: 1 }}
+            >
+              <circle cx="300" cy="56" r="26" fill="#FFF4DE" />
+              <g
+                fill="none"
+                stroke="#E9DFC9"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                opacity="0.75"
+              >
+                <path d="M-340 234 H0" />
+                <path d="M0 234 H358" />
+                <path d="M176 234 V204 H188 V198 L194 192 L200 198 V204 H212 V196 H226 V234" />
+                <path d="M234 234 V106 L240 92 L246 106 V234" />
+                <path d="M284 234 V206 H358 M292 206 V198 H350 V206 M298 198 V190 H344 V198" />
+              </g>
+              <g fill="#FFC56B" opacity="0.9">
+                <rect x="182" y="210" width="3" height="4" />
+                <rect x="204" y="212" width="3" height="4" />
+                <rect x="258" y="206" width="3" height="4" />
+                <rect x="304" y="214" width="3" height="4" />
+              </g>
+            </svg>
+          </div>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

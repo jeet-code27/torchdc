@@ -101,84 +101,31 @@ export function CartAddToOrder({
   };
 
   return (
-    <div className={`space-y-3 ${className}`}>
-      {/* Title matching client screenshot */}
-      <div className="flex items-center justify-between">
-        <h3 className="font-extrabold text-[15px] sm:text-[17px] text-neutral-900 tracking-tight">
-          {title}
-        </h3>
-      </div>
-
-      {/* Cards list / scrollable row */}
-      <div
-        className={
-          compact
-            ? "flex gap-2.5 overflow-x-auto scrollbar-none pb-1 -mx-1 px-1"
-            : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-3.5"
-        }
-      >
+    <div className={className}>
+      <span className="lbl">{title}</span>
+      <div className="addons addons--4">
         {availableSuggestions.map((prod) => {
           const isJustAdded = Boolean(addedIds[prod.id]);
 
           return (
-            <div
-              key={prod.id}
-              className={`bg-white rounded-2xl border border-neutral-200/80 p-3 sm:p-3.5 flex flex-col justify-between hover:shadow-xs hover:border-neutral-300 transition-all ${
-                compact ? "w-[155px] sm:w-[170px] shrink-0" : "w-full"
-              }`}
-            >
-              {/* Product Image */}
-              <Link
-                href={`/product/${prod.slug}`}
-                style={{ backgroundColor: "#F6F8F6" }}
-                className="relative aspect-square w-full rounded-xl p-2 flex items-center justify-center overflow-hidden mb-2 group"
-              >
-                <div
-                  style={{ backgroundColor: "#F6F8F6" }}
-                  className="relative w-full h-full transition-transform duration-300 group-hover:scale-105"
+            <div key={prod.id} className="addon">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={prod.image || "/assets/img/logo.webp"}
+                alt={prod.name}
+              />
+              <span>{prod.name}</span>
+              <span className="addon__row">
+                <b>${prod.price}</b>
+                <button
+                  type="button"
+                  className={`addsm ${isJustAdded ? "is-on" : ""}`}
+                  onClick={() => handleAdd(prod)}
+                  aria-label={`Add ${prod.name}`}
                 >
-                  <Image
-                    src={prod.image || "/images/placeholder-product.png"}
-                    alt={prod.name}
-                    fill
-                    sizes="(max-width: 640px) 150px, 200px"
-                    className="object-contain mix-blend-multiply"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
-                </div>
-              </Link>
-
-              {/* Product Info */}
-              <div className="flex-1 flex flex-col justify-between">
-                <h4 className="font-bold text-[13px] sm:text-[14px] text-neutral-900 line-clamp-2 leading-snug">
-                  <Link
-                    href={`/product/${prod.slug}`}
-                    className="hover:text-[#5A805B] transition-colors"
-                  >
-                    {prod.name}
-                  </Link>
-                </h4>
-
-                {/* Price & Solid Brand Green Plus Button */}
-                <div className="flex items-center justify-between mt-2.5 pt-1 border-t border-neutral-100/70">
-                  <span className="font-black text-[15px] sm:text-[16px] text-neutral-900 leading-none">
-                    ${prod.price}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => handleAdd(prod)}
-                    className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-[#5A805B] hover:bg-[#466645] text-white flex items-center justify-center shadow-xs cursor-pointer active:scale-95 transition-all shrink-0"
-                    aria-label={`Add ${prod.name} to order`}
-                  >
-                    {isJustAdded ? (
-                      <Check className="w-4 h-4 stroke-[3]" />
-                    ) : (
-                      <Plus className="w-4 h-4 stroke-[2.5]" />
-                    )}
-                  </button>
-                </div>
-              </div>
+                  {isJustAdded ? "✓" : "+"}
+                </button>
+              </span>
             </div>
           );
         })}

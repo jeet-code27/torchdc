@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCart } from "@/context/cart-context";
+import { nextStep, nextStepOz, unitOf, normalizeTier } from "@/lib/deals";
 import { ShopSidebar } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
 
@@ -60,7 +61,8 @@ interface ProductDetailViewProps {
 }
 
 export function ProductDetailView({ product }: ProductDetailViewProps) {
-  const { addItem, setIsCartDrawerOpen } = useCart();
+  const { addItem, items, finalTotal } = useCart();
+  const [sheetOpen, setSheetOpen] = React.useState(false);
   const sliderRef = React.useRef<HTMLDivElement>(null);
 
   const scrollSlider = (direction: "left" | "right") => {
@@ -136,37 +138,52 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     return catSlug === "flowers";
   }, [isPreRoll, isEdible, isVape, isConcentrate, isMushroom, catSlug, product.tier, lowerName]);
 
-  // Variants calculation: Use DB variants if provided, or standard flower weights
+  // Determine strain tag if explicitly mentioned
+  const strainTag = React.useMemo(() => {
+    const lower = (product.strain || product.name || "").toLowerCase();
+    if (lower.includes("sativa")) return "SATIVA";
+    if (lower.includes("indica")) return "INDICA";
+    if (lower.includes("hybrid")) return "HYBRID";
+    return null;
+  }, [product.strain, product.name]);
+
+  // Determine flower tier tag
+  const tierTag = React.useMemo(() => {
+    const lower = (product.tier || product.category?.slug || product.name || "").toLowerCase();
+    if (lower.includes("private-reserve") || lower.includes("exotic")) return "EXOTIC";
+    if (lower.includes("topshelf")) return "TOPSHELF";
+    if (lower.includes("midshelf")) return "MIDSHELF";
+    return "TOPSHELF";
+  }, [product.tier, product.category, product.name]);
+
+  // Variants calculation: Use DB variants if provided (sorted ascending by price), or standard flower weights
   const variants = React.useMemo(() => {
     if (product.variants && product.variants.length > 1) {
-      return product.variants;
+      return [...product.variants].sort((a, b) => a.price - b.price);
     }
     if (isFlower) {
-      const p = product.price || 40;
-      let v7 = 60;
-      let v14 = 100;
-      let v28 = 140;
-      if (p <= 30) {
-        v7 = 50;
-        v14 = 80;
-        v28 = 120;
-      } else if (p >= 50) {
-        v7 = 80;
-        v14 = 140;
-        v28 = 220;
-      }
+      // If product.price is an ounce price (>= 90), scale starting 3.5g eighth realistically ($35-$59)
+      const isOuncePrice = (product.price || 0) >= 90;
+      const baseEighth = isOuncePrice
+        ? (tierTag === "MIDSHELF" ? 35 : tierTag === "EXOTIC" ? 60 : 49)
+        : product.price || 49;
+
+      const ozPrice = isOuncePrice ? product.price : baseEighth * 3.5;
+      const halfOz = Math.round(ozPrice * 0.7);
+      const quarterOz = Math.round(baseEighth * 1.6);
+
       return [
-        { name: "3.5g", price: p, inStock: true },
-        { name: "7g", price: v7, inStock: true },
-        { name: "14g", price: v14, inStock: true },
-        { name: "1 oz", price: v28, inStock: true },
+        { name: "3.5g", price: baseEighth, inStock: true },
+        { name: "7g", price: quarterOz, inStock: true },
+        { name: "14g", price: halfOz, inStock: true },
+        { name: "1 oz", price: ozPrice, inStock: true },
       ];
     }
     if (product.variants && product.variants.length === 1) {
       return product.variants;
     }
     return [];
-  }, [product.variants, isFlower, product.price]);
+  }, [product.variants, isFlower, product.price, tierTag]);
 
   // A product has variants ONLY if it has more than 1 option
   const hasVariants = variants.length > 1;
@@ -201,24 +218,6 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     }
     return "Choose option";
   }, [variants, isFlower]);
-
-  // Determine strain tag if explicitly mentioned
-  const strainTag = React.useMemo(() => {
-    const lower = (product.strain || product.name || "").toLowerCase();
-    if (lower.includes("sativa")) return "SATIVA";
-    if (lower.includes("indica")) return "INDICA";
-    if (lower.includes("hybrid")) return "HYBRID";
-    return null;
-  }, [product.strain, product.name]);
-
-  // Determine flower tier tag
-  const tierTag = React.useMemo(() => {
-    const lower = (product.tier || product.category?.slug || product.name || "").toLowerCase();
-    if (lower.includes("private-reserve") || lower.includes("exotic")) return "EXOTIC";
-    if (lower.includes("topshelf")) return "TOPSHELF";
-    if (lower.includes("midshelf")) return "MIDSHELF";
-    return "TOPSHELF";
-  }, [product.tier, product.category, product.name]);
 
   // Determine top terpene based on strain for flowers
   const topTerpene = React.useMemo(() => {
@@ -546,405 +545,463 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     );
 
     setIsAdded(true);
-    toast.success(
-      `Added ${quantity}x ${cleanTitle} to cart!`,
-      { duration: 2500 }
-    );
-    // Automatically open the cart drawer so customer sees their updated cart immediately
-    setIsCartDrawerOpen(true);
+    setSheetOpen(true);
     setTimeout(() => setIsAdded(false), 1500);
   };
 
+  const itemWeight =
+    hasVariants && activeVariant.name !== "Standard"
+      ? activeVariant.name
+      : extractedWeightOrPotency || (isFlower ? "3.5g" : product.category?.name || "Standard");
+  const currentUnit = unitOf(itemWeight);
+  const normalizedTier = normalizeTier(tierTag || "");
+
+  const tierFlowerCount = React.useMemo(() => {
+    if (!normalizedTier) return { h: 0, o: 0 };
+    let h = 0;
+    let o = 0;
+    items.forEach((it) => {
+      if (normalizeTier(it.tier || "") === normalizedTier) {
+        const u = unitOf(it.weight);
+        if (u === "h") h += it.quantity;
+        if (u === "o") o += it.quantity;
+      }
+    });
+    return { h, o };
+  }, [items, normalizedTier]);
+
+  const ns = normalizedTier ? nextStep(normalizedTier, tierFlowerCount.h) : null;
+  const no = normalizedTier ? nextStepOz(normalizedTier, tierFlowerCount.o) : null;
+
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-5 lg:px-6 py-4 sm:py-6 text-neutral-900 pb-28 lg:pb-16">
-      <div className="flex gap-4 lg:gap-5 xl:gap-6 items-start">
-        {/* ================= 1. DESKTOP LEFT RAIL (Category Navigation) ================= */}
-        <div className="hidden lg:block shrink-0 sticky top-24 self-start">
-          <ShopSidebar activeCategory={catSlug || "flowers"} />
+    <>
+      <div className="shell">
+        {/* 1. DESKTOP LEFT RAIL (Category Navigation) */}
+        <ShopSidebar activeCategory={catSlug || "flowers"} />
+
+      {/* 2. MAIN CENTER CONTENT (Product Detail View) */}
+      <main className="shell__main">
+        <div className="pdp">
+          {/* Product Image Card */}
+          <div className="pdp__img">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={primaryImage}
+              alt={product.name}
+            />
+            <span className="pdp__tags">
+              {tierTag && (
+                <span className="tagdark">{tierTag.toUpperCase()}</span>
+              )}
+              {strainTag && (
+                <span className="taglight">{strainTag.toUpperCase()}</span>
+              )}
+            </span>
+          </div>
+
+          {/* Product Info */}
+          <div className="pdp__info">
+            {/* Breadcrumb */}
+            <span className="crumbs">
+              <Link href="/shop">Shop</Link> /{" "}
+              <Link href={isFlower ? "/flowers" : `/shop?category=${catSlug || "flowers"}`}>
+                {product.category?.name || "Flowers"}
+              </Link>
+              {tierTag ? ` / ${tierTag}` : ""}
+            </span>
+
+            {/* Title */}
+            <h1>{displayTitle}</h1>
+
+            {/* Price */}
+            <span className="pdp__price">${currentPrice}</span>
+
+            {/* Choose weight / variants */}
+            {hasVariants && (
+              <>
+                <span className="lbl">{variantLabel}</span>
+                <div className="weights">
+                  {variants.map((v, idx) => {
+                    const isSelected = selectedVariantIndex === idx;
+                    return (
+                      <button
+                        key={v.name + idx}
+                        type="button"
+                        onClick={() => setSelectedVariantIndex(idx)}
+                        className={`weight ${isSelected ? "is-on" : ""}`}
+                      >
+                        <strong>{v.name}</strong>
+                        <span>${v.price}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            {/* Facts 3-column Box */}
+            <div className="facts">
+              <div>
+                <span>{spec1.label}</span>
+                <strong>{spec1.value}</strong>
+              </div>
+              <div>
+                <span>{spec2.label}</span>
+                <strong>{spec2.value}</strong>
+              </div>
+              <div>
+                <span>{spec3.label}</span>
+                <strong>{spec3.value}</strong>
+              </div>
+            </div>
+
+            {/* Effects */}
+            {effects.length > 0 && (
+              <>
+                <span className="lbl">Effects</span>
+                <div className="chiplets">
+                  {effects.map((effect) => (
+                    <span key={effect} className="chiplet">
+                      {effect}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Flavors */}
+            {flavors.length > 0 && (
+              <>
+                <span className="lbl">Flavor</span>
+                <div className="chiplets">
+                  {flavors.map((flavor) => (
+                    <span key={flavor} className="chiplet">
+                      {flavor}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* About this strain / product */}
+            {cleanDescription && (
+              <>
+                <span className="lbl">{aboutHeading}</span>
+                <p className="pdp__desc">{cleanDescription}</p>
+              </>
+            )}
+
+            {/* Perks */}
+            <div className="perks">
+              <div>
+                <strong>Free delivery</strong>
+                <span>Across DC</span>
+              </div>
+              <div>
+                <strong>Pay cash</strong>
+                <span>At the door</span>
+              </div>
+            </div>
+
+            {/* Desktop buy bar (inside pdp__info, hidden on mobile by CSS) */}
+            <div className="pdp__buy">
+              <div className="stepper">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
+                  disabled={quantity <= 1}
+                  aria-label="Remove one"
+                >
+                  −
+                </button>
+                <span>{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity((prev) => prev + 1)}
+                  aria-label="Add one"
+                >
+                  +
+                </button>
+              </div>
+              <button
+                type="button"
+                className="buybtn"
+                onClick={handleAddToCart}
+              >
+                Add to cart · ${currentPrice * quantity}
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* ================= 2. MAIN CENTER CONTENT (Product Detail View) ================= */}
-        <main className="flex-1 min-w-0 space-y-8">
-          {/* 2-Column layout on desktop */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
-            {/* Left Sub-column: Product Image Card & Fulfillment */}
-            <div className="lg:col-span-6 space-y-4">
-              {/* Product Image Card */}
-              <div className="relative bg-[#F6F8F6] rounded-[28px] sm:rounded-[36px] p-6 sm:p-8 lg:p-10 flex items-center justify-center border border-neutral-100 shadow-xs overflow-hidden aspect-square w-full">
-                {/* Badges grouped in top-left like screenshot */}
-                <div className="absolute top-4 left-4 sm:top-5 sm:left-5 z-10 flex items-center gap-2 flex-wrap">
-                  {leftBadge && (
-                    <span className="bg-[#2D4A2B] text-white font-extrabold text-[11px] sm:text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs">
-                      {leftBadge}
-                    </span>
-                  )}
-                  {rightBadge && (
-                    <span className="bg-white/95 backdrop-blur-xs text-neutral-800 font-extrabold text-[11px] sm:text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs border border-neutral-200/60">
-                      {rightBadge}
-                    </span>
-                  )}
-                </div>
+        {/* Related Products Slider Section (Authentic Client Design) */}
+        {product.relatedProducts && product.relatedProducts.length > 0 && (
+          <div className="mt-14 pt-8 border-t border-neutral-200/80">
+            {/* Header: Title on Left, Controls & 'See all' on Right */}
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">
+                {similarHeading}
+              </h2>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => scrollSlider("left")}
+                  className="w-8 h-8 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 flex items-center justify-center text-neutral-700 transition-colors shadow-2xs cursor-pointer active:scale-95"
+                  aria-label="Scroll left"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollSlider("right")}
+                  className="w-8 h-8 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 flex items-center justify-center text-neutral-700 transition-colors shadow-2xs cursor-pointer active:scale-95"
+                  aria-label="Scroll right"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <Link
+                  href={isFlower ? "/flowers" : `/shop?category=${catSlug || "flowers"}`}
+                  className="text-xs sm:text-sm font-bold text-[#4A6E4B] hover:text-[#2F4F30] ml-1 transition-colors whitespace-nowrap"
+                >
+                  See all
+                </Link>
+              </div>
+            </div>
 
-                {/* Product Photo */}
-                <div className="relative w-full h-full max-w-[320px] max-h-[320px] sm:max-w-[380px] sm:max-h-[380px]">
-                  <Image
-                    src={primaryImage}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 640px) 320px, 380px"
-                    className="object-contain mix-blend-multiply drop-shadow-sm transition-transform duration-300 hover:scale-105"
-                    priority
+            {/* Slider Track with horizontal scroll */}
+            <div
+              ref={sliderRef}
+              className="flex gap-3 sm:gap-4 overflow-x-auto scroll-smooth pb-3 snap-x"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {product.relatedProducts.map((rel) => {
+                const relDisplayName =
+                  isFlower && rel.strain && !rel.name.includes("(")
+                    ? `${rel.name} (${rel.strain.charAt(0).toUpperCase() + rel.strain.slice(1).toLowerCase()})`
+                    : rel.name;
+
+                const relMeta = isFlower
+                  ? `${tierTag || "Topshelf"} · ${rel.strain ? rel.strain.charAt(0).toUpperCase() + rel.strain.slice(1).toLowerCase() : "Hybrid"}`
+                  : rel.strain || "Curated";
+
+                return (
+                  <div
+                    key={rel.id}
+                    className="pcard w-[165px] sm:w-[185px] shrink-0 snap-start flex flex-col group relative"
+                  >
+                    {/* Card Image Box with Floating (+) Button */}
+                    <div className="pcard__img relative w-full h-[155px] sm:h-[175px] rounded-[22px] bg-[#F6F8F6] flex items-center justify-center p-3 overflow-hidden">
+                      <Link
+                        href={`/product/${rel.slug}`}
+                        className="w-full h-full flex items-center justify-center"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={rel.image || "/assets/img/flower.webp"}
+                          alt={rel.name}
+                          className="w-28 h-28 sm:w-32 sm:h-32 object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
+                        />
+                      </Link>
+
+                      {/* Quick Add (+) Button at bottom right */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          addItem(
+                            {
+                              id: rel.id,
+                              name: rel.name.replace(/\s*\((sativa|indica|hybrid)\)/i, "").trim(),
+                              slug: rel.slug,
+                              price: rel.price,
+                              image: rel.image || "/assets/img/flower.webp",
+                              weight: isFlower ? "3.5g" : "Standard",
+                              tier: isFlower ? tierTag : undefined,
+                              category: catSlug,
+                            },
+                            1
+                          );
+                          toast.success(`Added ${rel.name} to cart`);
+                        }}
+                        className="add absolute right-2.5 bottom-2.5 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-neutral-900 shadow-md hover:bg-[#5A805B] hover:text-white flex items-center justify-center font-bold text-xl transition-all cursor-pointer z-10 active:scale-95"
+                        aria-label={`Add ${rel.name} to cart`}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Card Title */}
+                    <Link href={`/product/${rel.slug}`} className="mt-2 block">
+                      <h3 className="pcard__name font-bold text-sm sm:text-[15px] text-neutral-900 line-clamp-1 group-hover:text-[#5A805B] transition-colors">
+                        {relDisplayName}
+                      </h3>
+                    </Link>
+
+                    {/* Meta: Tier · Strain */}
+                    <span className="pcard__meta text-xs text-neutral-500 font-medium mt-0.5 truncate">
+                      {relMeta}
+                    </span>
+
+                    {/* Price: from $40 */}
+                    <div className="pcard__price text-sm sm:text-[15px] font-extrabold text-neutral-900 mt-1">
+                      <span className="text-xs font-normal text-neutral-500 mr-1">from</span>
+                      ${rel.price}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* 3. DESKTOP RIGHT RAIL (Sticky Cart Sidebar) */}
+      <ShopCartSidebar />
+    </div>
+
+      {/* ================= MOBILE FLOATING STICKY ACTION BAR ================= */}
+      <div className="buybar">
+        <div className="stepper">
+          <button
+            type="button"
+            onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
+            disabled={quantity <= 1}
+            aria-label="Remove one"
+          >
+            −
+          </button>
+          <span>{quantity}</span>
+          <button
+            type="button"
+            onClick={() => setQuantity((prev) => prev + 1)}
+            aria-label="Add one"
+          >
+            +
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          className="buybtn"
+        >
+          Add to cart · ${currentPrice * quantity}
+        </button>
+      </div>
+
+      {/* ================= ADDED TO CART SLIDE-UP SHEET ================= */}
+      {sheetOpen && (
+        <div className="sheet">
+          <div className="sheet__bg" onClick={() => setSheetOpen(false)} />
+          <div
+            className="sheet__card"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Added to cart"
+          >
+            <div className="sheet__grip" />
+            <div className="sheet__ok">
+              <span className="okdot">✓</span>
+              <span>
+                <strong>Added to cart</strong>
+                <span className="text-xs text-neutral-500">
+                  {cleanTitle} · {itemWeight} {quantity > 1 ? `x ${quantity}` : ""}
+                </span>
+              </span>
+            </div>
+
+            {/* If Flower & Ounce Deal */}
+            {isFlower && currentUnit === "o" && normalizedTier && no && (
+              <div className="dealbox">
+                <span className="dealbox__tag">
+                  {tierFlowerCount.o >= 8 ? "HALF-POUND HAUL" : "STACK & SAVE"}
+                </span>
+                <strong>{no.title}</strong>
+                <span className="muted">
+                  Mix any {normalizedTier} strains by the ounce.
+                </span>
+                <div className="meter">
+                  <span
+                    style={{ width: `${Math.min(tierFlowerCount.o, 4) * 25}%` }}
                   />
                 </div>
               </div>
-
-              {/* Fulfillment Badges */}
-              <div className="grid grid-cols-2 gap-2.5 pt-1">
-                <div className="bg-white border border-neutral-200/80 rounded-2xl p-3 flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-[#edf4ed] text-[#557754] flex items-center justify-center shrink-0">
-                    <Truck className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="block font-black text-xs text-neutral-900 leading-tight">
-                      Free delivery
-                    </span>
-                    <span className="block text-[10px] text-neutral-500 font-medium">
-                      Across DC
-                    </span>
-                  </div>
-                </div>
-
-                <div className="bg-white border border-neutral-200/80 rounded-2xl p-3 flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-[#edf4ed] text-[#557754] flex items-center justify-center shrink-0">
-                    <Banknote className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="block font-black text-xs text-neutral-900 leading-tight">
-                      Cash On Delivery
-                    </span>
-                    <span className="block text-[10px] text-neutral-500 font-medium">
-                      Pay cash at your door
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Sub-column: Info, Variants, Specs, Description, Action */}
-            <div className="lg:col-span-6 space-y-4">
-              {/* Breadcrumb directly above title */}
-              <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-neutral-400 font-medium">
-                <Link href="/shop" className="hover:text-neutral-700">Shop</Link>
-                <span>/</span>
-                <Link href={`/shop?category=${catSlug || "flowers"}`} className="hover:text-neutral-700">
-                  {product.category?.name || "Flowers"}
-                </Link>
-                {tierTag && (
-                  <>
-                    <span>/</span>
-                    <span className="text-neutral-600 font-medium capitalize">
-                      {tierTag.toLowerCase()}
-                    </span>
-                  </>
-                )}
-              </nav>
-
-              {/* Title */}
-              <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-black text-neutral-900 tracking-tight leading-tight">
-                {displayTitle}
-              </h1>
-
-              {/* Price */}
-              <div className="flex items-baseline gap-3">
-                <span className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
-                  ${currentPrice}
-                </span>
-                {currentSalePrice && currentSalePrice < currentPrice && (
-                  <span className="text-base font-bold text-neutral-400 line-through">
-                    ${currentSalePrice}
-                  </span>
-                )}
-              </div>
-
-              {/* Choose weight */}
-              {hasVariants && (
-                <div className="space-y-2 pt-1">
-                  <label className="block text-xs font-bold text-neutral-700">
-                    {variantLabel}
-                  </label>
-                  <div className="grid grid-cols-4 gap-2 sm:gap-2.5">
-                    {variants.map((v, idx) => {
-                      const isSelected = selectedVariantIndex === idx;
-                      return (
-                        <button
-                          key={v.name + idx}
-                          type="button"
-                          onClick={() => setSelectedVariantIndex(idx)}
-                          className={`p-2.5 sm:p-3 rounded-xl text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
-                            isSelected
-                              ? "bg-[#f0f5f0] border-2 border-[#5A805B] text-neutral-900 shadow-2xs"
-                              : "bg-white border border-neutral-200 text-neutral-700 hover:border-neutral-300"
-                          }`}
-                        >
-                          <span className="font-bold text-xs sm:text-sm leading-tight">
-                            {v.name}
-                          </span>
-                          <span className="text-[11px] font-medium text-neutral-500 mt-0.5">
-                            ${v.price}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* 3-Column Spec Box in single bordered container */}
-              <div className="border border-neutral-200/90 rounded-2xl bg-white p-3 sm:p-3.5 grid grid-cols-3 divide-x divide-neutral-200/80 text-center my-3 shadow-2xs">
-                <div className="px-1 sm:px-2">
-                  <span className="block text-[10px] font-black uppercase text-neutral-400 tracking-wider">
-                    {spec1.label}
-                  </span>
-                  <span className="block font-black text-xs sm:text-[13px] text-neutral-900 mt-1 truncate">
-                    {spec1.value}
-                  </span>
-                </div>
-                <div className="px-1 sm:px-2">
-                  <span className="block text-[10px] font-black uppercase text-neutral-400 tracking-wider">
-                    {spec2.label}
-                  </span>
-                  <span className="block font-black text-xs sm:text-[13px] text-neutral-900 mt-1 truncate">
-                    {spec2.value}
-                  </span>
-                </div>
-                <div className="px-1 sm:px-2">
-                  <span className="block text-[10px] font-black uppercase text-neutral-400 tracking-wider">
-                    {spec3.label}
-                  </span>
-                  <span className="block font-black text-xs sm:text-[13px] text-neutral-900 mt-1 truncate">
-                    {spec3.value}
-                  </span>
-                </div>
-              </div>
-
-              {/* About this strain / product */}
-              <div className="space-y-1.5 pt-1">
-                <h3 className="text-sm font-extrabold text-neutral-900">
-                  {aboutHeading}
-                </h3>
-                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-                  {cleanDescription}
-                </p>
-              </div>
-
-              {/* Quantity selector & Add to order button */}
-              <div className="flex items-center gap-3 pt-2">
-                <div
-                  className="flex items-center justify-between border border-neutral-200/90 rounded-full h-11 px-3.5 w-28 bg-white shadow-2xs"
-                  data-np-intersection-skip="true"
-                  data-1p-ignore="true"
-                  data-lpignore="true"
-                >
-                  <button
-                    type="button"
-                    onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
-                    disabled={quantity <= 1}
-                    className="text-neutral-500 hover:text-neutral-900 disabled:opacity-30 p-1 cursor-pointer transition-colors"
-                    aria-label="Decrease quantity"
-                    data-np-intersection-skip="true"
-                    data-1p-ignore="true"
-                  >
-                    <Minus className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="font-black text-sm text-neutral-900 select-none">
-                    {quantity}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setQuantity((prev) => prev + 1)}
-                    className="text-neutral-500 hover:text-neutral-900 p-1 cursor-pointer transition-colors"
-                    aria-label="Increase quantity"
-                    data-np-intersection-skip="true"
-                    data-1p-ignore="true"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  className={`flex-1 h-11 rounded-full font-black text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-[0.99] ${
-                    isAdded
-                      ? "bg-emerald-600 text-white"
-                      : "bg-[#5A805B] hover:bg-[#4a6b4b] text-white"
-                  }`}
-                >
-                  {isAdded ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>Added to cart!</span>
-                    </>
-                  ) : (
-                    <span>Add to order · ${currentPrice * quantity}</span>
-                  )}
-                </button>
-              </div>
-
-              {/* Effects & Flavors tags */}
-              <div className="flex flex-wrap items-center gap-1.5 pt-2">
-                {effects.slice(0, 4).map((effect) => (
-                  <span
-                    key={effect}
-                    className="bg-[#edf4ed] text-[#2F4F30] font-bold text-[11px] px-2.5 py-1 rounded-full"
-                  >
-                    {effect}
-                  </span>
-                ))}
-                {flavors.slice(0, 3).map((flavor) => (
-                  <span
-                    key={flavor}
-                    className="bg-[#fdf1ea] text-[#E8561E] font-bold text-[11px] px-2.5 py-1 rounded-full"
-                  >
-                    {flavor}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Related Products Section */}
-          {product.relatedProducts && product.relatedProducts.length > 0 && (
-            <div className="pt-8 border-t border-neutral-200/80 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-black text-neutral-900 tracking-tight">
-                    {similarHeading}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-0.5">
-                    Popular recommendations hand-picked for you
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => scrollSlider("left")}
-                    className="w-9 h-9 rounded-full bg-white border border-neutral-200/80 flex items-center justify-center text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50 hover:border-neutral-300 shadow-2xs transition-colors cursor-pointer"
-                    aria-label="Previous suggestions"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => scrollSlider("right")}
-                    className="w-9 h-9 rounded-full bg-white border border-neutral-200/80 flex items-center justify-center text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50 hover:border-neutral-300 shadow-2xs transition-colors cursor-pointer"
-                    aria-label="Next suggestions"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div
-                ref={sliderRef}
-                className="flex gap-4 overflow-x-auto scroll-smooth pb-4 pt-1 snap-x scrollbar-none"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-              >
-                {product.relatedProducts.map((rel) => (
-                  <Link
-                    key={rel.id}
-                    href={`/product/${rel.slug}`}
-                    className="w-48 sm:w-56 shrink-0 snap-start bg-white border border-neutral-200/80 rounded-2xl p-3 hover:border-[#5A805B]/40 hover:shadow-xs transition-all flex flex-col group"
-                  >
-                    <div className="relative aspect-square w-full rounded-xl bg-[#F6F8F6] overflow-hidden mb-2.5 flex items-center justify-center">
-                      <Image
-                        src={rel.image || "/images/placeholder-product.png"}
-                        alt={rel.name}
-                        fill
-                        sizes="(max-width: 640px) 192px, 224px"
-                        className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform p-2"
-                      />
-                    </div>
-                    <h4 className="font-bold text-xs sm:text-sm text-neutral-900 truncate">
-                      {rel.name.replace(/\s*\(.*\)/, "")}
-                    </h4>
-                    <div className="flex items-center justify-between mt-1">
-                      <span className="text-[11px] text-neutral-500 font-medium">
-                        {rel.strain ? rel.strain.charAt(0).toUpperCase() + rel.strain.slice(1) : "Flower"}
-                      </span>
-                      <span className="text-xs sm:text-sm font-black text-neutral-900">
-                        from ${rel.price}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </main>
-
-        {/* ================= 3. DESKTOP RIGHT RAIL (Sticky Cart Sidebar) ================= */}
-        <div className="hidden xl:block shrink-0 sticky top-24 self-start">
-          <ShopCartSidebar />
-        </div>
-      </div>
-
-      {/* ================= MOBILE FLOATING STICKY ACTION BAR ================= */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-neutral-200/80 p-3 z-40 shadow-lg">
-        <div className="max-w-xl mx-auto flex items-center gap-3">
-          <div
-            className="flex items-center justify-between border border-neutral-200/90 rounded-full h-12 px-3.5 w-28 bg-white shadow-2xs"
-            data-np-intersection-skip="true"
-            data-1p-ignore="true"
-            data-lpignore="true"
-          >
-            <button
-              type="button"
-              onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
-              disabled={quantity <= 1}
-              className="text-neutral-500 hover:text-neutral-900 disabled:opacity-30 p-1 cursor-pointer transition-colors"
-              aria-label="Decrease quantity"
-              data-np-intersection-skip="true"
-              data-1p-ignore="true"
-            >
-              <Minus className="w-3.5 h-3.5" />
-            </button>
-            <span className="font-black text-sm text-neutral-900 select-none">
-              {quantity}
-            </span>
-            <button
-              type="button"
-              onClick={() => setQuantity((prev) => prev + 1)}
-              className="text-neutral-500 hover:text-neutral-900 p-1 cursor-pointer transition-colors"
-              aria-label="Increase quantity"
-              data-np-intersection-skip="true"
-              data-1p-ignore="true"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            className={`flex-1 h-12 rounded-full font-black text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-[0.99] ${
-              isAdded
-                ? "bg-emerald-600 text-white"
-                : "bg-[#5A805B] hover:bg-[#4a6b4b] text-white"
-            }`}
-          >
-            {isAdded ? (
-              <>
-                <Check className="w-4 h-4" />
-                <span>Added to cart!</span>
-              </>
-            ) : (
-              <span>Add to order · ${currentPrice * quantity}</span>
             )}
-          </button>
+
+            {/* If Flower & Half-Ounce Deal */}
+            {isFlower && currentUnit === "h" && normalizedTier && ns && (
+              <div className="dealbox">
+                <span className="dealbox__tag">BUNDLE DEAL</span>
+                <strong>{ns.title}</strong>
+                <span className="muted">
+                  Mix any {normalizedTier} strains by the half ounce.
+                </span>
+                <div className="meter">
+                  <span
+                    style={{ width: `${Math.min(tierFlowerCount.h, 4) * 25}%` }}
+                  />
+                </div>
+
+                {product.relatedProducts &&
+                  product.relatedProducts.slice(0, 3).map((pick) => {
+                    const inCart = items.some((it) => it.id === pick.id);
+                    return (
+                      <div key={pick.id} className="pickrow">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={pick.image || "/assets/img/flower.webp"}
+                          alt={pick.name}
+                        />
+                        <span>
+                          <strong>{pick.name}</strong>
+                          <span>
+                            {pick.strain || "Flower"} · ½ oz · ${pick.price}
+                          </span>
+                        </span>
+                        <button
+                          type="button"
+                          className={`smallpill ${inCart ? "is-on" : ""}`}
+                          onClick={() => {
+                            addItem(
+                              {
+                                id: pick.id,
+                                name: pick.name,
+                                slug: pick.slug,
+                                price: pick.price,
+                                image: pick.image,
+                                weight: "14g",
+                                tier: normalizedTier,
+                                category: "flowers",
+                              },
+                              1
+                            );
+                          }}
+                        >
+                          {inCart ? "Added" : "+ Add"}
+                        </button>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div className="sheet__btns">
+              <button
+                type="button"
+                className="ghostbtn"
+                onClick={() => setSheetOpen(false)}
+              >
+                Keep shopping
+              </button>
+              <Link className="checkoutbtn" href="/cart">
+                View cart · ${finalTotal}
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }

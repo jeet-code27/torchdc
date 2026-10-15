@@ -26,15 +26,12 @@ const ITEMS_PER_PAGE = 12;
 
 const CATEGORY_PILLS = [
   { slug: "all", label: "All" },
-  { slug: "flowers", label: "Flower" },
+  { slug: "flowers", label: "Flowers" },
   { slug: "pre-rolls", label: "Pre-rolls" },
   { slug: "disposables", label: "Disposables" },
-  { slug: "cartridges", label: "Cartridges" },
   { slug: "concentrates", label: "Concentrates" },
   { slug: "edibles", label: "Edibles" },
   { slug: "mushrooms", label: "Mushrooms" },
-  { slug: "best-sellers", label: "Best Sellers" },
-  { slug: "new-arrivals", label: "New Arrivals" },
 ];
 
 function getPageNumbers(currentPage: number, totalPages: number): (number | string)[] {
@@ -124,12 +121,14 @@ export function ShopCatalog({
       }
 
       // 2. Category Filter
-      if (activeCategory === "best-sellers") {
+      if (activeCategory === "best" || activeCategory === "best-sellers") {
         if (!product.isBestSeller) return false;
-      } else if (activeCategory === "new-arrivals") {
+      } else if (activeCategory === "new" || activeCategory === "new-arrivals") {
         if (!product.isNewArrival) return false;
       } else if (activeCategory !== "all") {
-        if (product.category !== activeCategory) return false;
+        const cat = (product.category || "").toLowerCase();
+        const target = activeCategory.toLowerCase();
+        if (cat !== target && !(target === "flowers" && (cat === "flower" || cat === "flowers"))) return false;
       }
 
       // 3. Flower Tier Filter
@@ -164,13 +163,18 @@ export function ShopCatalog({
   }, [filteredProducts, currentPage]);
 
   const categoryTitle = React.useMemo(() => {
+    if (activeCategory === "best" || activeCategory === "best-sellers") return "Best Sellers";
+    if (activeCategory === "new" || activeCategory === "new-arrivals") return "New Arrivals";
+    if (activeCategory === "flowers") {
+      if (activeTier === "midshelf") return "Midshelf Flower";
+      if (activeTier === "topshelf") return "Topshelf Flower";
+      if (activeTier === "exotic") return "Private Reserve Flower";
+      return "Flower";
+    }
     if (activeCategory === "all") return "Shop All";
-    if (activeCategory === "flowers") return "Flower";
-    if (activeCategory === "best-sellers") return "Best Sellers";
-    if (activeCategory === "new-arrivals") return "New Arrivals";
     const found = CATEGORY_PILLS.find((c) => c.slug === activeCategory);
     return found ? found.label : "Products";
-  }, [activeCategory]);
+  }, [activeCategory, activeTier]);
 
   return (
     <div className="min-h-screen bg-[#fafbfa] text-neutral-900">
@@ -192,101 +196,87 @@ export function ShopCatalog({
 
           {/* ================= 2. CENTER PRODUCT FEED ================= */}
           <main className="flex-1 min-w-0">
-            {/* Mobile Search Bar (Above Banner) */}
-            <div className="lg:hidden mb-3">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                }}
-                className="relative w-full"
-              >
-                <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="What are you looking for today?"
-                  className="w-full bg-[#f4f5f4] hover:bg-[#edf0ed] focus:bg-white text-sm text-neutral-800 placeholder-neutral-500 rounded-full pl-11 pr-4 py-2.5 sm:py-3 outline-none border border-transparent focus:border-[#5A805B] transition-all shadow-2xs"
-                />
-              </form>
-            </div>
+            {/* Delivery/Pickup + Category Chips Bar (Client Reference Matching) */}
+            <div className="shopbar">
+              <div className="seg seg--green lg:hidden" role="tablist" aria-label="Delivery or pickup">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={fulfillment === "delivery"}
+                  className={fulfillment === "delivery" ? "is-on" : ""}
+                  onClick={() => setFulfillment("delivery")}
+                >
+                  Delivery
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={fulfillment === "pickup"}
+                  className={fulfillment === "pickup" ? "is-on" : ""}
+                  onClick={() => setFulfillment("pickup")}
+                >
+                  Pickup
+                </button>
+              </div>
+              <div className="shopbar__note lg:hidden">
+                {fulfillment === "delivery"
+                  ? "Free delivery across DC"
+                  : "Pickup at 1000 G St NW"}
+              </div>
 
-            {/* Hero Slider Carousel - Exact same size as home page */}
-            <StoreHeroCarousel />
+              {/* Category Filter Pills (Matching Client Reference) */}
+              <div className="chips rail-x items-center" role="tablist" aria-label="Categories">
+                {CATEGORY_PILLS.map((cat) => {
+                  if (cat.slug === "flowers") {
+                    return (
+                      <Link
+                        key={cat.slug}
+                        href="/flowers"
+                        className="chip inline-flex items-center justify-center"
+                      >
+                        {cat.label}
+                      </Link>
+                    );
+                  }
 
-            {/* Mobile Order Mode Switcher (Below Banner, No Extra Text) */}
-            <div className="lg:hidden bg-neutral-100 p-1 rounded-full flex text-xs font-bold max-w-md mx-auto my-3">
-              <button
-                type="button"
-                onClick={() => setFulfillment("delivery")}
-                className={`flex-1 py-2 sm:py-2.5 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  fulfillment === "delivery"
-                    ? "bg-[#5A805B] text-white font-black shadow-xs"
-                    : "text-neutral-600 hover:text-neutral-900"
-                }`}
-              >
-                <Truck className="w-3.5 h-3.5" />
-                <span>Delivery</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setFulfillment("pickup")}
-                className={`flex-1 py-2 sm:py-2.5 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  fulfillment === "pickup"
-                    ? "bg-[#5A805B] text-white font-black shadow-xs"
-                    : "text-neutral-600 hover:text-neutral-900"
-                }`}
-              >
-                <Store className="w-3.5 h-3.5" />
-                <span>Pickup</span>
-              </button>
-            </div>
-
-            {/* Category Filter Pills (Matching Client Reference) */}
-            <div className="mb-4 flex items-center gap-2 overflow-x-auto scrollbar-none py-1.5 -mx-4 px-4 sm:mx-0 sm:px-0">
-              {CATEGORY_PILLS.map((cat) => {
-                const isActive = activeCategory === cat.slug;
-                return (
-                  <button
-                    key={cat.slug}
-                    type="button"
-                    onClick={() => {
-                      setActiveCategory(cat.slug);
-                      if (cat.slug !== "flowers") setActiveTier("all");
-                    }}
-                    className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex-shrink-0 ${
-                      isActive
-                        ? "bg-neutral-900 text-white shadow-xs font-black"
-                        : "bg-white text-neutral-800 border border-neutral-200/90 hover:border-neutral-300 hover:bg-neutral-50 shadow-2xs"
-                    }`}
-                  >
-                    {cat.label}
-                  </button>
-                );
-              })}
+                  const isActive = activeCategory === cat.slug;
+                  return (
+                    <button
+                      key={cat.slug}
+                      type="button"
+                      onClick={() => {
+                        setActiveCategory(cat.slug);
+                        setActiveTier("all");
+                      }}
+                      className={`chip inline-flex items-center justify-center ${isActive ? "is-on" : ""}`}
+                    >
+                      {cat.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Catalog Grid Section with Pagination */}
-            <div id="catalog-top">
-              {/* Header Bar: Title, Count & Sort (Responsive Single-Line Layout) */}
+            <div id="catalog-top" className="px-4 sm:px-0 pt-5 sm:pt-6">
+              {/* Header Bar: Title, Count & Sort */}
               <div className="flex items-center justify-between gap-3 sm:gap-4 pb-2 mb-3">
                 {/* Left: Section Title & Count */}
                 <div className="min-w-0 flex-1">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-neutral-900 leading-tight truncate">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111111] leading-tight truncate">
                     {categoryTitle}
-                  </h2>
-                  <p className="text-xs text-neutral-500 font-medium mt-0.5 truncate">
+                  </h1>
+                  <span className="text-xs sm:text-sm text-[#4F5A50] font-medium mt-1 block truncate">
                     {filteredProducts.length === 0
                       ? "0 products"
                       : `${filteredProducts.length} products`}
-                  </p>
+                  </span>
                 </div>
 
-                {/* Right: Sort Button (Compact on mobile, full on desktop, never wraps) */}
+                {/* Right: Sort Button */}
                 <div className="relative shrink-0">
                   <div className="flex items-center gap-1.5 sm:gap-2 bg-white border border-neutral-200/90 rounded-full px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs font-bold text-neutral-800 shadow-2xs hover:border-neutral-300 transition-colors pointer-events-none whitespace-nowrap">
                     <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 shrink-0" />
-                    {/* Full label on tablet/desktop */}
                     <span className="hidden sm:inline">
                       {sortBy === "popular"
                         ? "Popular"
@@ -296,7 +286,6 @@ export function ShopCatalog({
                         ? "Price: High to Low"
                         : "New Arrivals"}
                     </span>
-                    {/* Compact label on mobile to fit nicely in 1 line */}
                     <span className="sm:hidden">
                       {sortBy === "popular"
                         ? "Popular"
@@ -322,49 +311,20 @@ export function ShopCatalog({
                 </div>
               </div>
 
-              {/* Mobile Flower Tier Shortcut Banner (Screenshot 2 / Client reference position) */}
-              <div className="mb-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveCategory("flowers");
-                    setShowTierModal(!showTierModal);
-                  }}
-                  className="w-full bg-[#edf4ed] border border-emerald-100 rounded-2xl p-3.5 flex items-center justify-between text-left cursor-pointer hover:bg-[#e4eee4] transition-colors"
-                >
-                  <div>
-                    <h4 className="font-extrabold text-[14px] text-[#2F4F30]">
-                      Shop flower by tier
-                    </h4>
-                    <p className="text-[12px] text-neutral-600">
-                      Midshelf · Topshelf · Private Reserve
-                    </p>
-                  </div>
+              {/* Flower Tier Shortcut or Stacked Tier Boxes (Matching Client Reference) */}
+              {activeCategory === "flowers" ? (
+                <ShopFlowerTiers
+                  activeTier={activeTier}
+                  onSelectTier={(tier) => setActiveTier(tier)}
+                />
+              ) : (
+                <Link href="/flowers" className="tierlink mb-4">
+                  <span>
+                    <strong>Shop flower by tier</strong>
+                    <span>Midshelf · Topshelf · Private Reserve</span>
+                  </span>
                   <ChevronRight className="w-5 h-5 text-[#557754]" />
-                </button>
-              </div>
-
-              {/* Flower Tiers Section (STRICTLY ONLY WHEN FLOWERS CATEGORY IS SELECTED) */}
-              {activeCategory === "flowers" && (
-                <div className="mb-6 animate-in fade-in duration-200">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-[#E8561E]">
-                      Lab-Tested · Same-Day Delivery
-                    </span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-neutral-900">
-                    Flowers
-                  </h3>
-                  <p className="text-xs sm:text-sm text-neutral-500 mb-3">
-                    Three tiers, one standard of quality.
-                  </p>
-
-                  {/* 3 Tier Cards */}
-                  <ShopFlowerTiers
-                    activeTier={activeTier}
-                    onSelectTier={(tier) => setActiveTier(tier)}
-                  />
-                </div>
+                </Link>
               )}
 
               {/* Products Grid */}
@@ -394,7 +354,7 @@ export function ShopCatalog({
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+                  <div className="grid">
                     {paginatedProducts.map((product) => (
                       <ShopProductCard key={product.id} product={product} />
                     ))}

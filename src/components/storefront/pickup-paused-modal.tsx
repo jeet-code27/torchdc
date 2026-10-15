@@ -13,11 +13,11 @@ interface PickupPausedModalProps {
 
 export function PickupPausedModal({
   isOpen,
-  onClose,
   title = "Pickup is paused right now",
   message = "We'll deliver it free, with a pre-roll on us.",
+  onClose,
 }: PickupPausedModalProps) {
-  const { setFulfillment } = useCart();
+  const { setFulfillment, setHasPrerollBonus } = useCart();
 
   // Handle ESC key
   React.useEffect(() => {
@@ -32,6 +32,7 @@ export function PickupPausedModal({
   if (!isOpen) return null;
 
   const handleSwitchToDelivery = () => {
+    setHasPrerollBonus(true);
     setFulfillment("delivery", true); // force switch
     onClose();
   };

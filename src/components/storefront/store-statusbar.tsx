@@ -2,65 +2,89 @@
 
 import * as React from "react";
 
-function getIsDCOpen(): boolean {
+const HOURS: [number, number][] = [
+  [600, 1260], // Sun: 10:00 AM - 9:00 PM (600 - 1260 mins)
+  [420, 1380], // Mon: 7:00 AM - 11:00 PM (420 - 1380 mins)
+  [420, 1380], // Tue: 7:00 AM - 11:00 PM
+  [420, 1380], // Wed: 7:00 AM - 11:00 PM
+  [420, 1380], // Thu: 7:00 AM - 11:00 PM
+  [420, 1380], // Fri: 7:00 AM - 11:00 PM
+  [420, 1380], // Sat: 7:00 AM - 11:00 PM
+];
+
+function fmt(mins: number): string {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  const ap = h >= 12 ? "PM" : "AM";
+  const displayH = h % 12 || 12;
+  return `${displayH}${m ? `:${m < 10 ? "0" : ""}${m}` : ""}${ap}`;
+}
+
+function getDCStatus(): { isOpen: boolean; text: string } {
   try {
-    const formatter = new Intl.DateTimeFormat("en-US", {
+    const parts = new Intl.DateTimeFormat("en-US", {
       timeZone: "America/New_York",
+      weekday: "short",
       hour: "numeric",
+      minute: "numeric",
       hour12: false,
+    }).formatToParts(new Date());
+
+    const p: Record<string, string> = {};
+    parts.forEach((x) => {
+      p[x.type] = x.value;
     });
-    const hourStr = formatter.format(new Date());
-    const hour = parseInt(hourStr, 10);
-    // Washington D.C. hours: Open 7:00 AM (07) to 11:00 PM (23)
-    return hour >= 7 && hour < 23;
+
+    const dayIdx = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(
+      p.weekday
+    );
+    const day = dayIdx >= 0 ? dayIdx : 0;
+    const nowMins =
+      (parseInt(p.hour || "0", 10) % 24) * 60 + parseInt(p.minute || "0", 10);
+    const today = HOURS[day];
+
+    if (today && nowMins >= today[0] && nowMins < today[1]) {
+      return {
+        isOpen: true,
+        text: `Delivering until ${fmt(today[1])}`,
+      };
+    } else {
+      const next =
+        nowMins < today[0] ? today[0] : HOURS[(day + 1) % 7][0];
+      const isTomorrow = nowMins >= today[0];
+      return {
+        isOpen: false,
+        text: `Order ahead, we open at ${fmt(next)}${isTomorrow ? " tomorrow" : ""}`,
+      };
+    }
   } catch {
-    const hour = new Date().getHours();
-    return hour >= 7 && hour < 23;
+    return {
+      isOpen: true,
+      text: "Delivering until 11PM",
+    };
   }
 }
 
 export function StoreStatusbar() {
-  const [isOpen, setIsOpen] = React.useState<boolean>(getIsDCOpen);
-  const [mounted, setMounted] = React.useState(false);
+  const [status, setStatus] = React.useState(getDCStatus);
 
   React.useEffect(() => {
-    setMounted(true);
-    const check = () => setIsOpen(getIsDCOpen());
+    const check = () => setStatus(getDCStatus());
     check();
-    const interval = setInterval(check, 60000); // Check every minute
-    return () => clearInterval(interval);
+    const timer = setInterval(check, 60000);
+    return () => clearInterval(timer);
   }, []);
 
-  // When not yet mounted, use initial getIsDCOpen result to prevent hydration flash
-  const openStatus = mounted ? isOpen : getIsDCOpen();
-
-  if (!openStatus) {
-    return (
-      <div className="w-full bg-[#fdf3f2] text-[#93372c] border-b border-[#fbdcd9] text-xs py-1.5 px-4 font-medium transition-colors">
-        <div className="max-w-6xl mx-auto flex items-center justify-center gap-2 text-center flex-wrap">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
-          </span>
-          <span className="font-bold">Closed now</span>
-          <span className="text-[#93372c]/60">·</span>
-          <span>Order ahead, we open at 7AM</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full bg-[#EBF3EA] text-[#3D5B3C] border-b border-[#D8E6D7] text-xs py-1.5 px-4 font-medium transition-colors">
-      <div className="max-w-6xl mx-auto flex items-center justify-center gap-2 text-center flex-wrap">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
-        </span>
-        <span className="font-bold">Open now</span>
-        <span className="text-emerald-700/60">•</span>
-        <span>Delivering Until 11PM</span>
-      </div>
+    <div
+      className={`openbar ${status.isOpen ? "" : "is-closed"}`}
+      role="status"
+    >
+      <span className="openbar__dot" aria-hidden="true" />
+      <span className="openbar__text">
+        <strong>{status.isOpen ? "Open now" : "Closed now"}</strong> ·{" "}
+        {status.text}
+      </span>
     </div>
   );
 }

@@ -13,11 +13,8 @@ interface StorefrontShellProps {
 export function StorefrontShell({ children }: StorefrontShellProps) {
   const pathname = usePathname();
 
-  // Exclude admin dashboard, checkout, order-success, or studio
-  const isExcluded =
-    pathname?.startsWith("/admin") ||
-    pathname?.startsWith("/checkout") ||
-    pathname?.startsWith("/order-success");
+  // Exclude admin dashboard
+  const isExcluded = pathname?.startsWith("/admin");
 
   if (isExcluded) {
     return <>{children}</>;

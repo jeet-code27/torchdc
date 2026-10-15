@@ -2,328 +2,204 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Phone, MapPin, Mail, Clock } from "lucide-react";
+
+const DC_NEIGHBORHOODS = [
+  { name: "Downtown", href: "/affordable-cannabis-in-downtown-dc-weed-deals" },
+  { name: "Adams Morgan", href: "/adams-morgan-weed-delivery-dc" },
+  { name: "Columbia Heights", href: "/affordable-cannabis-columbia-heights-dc" },
+  { name: "Brookland", href: "/brookland-dc-weed-delivery-catholic-university-area-torch-cannabis" },
+  { name: "Shaw", href: "/shaw-dc-cannabis-delivery-dispensary" },
+  { name: "Logan Circle", href: "/cannabis-delivery-in-logan-circle-dc-torch-dispensary" },
+  { name: "Capitol Hill", href: "/cannabis-delivery-in-capitol-hill-dc-torch-dispensary" },
+  { name: "Navy Yard", href: "/cannabis-delivery-in-navy-yard-dc-torch" },
+  { name: "Dupont Circle", href: "/cannabis-delivery-in-dupont-circle-dc-torch-dispensary" },
+  { name: "Petworth", href: "/cannabis-delivery-in-petworth-dc-torch" },
+  { name: "U Street", href: "/cannabis-delivery-on-u-street-dc-torch" },
+  { name: "Georgetown", href: "/cannabis-delivery-in-georgetown-dc-torch-dispensary" },
+  { name: "H Street", href: "/cannabis-delivery-on-h-street-ne-dc-torch" },
+];
 
 export function StoreFooter() {
-  const shopLinks = [
-    { name: "Flowers", href: "/category/flowers" },
-    { name: "Pre-rolls", href: "/category/pre-rolls" },
-    { name: "Disposables", href: "/category/disposables" },
-    { name: "Concentrates", href: "/category/concentrates" },
-    { name: "Edibles", href: "/category/edibles" },
-    { name: "Mushrooms", href: "/category/mushrooms" },
-  ];
-
-  const companyLinks = [
-    { name: "About Us", href: "/about" },
-    { name: "Deals", href: "/deals" },
-    { name: "Track Order", href: "/track-order" },
-    { name: "Blog", href: "/blog" },
-    { name: "Contact Us", href: "/contact" },
-    { name: "FAQ", href: "/faq" },
-    { name: "Terms and Conditions", href: "/terms" },
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Home", href: "/" },
-  ];
-
-  const deliveryAreas = [
-    { name: "Downtown", href: "/delivery-areas/downtown" },
-    { name: "Adams Morgan", href: "/delivery-areas/adams-morgan" },
-    { name: "Columbia Heights", href: "/delivery-areas/columbia-heights" },
-    { name: "Brookland", href: "/delivery-areas/brookland" },
-    { name: "Shaw", href: "/delivery-areas/shaw" },
-    { name: "Logan Circle", href: "/delivery-areas/logan-circle" },
-    { name: "Capitol Hill", href: "/delivery-areas/capitol-hill" },
-    { name: "Navy Yard", href: "/delivery-areas/navy-yard" },
-    { name: "Dupont Circle", href: "/delivery-areas/dupont-circle" },
-    { name: "Petworth", href: "/delivery-areas/petworth" },
-    { name: "U Street", href: "/delivery-areas/u-street" },
-    { name: "Georgetown", href: "/delivery-areas/georgetown" },
-    { name: "H Street", href: "/delivery-areas/h-street" },
-  ];
-
   return (
-    <footer className="bg-[#557754] text-white pt-12 sm:pt-14 pb-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* ================= DESKTOP & TABLET LAYOUT ================= */}
-        <div className="hidden md:grid md:grid-cols-12 gap-8 lg:gap-10 pb-10">
-          {/* Col 1: Contact info with orange icon badges (4 cols) */}
-          <div className="md:col-span-4 space-y-5">
-            <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">
-              Order online or by phone for free delivery or curbside pickup.
-            </h3>
+    <footer className="footer">
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <span className="footer__lead">
+          Order online or by phone for free delivery or pickup.
+        </span>
 
-            <div className="space-y-3.5 pt-1 text-sm font-medium">
-              {/* Phone */}
-              <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <Phone className="w-3.5 h-3.5" />
-                </span>
-                <a
-                  href="tel:+12024681966"
-                  className="hover:underline text-white font-semibold transition-colors"
-                >
-                  (202) 468-1966
-                </a>
-              </div>
+        <a className="footer__line" href="tel:+12024681966">
+          <span className="footer__ic">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFF"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
+            </svg>
+          </span>
+          (202) 468-1966
+        </a>
 
-              {/* Address */}
-              <div className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                  <MapPin className="w-3.5 h-3.5" />
-                </span>
-                <a
-                  href="https://maps.google.com/?q=1000+G+St+NW,+Washington,+DC+20001"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline text-white/95 transition-colors"
-                >
-                  1000 G St NW, Washington, DC 20001
-                </a>
-              </div>
+        <a
+          className="footer__line"
+          href="https://maps.google.com/?q=1000+G+St+NW,+Washington,+DC+20001"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span className="footer__ic">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFF"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z" />
+              <circle cx="12" cy="10" r="2.5" />
+            </svg>
+          </span>
+          1000 G St NW, Washington, DC 20001
+        </a>
 
-              {/* Email */}
-              <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <Mail className="w-3.5 h-3.5" />
-                </span>
-                <a
-                  href="mailto:info@torchdc.co"
-                  className="hover:underline text-white/95 transition-colors"
-                >
-                  info@torchdc.co
-                </a>
-              </div>
+        <a className="footer__line" href="mailto:info@torchdc.co">
+          <span className="footer__ic">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFF"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="M3 7l9 6 9-6" />
+            </svg>
+          </span>
+          info@torchdc.co
+        </a>
 
-              {/* Hours */}
-              <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <Clock className="w-3.5 h-3.5" />
-                </span>
-                <span className="text-white/95">Open daily, 7AM to 11PM</span>
-              </div>
-            </div>
-          </div>
+        <span className="footer__line">
+          <span className="footer__ic">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFF"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 2" />
+            </svg>
+          </span>
+          Mon to Sat 7AM to 11PM · Sun 10AM to 9PM
+        </span>
+      </div>
 
-          {/* Col 2: Shop links (2 cols) */}
-          <div className="md:col-span-2 space-y-4">
-            <h4 className="text-base sm:text-lg font-bold text-white">Shop</h4>
-            <ul className="space-y-2.5 text-sm">
-              {shopLinks.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="text-white/90 hover:text-white hover:underline transition-colors"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 3: Company links (2.5 cols) */}
-          <div className="md:col-span-2 lg:col-span-3 space-y-4">
-            <h4 className="text-base sm:text-lg font-bold text-white">Company</h4>
-            <ul className="space-y-2.5 text-sm">
-              {companyLinks.slice(0, 7).map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="text-white/90 hover:text-white hover:underline transition-colors"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 4: Delivery Areas Pill Tags (3.5 cols) */}
-          <div className="md:col-span-4 lg:col-span-3 space-y-4">
-            <h4 className="text-base sm:text-lg font-bold text-white">
-              Delivery Areas
-            </h4>
-            <div className="flex flex-wrap gap-2 pt-1">
-              {deliveryAreas.map((area) => (
-                <Link
-                  key={area.name}
-                  href={area.href}
-                  className="bg-white/20 hover:bg-white/30 text-white text-xs font-medium px-3.5 py-1.5 rounded-full transition-colors backdrop-blur-xs"
-                >
-                  {area.name}
-                </Link>
-              ))}
-            </div>
-          </div>
+      <div className="footer__cols">
+        <div>
+          <h3>Shop</h3>
+          <Link href="/flowers">Flowers</Link>
+          <Link href="/shop?category=pre-rolls">Pre-rolls</Link>
+          <Link href="/shop?category=disposables">Disposables</Link>
+          <Link href="/shop?category=concentrates">Concentrates</Link>
+          <Link href="/shop?category=edibles">Edibles</Link>
+          <Link href="/shop?category=mushrooms">Mushrooms</Link>
         </div>
 
-        {/* ================= MOBILE LAYOUT ================= */}
-        <div className="block md:hidden space-y-6 pb-8">
-          {/* 1. Header & Contact with orange round badges */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold tracking-tight text-white leading-snug">
-              Order online or by phone for free delivery or curbside pickup.
-            </h3>
+        <div>
+          <h3>Company</h3>
+          <Link href="/about">About Us</Link>
+          <Link href="/deals">Deals</Link>
+          <Link href="/contact">Contact Us</Link>
+          <Link href="/faq">FAQ</Link>
+          <Link href="/terms-conditions">Terms and Conditions</Link>
+          <Link href="/privacy-policy">Privacy Policy</Link>
+          <Link href="/track-order">Track Order</Link>
+        </div>
+      </div>
 
-            <div className="space-y-3 pt-1 text-sm font-medium">
-              <div className="flex items-center gap-3">
-                <span className="w-7 h-7 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <Phone className="w-3.5 h-3.5" />
-                </span>
-                <a href="tel:+12024681966" className="text-white font-semibold">
-                  (202) 468-1966
-                </a>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <span className="w-7 h-7 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                  <MapPin className="w-3.5 h-3.5" />
-                </span>
-                <a
-                  href="https://maps.google.com/?q=1000+G+St+NW,+Washington,+DC+20001"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/95"
-                >
-                  1000 G St NW, Washington, DC 20001
-                </a>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className="w-7 h-7 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <Mail className="w-3.5 h-3.5" />
-                </span>
-                <a href="mailto:info@torchdc.co" className="text-white/95">
-                  info@torchdc.co
-                </a>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className="w-7 h-7 rounded-full bg-[#f95721] text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <Clock className="w-3.5 h-3.5" />
-                </span>
-                <span className="text-white/95">Open daily, 7AM to 11PM</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-white/20 pt-6"></div>
-
-          {/* 2. Shop & Company in 2 Columns */}
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <h4 className="text-base font-bold text-white">Shop</h4>
-              <ul className="space-y-2 text-sm">
-                {shopLinks.map((item) => (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className="text-white/90 hover:text-white"
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="text-base font-bold text-white">Company</h4>
-              <ul className="space-y-2 text-sm">
-                {companyLinks.map((item) => (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className="text-white/90 hover:text-white"
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-white/20 pt-6"></div>
-
-          {/* 3. Delivery Areas with Pill Tags */}
-          <div className="space-y-3">
-            <h4 className="text-base font-bold text-white">Delivery Areas</h4>
-            <div className="flex flex-wrap gap-2 pt-1">
-              {deliveryAreas.map((area) => (
-                <Link
-                  key={area.name}
-                  href={area.href}
-                  className="bg-white/20 hover:bg-white/30 text-white text-xs font-medium px-3.5 py-1.5 rounded-full transition-colors backdrop-blur-xs"
-                >
-                  {area.name}
-                </Link>
-              ))}
-            </div>
-          </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <h3>Delivery Areas</h3>
+        <div className="areas">
+          {DC_NEIGHBORHOODS.map((hood) => (
+            <Link key={hood.name} href={hood.href}>
+              {hood.name}
+            </Link>
+          ))}
         </div>
 
-        {/* ================= BOTTOM BAR (BORDER & COPYRIGHT & SOCIALS) ================= */}
-        <div className="border-t border-white/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-white/90">
-          <p className="text-center sm:text-left">
-            © 2026 Torch · 1000 G St NW, Washington, DC 20001 · (202) 468-1966 · For adults 21+ only.
-          </p>
-
-          {/* Social circular pill buttons */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            {/* Instagram */}
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        <div className="social">
+          <a
+            href="https://www.instagram.com/torch.dc/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
             >
-              <svg
-                viewBox="0 0 24 24"
-                className="w-3.5 h-3.5 fill-current"
-                aria-hidden="true"
-              >
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-              </svg>
-            </a>
-
-            {/* Facebook */}
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+              <rect x="3" y="3" width="18" height="18" rx="5" />
+              <circle cx="12" cy="12" r="4" />
+            </svg>
+          </a>
+          <a
+            href="https://www.facebook.com/Torch-Dispensary"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
             >
-              <svg
-                viewBox="0 0 24 24"
-                className="w-3.5 h-3.5 fill-current"
-                aria-hidden="true"
-              >
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-              </svg>
-            </a>
-
-            {/* X / Twitter */}
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="X (formerly Twitter)"
-              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+              <path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8z" />
+            </svg>
+          </a>
+          <a
+            href="https://x.com/torchdcusa"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="X"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
             >
-              <svg
-                viewBox="0 0 24 24"
-                className="w-3.5 h-3.5 fill-current"
-                aria-hidden="true"
-              >
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-            </a>
-          </div>
+              <path d="M4 4l16 16M20 4L4 20" />
+            </svg>
+          </a>
         </div>
+
+        <span className="legal">
+          © 2026 Torch · 1000 G St NW, Washington, DC 20001 · (202) 468-1966 · For adults 21+ only.
+        </span>
       </div>
     </footer>
   );

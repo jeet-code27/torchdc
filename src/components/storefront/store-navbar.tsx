@@ -1,397 +1,392 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  Phone,
-  ShoppingBag,
-  Search,
-  Menu,
-  X,
-  User,
-  LogOut,
-  Package,
-  MapPin,
-  Home,
-  Tag,
-  Info,
-  HelpCircle,
-  ChevronRight,
-  Sparkles,
-} from "lucide-react";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useCart } from "@/context/cart-context";
-import { CustomerAuthModal } from "./customer-auth-modal";
-import { StoreCartDrawer } from "./store-cart-drawer";
-import { STORE_CATEGORIES } from "./shop-sidebar";
+
+const DC_NEIGHBORHOODS = [
+  { name: "Downtown", href: "/affordable-cannabis-in-downtown-dc-weed-deals" },
+  { name: "Adams Morgan", href: "/adams-morgan-weed-delivery-dc" },
+  { name: "Columbia Heights", href: "/affordable-cannabis-columbia-heights-dc" },
+  { name: "Brookland", href: "/brookland-dc-weed-delivery-catholic-university-area-torch-cannabis" },
+  { name: "Shaw", href: "/shaw-dc-cannabis-delivery-dispensary" },
+  { name: "Logan Circle", href: "/cannabis-delivery-in-logan-circle-dc-torch-dispensary" },
+  { name: "Capitol Hill", href: "/cannabis-delivery-in-capitol-hill-dc-torch-dispensary" },
+  { name: "Navy Yard", href: "/cannabis-delivery-in-navy-yard-dc-torch" },
+  { name: "Dupont Circle", href: "/cannabis-delivery-in-dupont-circle-dc-torch-dispensary" },
+  { name: "Petworth", href: "/cannabis-delivery-in-petworth-dc-torch" },
+  { name: "U Street", href: "/cannabis-delivery-on-u-street-dc-torch" },
+  { name: "Georgetown", href: "/cannabis-delivery-in-georgetown-dc-torch-dispensary" },
+  { name: "H Street", href: "/cannabis-delivery-on-h-street-ne-dc-torch" },
+];
 
 export function StoreNavbar() {
   const router = useRouter();
   const { data: session } = useSession();
-  const { totalCount, setIsCartDrawerOpen, fulfillment, setFulfillment } = useCart();
-
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-  const [authModalOpen, setAuthModalOpen] = React.useState(false);
+  const { totalCount } = useCart();
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  const isCustomer = Boolean(session?.user && session.user.role === "customer");
-  const isAdminStaff = Boolean(
-    session?.user && session.user.role && session.user.role !== "customer"
-  );
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/shop?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
-  const handleSignOut = async () => {
-    setMobileMenuOpen(false);
-    await signOut({ redirect: false });
-    window.location.href = "/";
-  };
+  React.useEffect(() => {
+    if (menuOpen) {
+      document.body.classList.add("mnav-on");
+    } else {
+      document.body.classList.remove("mnav-on");
+    }
+    return () => {
+      document.body.classList.remove("mnav-on");
+    };
+  }, [menuOpen]);
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white border-b border-neutral-200/80 shadow-2xs">
-        {/* ================= DESKTOP HEADER (Screenshots exact match) ================= */}
-        <div className="hidden lg:block">
-          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-6">
-            {/* Logo */}
-            <Link href="/" className="flex-shrink-0" aria-label="Torch Home">
-              <div className="relative w-40 sm:w-44 h-12 sm:h-14">
-                <Image
-                  src="/images/torch-logo.svg"
-                  alt="Torch Dispensary"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-            </Link>
-
-            {/* Large Search Pill (Center) */}
-            <form onSubmit={handleSearchSubmit} className="flex-1 max-w-xl relative">
-              <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="What are you looking for today?"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-neutral-100 hover:bg-neutral-100/80 focus:bg-white text-sm text-neutral-800 placeholder-neutral-400 rounded-full pl-11 pr-10 py-2.5 outline-none border border-transparent focus:border-neutral-300 transition-all"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-neutral-700"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </form>
-
-            {/* Links, Phone & Cart (Exact Screenshot Match - Dropdown removed) */}
-            <div className="flex items-center gap-5 xl:gap-6 text-sm font-bold text-neutral-800">
-              <Link href="/shop" className="hover:text-[#5A805B] transition-colors">
-                Shop
-              </Link>
-              <Link href="/deals" className="hover:text-[#5A805B] transition-colors">
-                Deals
-              </Link>
-              <Link href="/about" className="hover:text-[#5A805B] transition-colors">
-                About
-              </Link>
-              <Link href="/contact" className="hover:text-[#5A805B] transition-colors">
-                Contact
-              </Link>
-
-              {/* Phone Button (Circle icon + number) */}
-              <a
-                href="tel:+12024681966"
-                className="flex items-center gap-2 text-sm font-bold text-neutral-900 hover:text-[#5A805B] transition-colors ml-1"
-                title="Call (202) 468-1966"
-              >
-                <span className="w-9 h-9 rounded-full bg-[#f4f7f4] flex items-center justify-center text-[#5A805B]">
-                  <Phone className="w-4 h-4" />
-                </span>
-                <span className="font-extrabold tracking-tight">(202) 468-1966</span>
-              </a>
-
-              {/* Circular Cart Button (Opens Drawer, Exact Screenshot Match) */}
-              <button
-                type="button"
-                onClick={() => setIsCartDrawerOpen(true)}
-                className="relative w-10 h-10 rounded-full bg-[#5A805B] hover:bg-[#4a6b4b] text-white flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95 shrink-0"
-                aria-label="Open cart"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                {totalCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#E8561E] text-white text-[11px] font-black flex items-center justify-center shadow-xs">
-                    {totalCount}
-                  </span>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* ================= MOBILE HEADER ================= */}
-        <div className="lg:hidden px-4 py-3 flex items-center justify-between">
-          {/* Left: Phone Call button */}
-          <a
-            href="tel:+12024681966"
-            className="w-10 h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-700 flex items-center justify-center transition-colors"
-            aria-label="Call Torch"
-            title="Call (202) 468-1966"
+      <header className="header">
+        <div className="header__in">
+          {/* Mobile hamburger button */}
+          <button
+            className="iconbtn iconbtn--menu"
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen(true)}
           >
-            <Phone className="w-4 h-4 text-[#5A805B]" />
-          </a>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
 
-          {/* Centered Logo (Increased size for mobile prominence) */}
-          <Link href="/" className="relative w-36 h-11">
-            <Image
-              src="/images/torch-logo.svg"
-              alt="Torch"
-              fill
-              className="object-contain"
-              priority
+          {/* Logo */}
+          <Link className="header__logo" href="/" aria-label="Torch home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/img/logo.webp"
+              alt="Torch Cannabis Delivery"
+              style={{ height: "32px", width: "auto", maxWidth: "115px", objectFit: "contain" }}
             />
           </Link>
 
-          {/* Right: Cart Button + Hamburger */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsCartDrawerOpen(true)}
-              className="relative w-10 h-10 rounded-full bg-[#5A805B] text-white flex items-center justify-center shadow-xs active:scale-95 transition-transform"
-              aria-label="Cart"
+          {/* Desktop Search */}
+          <form className="dsearch" role="search" onSubmit={handleSearch}>
+            <label htmlFor="dq" className="sr-only">
+              Search the menu
+            </label>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#4F5A50"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden="true"
             >
-              <ShoppingBag className="w-4 h-4" />
-              {totalCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#E8561E] text-white text-[11px] font-black flex items-center justify-center shadow-xs">
-                  {totalCount}
-                </span>
-              )}
-            </button>
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-3.5-3.5" />
+            </svg>
+            <input
+              id="dq"
+              name="q"
+              type="search"
+              placeholder="What are you looking for today?"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </form>
 
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              className="w-10 h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 flex items-center justify-center transition-all cursor-pointer"
-              aria-label="Open menu"
+          {/* Desktop Nav */}
+          <nav className="dnav" aria-label="Main">
+            <Link href="/shop">Shop</Link>
+            <Link href="/deals">Deals</Link>
+            <Link href="/about">About</Link>
+            <Link href="/contact">Contact</Link>
+            {session?.user && (
+              <Link href="/account" title="My Account">
+                Account
+              </Link>
+            )}
+          </nav>
+
+          {/* Desktop Phone Pill */}
+          <a className="dphone" href="tel:+12024681966">
+            <span className="dphone__ic">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
+              </svg>
+            </span>
+            (202) 468-1966
+          </a>
+
+          {/* Header Right (Call & Cart buttons on Mobile) */}
+          <span className="header__right">
+            <a
+              className="iconbtn iconbtn--call"
+              href="tel:+12024681966"
+              aria-label="Call Torch"
             >
-              <Menu className="w-5 h-5" />
-            </button>
-          </div>
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
+              </svg>
+            </a>
+            <Link className="iconbtn iconbtn--cart" href="/cart" aria-label="Cart">
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="9" cy="20" r="1.5" />
+                <circle cx="18" cy="20" r="1.5" />
+                <path d="M2 3h3l2.6 12.2a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L22 7H6" />
+              </svg>
+              <span className={`badge ${totalCount > 0 ? "is-on" : ""}`}>
+                {totalCount}
+              </span>
+            </Link>
+          </span>
         </div>
       </header>
 
-      {/* ================= MOBILE SLIDE-OVER SIDEBAR DRAWER (Slides from LEFT) ================= */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex justify-start">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-
-          <div className="relative w-[85%] max-w-sm bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-left duration-300">
-            {/* Top Bar */}
-            <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
-              <div className="relative w-32 h-10">
-                <Image
-                  src="/images/torch-logo.svg"
-                  alt="Torch Dispensary"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center justify-center cursor-pointer transition-colors"
-                aria-label="Close menu"
+      {/* Slide-in Mobile Drawer */}
+      <div className="mnav" hidden={!menuOpen}>
+        <div className="mnav__bg" onClick={() => setMenuOpen(false)} />
+        <aside className="mnav__panel" aria-label="Menu">
+          <div className="mnav__top">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/img/logo.webp"
+              alt="Torch"
+              style={{ height: "30px", width: "auto", maxWidth: "105px", objectFit: "contain" }}
+            />
+            <button
+              className="mnav__x"
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setMenuOpen(false)}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                aria-hidden="true"
               >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Scrollable Body */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-5">
-              {/* Search Bar for Mobile Drawer */}
-              <form
-                onSubmit={(e) => {
-                  handleSearchSubmit(e);
-                  setMobileMenuOpen(false);
-                }}
-                className="relative"
-              >
-                <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-neutral-100 text-xs rounded-full pl-9 pr-4 py-2.5 outline-none border border-transparent focus:border-neutral-300"
-                />
-              </form>
-
-              {/* 1. Primary Site Navigation */}
-              <div>
-                <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-1">
-                  Navigation
-                </span>
-                <nav className="space-y-1">
-                  <Link
-                    href="/"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-neutral-800 hover:bg-neutral-50"
-                  >
-                    <Home className="w-4 h-4 text-[#5A805B]" />
-                    <span>Home</span>
-                  </Link>
-                  <Link
-                    href="/shop"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-neutral-800 hover:bg-neutral-50"
-                  >
-                    <Package className="w-4 h-4 text-[#5A805B]" />
-                    <span>Shop</span>
-                  </Link>
-                  <Link
-                    href="/deals"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[#5A805B] bg-[#5A805B]/10 hover:bg-[#5A805B]/15"
-                  >
-                    <span className="flex items-center gap-3">
-                      <Tag className="w-4 h-4 text-[#E8561E]" />
-                      <span>Deals</span>
-                    </span>
-                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#E8561E] text-white">
-                      HOT
-                    </span>
-                  </Link>
-                  <Link
-                    href="/about"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-neutral-800 hover:bg-neutral-50"
-                  >
-                    <Info className="w-4 h-4 text-[#5A805B]" />
-                    <span>About</span>
-                  </Link>
-                  <Link
-                    href="/contact"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-neutral-800 hover:bg-neutral-50"
-                  >
-                    <Phone className="w-4 h-4 text-[#5A805B]" />
-                    <span>Contact</span>
-                  </Link>
-                </nav>
-              </div>
-
-              {/* 2. Menu */}
-              <div>
-                <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-1">
-                  Menu
-                </span>
-                <nav className="space-y-1">
-                  {STORE_CATEGORIES.map((cat) => (
-                    <Link
-                      key={cat.slug}
-                      href={`/shop?category=${cat.slug}`}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold text-neutral-700 hover:bg-neutral-50"
-                    >
-                      <span>{cat.name}</span>
-                      <ChevronRight className="w-4 h-4 text-neutral-400" />
-                    </Link>
-                  ))}
-                </nav>
-              </div>
-
-              {/* 3. Order Mode Switch */}
-              <div className="pt-3 border-t border-neutral-100">
-                <span className="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 mb-2 px-1">
-                  Order Mode
-                </span>
-                <div className="bg-neutral-100 p-1 rounded-full flex text-xs font-bold">
-                  <button
-                    type="button"
-                    onClick={() => setFulfillment("delivery")}
-                    className={`flex-1 py-2 text-center rounded-full transition-all ${
-                      fulfillment === "delivery"
-                        ? "bg-[#5A805B] text-white font-black shadow-xs"
-                        : "text-neutral-600"
-                    }`}
-                  >
-                    Delivery
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFulfillment("pickup")}
-                    className={`flex-1 py-2 text-center rounded-full transition-all ${
-                      fulfillment === "pickup"
-                        ? "bg-[#5A805B] text-white font-black shadow-xs"
-                        : "text-neutral-600"
-                    }`}
-                  >
-                    Pickup
-                  </button>
-                </div>
-              </div>
-
-              {/* 4. Customer Login / Profile */}
-              <div className="pt-3 border-t border-neutral-100">
-                {session?.user ? (
-                  <div className="space-y-2">
-                    <Link
-                      href="/account"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-neutral-50 text-neutral-800"
-                    >
-                      <User className="w-4 h-4 text-[#5A805B]" />
-                      <span>{session.user.name || "My Account"}</span>
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={handleSignOut}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-xl"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setAuthModalOpen(true);
-                    }}
-                    className="w-full py-2.5 rounded-full text-xs font-bold border border-neutral-300 text-neutral-800 flex items-center justify-center gap-2"
-                  >
-                    <User className="w-4 h-4 text-[#5A805B]" />
-                    <span>Customer Sign In</span>
-                  </button>
-                )}
-              </div>
-            </div>
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
           </div>
-        </div>
-      )}
 
-      {/* Slide-out Cart Drawer */}
-      <StoreCartDrawer />
+          <nav className="mnav__links">
+            <Link href="/shop" onClick={() => setMenuOpen(false)}>
+              Shop all
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </Link>
+            <Link href="/deals" onClick={() => setMenuOpen(false)}>
+              Deals
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </Link>
+            <Link href="/about" onClick={() => setMenuOpen(false)}>
+              About
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </Link>
+            <Link href="/contact" onClick={() => setMenuOpen(false)}>
+              Contact
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </Link>
+            <Link href="/faq" onClick={() => setMenuOpen(false)}>
+              FAQ
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </Link>
 
-      {/* Customer Login Modal */}
-      <CustomerAuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-      />
+            {session?.user ? (
+              <Link href="/account" onClick={() => setMenuOpen(false)}>
+                My Account
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9 6l6 6-6 6" />
+                </svg>
+              </Link>
+            ) : (
+              <Link href="/login" onClick={() => setMenuOpen(false)}>
+                Sign in / Account
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M9 6l6 6-6 6" />
+                </svg>
+              </Link>
+            )}
+
+            <details open className="mnav__acc">
+              <summary>
+                Delivery Areas
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </summary>
+              <div className="mnav__areas">
+                {DC_NEIGHBORHOODS.map((area) => (
+                  <Link
+                    key={area.name}
+                    href={area.href}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
+                      <circle cx="12" cy="9.5" r="2.5" />
+                    </svg>
+                    {area.name}
+                  </Link>
+                ))}
+              </div>
+            </details>
+          </nav>
+
+          <a className="mnav__call" href="tel:+12024681966">
+            Call (202) 468-1966
+          </a>
+        </aside>
+      </div>
     </>
   );
 }

@@ -89,7 +89,7 @@ export default async function OrderSuccessPage({
               <span>
                 {order.fulfillment === "delivery"
                   ? "Estimated Arrival: 35 to 45 minutes"
-                  : "Ready for Curbside Pickup in 15 minutes"}
+                  : "Ready for Pickup in 15 minutes"}
               </span>
             </div>
 

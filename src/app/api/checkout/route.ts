@@ -5,6 +5,7 @@ import { Order } from "@/models/Order";
 import { Cart } from "@/models/Cart";
 import { Coupon } from "@/models/Coupon";
 import { auth } from "@/auth";
+import { computeDeals, unitOf } from "@/lib/deals";
 import {
   sendOrderConfirmationEmail,
   sendAdminNewOrderNotification,
@@ -20,6 +21,9 @@ export async function POST(request: Request) {
       fulfillment,
       deliveryAddress,
       deliveryNotes,
+      changeFor,
+      firstOrder,
+      prerollBonus,
       items,
       sessionId,
       isAgeVerified,
@@ -27,14 +31,14 @@ export async function POST(request: Request) {
     } = body;
 
     // Validate customer fields
-    if (!customer?.name || !customer?.email || !customer?.phone) {
+    if (!customer?.name?.trim()) {
       return NextResponse.json(
-        { success: false, error: "Please provide your full name, email, and phone number." },
+        { success: false, error: "Please provide your full name." },
         { status: 400 }
       );
     }
 
-    const phoneDigits = String(customer.phone).replace(/\D/g, "");
+    const phoneDigits = String(customer?.phone || "").replace(/\D/g, "");
     if (phoneDigits.length < 10) {
       return NextResponse.json(
         { success: false, error: "Please provide a valid 10-digit mobile phone number (e.g. (202) 555-0143)." },
@@ -49,9 +53,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (fulfillment === "delivery" && (!deliveryAddress?.street || !deliveryAddress?.zip)) {
+    if (fulfillment === "delivery" && (!deliveryAddress?.street || !deliveryAddress?.street.trim())) {
       return NextResponse.json(
-        { success: false, error: "Please provide a valid street address and DC ZIP code." },
+        { success: false, error: "Please provide your delivery street address." },
         { status: 400 }
       );
     }
@@ -87,8 +91,19 @@ export async function POST(request: Request) {
       0
     );
 
+    // Server-verified automatic flower deals
+    const dealLines = orderItems.map((it: any) => ({
+      tier: it.tier,
+      unit: unitOf(it.weight),
+      price: it.price,
+      qty: it.quantity,
+    }));
+    const computedDeals = computeDeals(dealLines);
+    const dealsDiscount = computedDeals.total;
+    const dealsBreakdown = computedDeals.items;
+
     // Apply Coupon Code if provided
-    let discountAmount = 0;
+    let couponDiscountAmount = 0;
     let appliedCouponCode: string | undefined = undefined;
 
     if (couponCode && typeof couponCode === "string" && couponCode.trim()) {
@@ -106,14 +121,14 @@ export async function POST(request: Request) {
 
         if (isValidDate && hasUsesLeft && meetsMin) {
           if (couponDoc.discountType === "percentage") {
-            discountAmount = (subtotal * couponDoc.discountValue) / 100;
-            if (couponDoc.maxDiscount && discountAmount > couponDoc.maxDiscount) {
-              discountAmount = couponDoc.maxDiscount;
+            couponDiscountAmount = (subtotal * couponDoc.discountValue) / 100;
+            if (couponDoc.maxDiscount && couponDiscountAmount > couponDoc.maxDiscount) {
+              couponDiscountAmount = couponDoc.maxDiscount;
             }
           } else if (couponDoc.discountType === "fixed_amount") {
-            discountAmount = Math.min(couponDoc.discountValue, subtotal);
+            couponDiscountAmount = Math.min(couponDoc.discountValue, subtotal);
           }
-          discountAmount = Number(discountAmount.toFixed(2));
+          couponDiscountAmount = Number(couponDiscountAmount.toFixed(2));
           appliedCouponCode = cleanCode;
 
           // Increment usage count
@@ -122,6 +137,7 @@ export async function POST(request: Request) {
       }
     }
 
+    const discountAmount = Number((dealsDiscount + couponDiscountAmount).toFixed(2));
     const deliveryFee = 0; // Free delivery across DC
     const total = Math.max(0, Number((subtotal - discountAmount + deliveryFee).toFixed(2)));
 
@@ -129,11 +145,20 @@ export async function POST(request: Request) {
     const randomDigits = Math.floor(100000 + Math.random() * 900000);
     const orderNumber = `TORCH-${randomDigits}`;
 
+    const formattedNotes = [
+      deliveryNotes?.trim() || "",
+      changeFor ? `Needs change for $${changeFor}` : "",
+      firstOrder ? "FIRST ORDER: throw in something on the house" : "",
+      prerollBonus ? "Switched from pickup: add a free pre-roll" : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
     const newOrder = new Order({
       orderNumber,
       customer: {
         name: customer.name.trim(),
-        email: customer.email.trim().toLowerCase(),
+        email: customer.email ? customer.email.trim().toLowerCase() : "",
         phone: customer.phone.trim(),
       },
       fulfillment: fulfillment === "pickup" ? "pickup" : "delivery",
@@ -147,7 +172,11 @@ export async function POST(request: Request) {
               zip: deliveryAddress?.zip?.trim() || "20004",
             }
           : undefined,
-      deliveryNotes: deliveryNotes?.trim() || "",
+      deliveryNotes: formattedNotes,
+      changeFor: changeFor ? String(changeFor).trim() : "",
+      firstOrder: Boolean(firstOrder),
+      prerollBonus: Boolean(prerollBonus),
+      dealsBreakdown,
       pickupLocation: "1000 G St NW, Washington, DC",
       items: orderItems,
       subtotal,

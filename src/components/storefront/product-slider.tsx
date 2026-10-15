@@ -23,43 +23,34 @@ export function ProductSlider({
   if (!products || products.length === 0) return null;
 
   return (
-    <section id={id} className="space-y-3 sm:space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between px-0.5">
-        <h2 className="text-xl sm:text-2xl font-black text-neutral-900 tracking-tight">
-          {title}
-        </h2>
-        <Link
-          href={seeAllHref}
-          className="text-xs sm:text-sm font-bold text-[#5A805B] hover:underline flex items-center gap-1"
-        >
-          <span>See all</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </Link>
+    <section id={id} className="sec">
+      <div className="sec__head">
+        <h2>{title}</h2>
+        <Link href={seeAllHref}>See all</Link>
       </div>
 
-      {/* 1. Mobile Horizontal Slider (< lg screens) */}
-      <div className="lg:hidden flex gap-3 overflow-x-auto scrollbar-none pb-2 pt-0.5 -mx-3 px-3 scroll-smooth">
-        {products.map((prod) => (
-          <div
-            key={prod.id}
-            className="w-[155px] sm:w-[170px] shrink-0"
-          >
+      {/* 1. Mobile Horizontal Snap Rail (Only on mobile/tablets < 1024px) */}
+      <div className="block lg:!hidden">
+        <div className="rail">
+          {products.map((prod) => (
             <ShopProductCard
+              key={`m-${prod.id}`}
               product={defaultBadge && !prod.badge ? { ...prod, badge: defaultBadge } : prod}
             />
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* 2. Desktop Grid (≥ lg screens) */}
-      <div className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        {products.map((prod) => (
-          <ShopProductCard
-            key={prod.id}
-            product={defaultBadge && !prod.badge ? { ...prod, badge: defaultBadge } : prod}
-          />
-        ))}
+      {/* 2. Desktop Uniform 3-Column Grid (Only on desktop >= 1024px) */}
+      <div className="hidden lg:!block">
+        <div className="grid">
+          {products.map((prod) => (
+            <ShopProductCard
+              key={`d-${prod.id}`}
+              product={defaultBadge && !prod.badge ? { ...prod, badge: defaultBadge } : prod}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

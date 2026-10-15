@@ -151,11 +151,20 @@ export async function getShopProducts(): Promise<ShopProduct[]> {
         ? "NEW"
         : undefined;
 
-      // Price fallback
-      const price =
-        p.price || (p.variants && p.variants[0]?.price) || 0;
-      const salePrice =
-        p.salePrice || (p.variants && p.variants[0]?.salePrice) || undefined;
+      // Price calculation: Use lowest starting price if product has variants
+      let price = p.price || 0;
+      let salePrice = p.salePrice || undefined;
+
+      if (p.variants && p.variants.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const validVariants = p.variants.filter((v: any) => typeof v.price === "number" && v.price > 0);
+        if (validVariants.length > 0) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const sorted = [...validVariants].sort((a: any, b: any) => a.price - b.price);
+          price = sorted[0].price;
+          salePrice = sorted[0].salePrice || undefined;
+        }
+      }
 
       // Primary image
       const primaryImage =

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { ShopCatalog } from "@/components/storefront/shop-catalog";
 import { getShopProducts } from "@/lib/get-shop-products";
 
@@ -23,6 +24,12 @@ export async function generateMetadata({
 }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
   const normalizedSlug = decodeURIComponent(slug).toLowerCase();
+  if (normalizedSlug === "flowers" || normalizedSlug === "flower") {
+    return {
+      title: "Cannabis Flower Delivery in DC | Midshelf, Topshelf, Private Reserve | Torch",
+      description: "Hand-picked cannabis flower in three tiers: Midshelf, Topshelf and Private Reserve. Free same-day delivery across Washington, DC.",
+    };
+  }
   const displayName =
     CATEGORY_NAMES[normalizedSlug] ||
     normalizedSlug
@@ -39,6 +46,11 @@ export async function generateMetadata({
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
   const normalizedSlug = decodeURIComponent(slug).toLowerCase();
+
+  if (normalizedSlug === "flowers" || normalizedSlug === "flower") {
+    redirect("/flowers");
+  }
+
   const products = await getShopProducts();
 
   return (

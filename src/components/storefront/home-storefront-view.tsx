@@ -3,24 +3,32 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  Sparkles,
-  Flame,
-  ChevronRight,
-  Info,
-  Truck,
-  Store,
-  Search,
-} from "lucide-react";
+import { Search } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { ShopSidebar } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
-import { ShopProductCard, ShopProduct } from "./shop-product-card";
+import { ShopProduct } from "./shop-product-card";
 import { StoreHeroCarousel } from "./store-hero-carousel";
 import { StoreFaqSection } from "./store-faq-section";
 import { MobileCategoryGrid } from "./mobile-category-grid";
 import { ProductSlider } from "./product-slider";
+
+const DC_NEIGHBORHOODS = [
+  { name: "Downtown", href: "/affordable-cannabis-in-downtown-dc-weed-deals" },
+  { name: "Adams Morgan", href: "/adams-morgan-weed-delivery-dc" },
+  { name: "Columbia Heights", href: "/affordable-cannabis-columbia-heights-dc" },
+  { name: "Brookland", href: "/brookland-dc-weed-delivery-catholic-university-area-torch-cannabis" },
+  { name: "Shaw", href: "/shaw-dc-cannabis-delivery-dispensary" },
+  { name: "Logan Circle", href: "/cannabis-delivery-in-logan-circle-dc-torch-dispensary" },
+  { name: "Capitol Hill", href: "/cannabis-delivery-in-capitol-hill-dc-torch-dispensary" },
+  { name: "Navy Yard", href: "/cannabis-delivery-in-navy-yard-dc-torch" },
+  { name: "Dupont Circle", href: "/cannabis-delivery-in-dupont-circle-dc-torch-dispensary" },
+  { name: "Petworth", href: "/cannabis-delivery-in-petworth-dc-torch" },
+  { name: "U Street", href: "/cannabis-delivery-on-u-street-dc-torch" },
+  { name: "Georgetown", href: "/cannabis-delivery-in-georgetown-dc-torch-dispensary" },
+  { name: "H Street", href: "/cannabis-delivery-on-h-street-ne-dc-torch" },
+];
 
 interface HomeStorefrontViewProps {
   products: ShopProduct[];
@@ -28,10 +36,11 @@ interface HomeStorefrontViewProps {
 
 export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
   const router = useRouter();
-  const { fulfillment, setFulfillment, isPickupEnabled } = useCart();
+  const { fulfillment, setFulfillment } = useCart();
   const [showFullLegalText, setShowFullLegalText] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
 
-  // Group products by category (6 products per section for 2 balanced rows of 3)
+  // Group products by category
   const bestSellers = React.useMemo(() => {
     const list = products.filter((p) => p.isBestSeller);
     return list.length >= 6 ? list.slice(0, 6) : products.slice(0, 6);
@@ -59,6 +68,11 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
     return list.length > 0 ? list.slice(0, 6) : products.slice(1, 7);
   }, [products]);
 
+  const concentrates = React.useMemo(() => {
+    const list = products.filter((p) => p.category === "concentrates");
+    return list.length > 0 ? list.slice(0, 6) : products.slice(0, 6);
+  }, [products]);
+
   const edibles = React.useMemo(() => {
     const list = products.filter((p) => p.category === "edibles");
     return list.length > 0 ? list.slice(0, 6) : products.slice(3, 9);
@@ -69,178 +83,238 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
     return list.length > 0 ? list.slice(0, 6) : products.slice(0, 6);
   }, [products]);
 
+  const handleMobileSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/shop?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-5 lg:px-6 py-4 sm:py-6">
-      <div className="flex gap-4 lg:gap-5 xl:gap-6 items-start">
-        {/* ================= 1. DESKTOP LEFT RAIL (Category Navigation) ================= */}
-        <div className="hidden lg:block shrink-0 sticky top-24 self-start">
-          <ShopSidebar scrollLinks={true} />
+    <div className="shell">
+      {/* 1. Left Menu Navigation */}
+      <ShopSidebar scrollLinks={true} />
+
+      {/* 2. Main Column */}
+      <main className="shell__main">
+        {/* Mobile Search Input */}
+        <form className="search" role="search" onSubmit={handleMobileSearch}>
+          <label htmlFor="mobile-q" className="sr-only">
+            Search the menu
+          </label>
+          <Search className="w-4 h-4 text-neutral-400 ml-4 shrink-0" />
+          <input
+            id="mobile-q"
+            name="q"
+            type="search"
+            placeholder="What are you looking for today?"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </form>
+
+        {/* Hero Banner Carousel */}
+        <StoreHeroCarousel />
+
+        {/* Mobile Order Mode Buttons */}
+        <div className="orderbtns">
+          <button
+            type="button"
+            className={`pill ${fulfillment === "delivery" ? "pill--green" : "pill--black"}`}
+            onClick={() => setFulfillment("delivery")}
+          >
+            Free Delivery
+          </button>
+          <button
+            type="button"
+            className={`pill ${fulfillment === "pickup" ? "pill--green" : "pill--black"}`}
+            onClick={() => setFulfillment("pickup")}
+          >
+            Pickup
+          </button>
+        </div>
+        <p className="ordernote">
+          {fulfillment === "delivery"
+            ? "Fast delivery across DC · Pay cash at the door"
+            : "Pickup at 1000 G St NW · Pickup paused"}
+        </p>
+
+        {/* Mobile Categories Grid */}
+        <MobileCategoryGrid />
+
+        {/* How It Works Steps */}
+        <div className="steps">
+          <h2>How it works</h2>
+          <div className="step">
+            <span className="step__rail">
+              <span className="step__icon" style={{ background: "#5A805B" }}>
+                1
+              </span>
+              <span className="step__line" />
+            </span>
+            <div className="step__body">
+              <strong>Pick your favorites</strong>
+              <span>
+                Add what you want to your cart. No medical card needed — 21+ with government ID.
+              </span>
+            </div>
+          </div>
+          <div className="step">
+            <span className="step__rail">
+              <span className="step__icon" style={{ background: "#2F4F30" }}>
+                2
+              </span>
+              <span className="step__line" />
+            </span>
+            <div className="step__body">
+              <strong>We text you updates</strong>
+              <span>
+                Your driver reaches out with an ETA as soon as your order is out for delivery.
+              </span>
+            </div>
+          </div>
+          <div className="step">
+            <span className="step__rail">
+              <span className="step__icon" style={{ background: "#E8561E" }}>
+                3
+              </span>
+            </span>
+            <div className="step__body">
+              <strong>Pay with cash</strong>
+              <span>
+                Show your 21+ ID and pay cash at the door. Free delivery across Washington, DC.
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* ================= 2. MAIN CENTER CONTENT (Slider + Categorized Sections) ================= */}
-        <main className="flex-1 min-w-0 space-y-4 sm:space-y-6">
-          {/* ================= MOBILE SEARCH BAR (Above Banner) ================= */}
-          <div className="lg:hidden">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.currentTarget;
-                const input = form.elements.namedItem("search") as HTMLInputElement;
-                if (input?.value.trim()) {
-                  router.push(`/shop?search=${encodeURIComponent(input.value.trim())}`);
-                }
-              }}
-              className="relative w-full"
-            >
-              <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                name="search"
-                placeholder="What are you looking for today?"
-                className="w-full bg-[#f4f5f4] hover:bg-[#edf0ed] focus:bg-white text-sm text-neutral-800 placeholder-neutral-500 rounded-full pl-11 pr-4 py-2.5 sm:py-3 outline-none border border-transparent focus:border-[#5A805B] transition-all shadow-2xs"
-              />
-            </form>
-          </div>
-
-          {/* ================= HERO SLIDER CAROUSEL ================= */}
-          <StoreHeroCarousel />
-
-          {/* ================= MOBILE ORDER MODE SWITCHER (Below Banner, No Extra Text) ================= */}
-          <div className="lg:hidden bg-neutral-100 p-1 rounded-full flex text-xs font-bold max-w-md mx-auto">
-            <button
-              type="button"
-              onClick={() => setFulfillment("delivery")}
-              className={`flex-1 py-2 sm:py-2.5 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                fulfillment === "delivery"
-                  ? "bg-[#5A805B] text-white font-black shadow-xs"
-                  : "text-neutral-600 hover:text-neutral-900"
-              }`}
-            >
-              <Truck className="w-3.5 h-3.5" />
-              <span>Delivery</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setFulfillment("pickup")}
-              className={`flex-1 py-2 sm:py-2.5 text-center rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                fulfillment === "pickup"
-                  ? "bg-[#5A805B] text-white font-black shadow-xs"
-                  : "text-neutral-600 hover:text-neutral-900"
-              }`}
-            >
-              <Store className="w-3.5 h-3.5" />
-              <span>Pickup</span>
-            </button>
-          </div>
-
-          {/* ================= MOBILE SHOP BY CATEGORY (Below Toggle, Mobile Only) ================= */}
-          <MobileCategoryGrid />
-
-          {/* ================= 1. BEST SELLERS ================= */}
+        {/* Sections synced with menu IDs */}
+        <div className="space-y-6 pt-4">
           <ProductSlider
-            id="section-best-sellers"
+            id="best"
             title="Best Sellers"
             seeAllHref="/shop?category=best-sellers"
             products={bestSellers}
             defaultBadge="Best Seller"
           />
 
-          {/* ================= 2. NEW ARRIVALS ================= */}
           <ProductSlider
-            id="section-new-arrivals"
+            id="new"
             title="New Arrivals"
             seeAllHref="/shop?category=new-arrivals"
             products={newArrivals}
             defaultBadge="New"
           />
 
-          {/* ================= 3. FLOWERS ================= */}
           <ProductSlider
-            id="section-flowers"
+            id="flowers"
             title="Flowers"
-            seeAllHref="/shop?category=flowers"
+            seeAllHref="/flowers"
             products={flowers}
           />
 
-          {/* ================= 4. PRE-ROLLS ================= */}
           <ProductSlider
-            id="section-pre-rolls"
+            id="pre-rolls"
             title="Pre-rolls"
             seeAllHref="/shop?category=pre-rolls"
             products={preRolls}
           />
 
-          {/* ================= 5. DISPOSABLES & CARTRIDGES ================= */}
           <ProductSlider
-            id="section-disposables"
-            title="Disposable Vape & Cartridges"
+            id="disposables"
+            title="Disposables"
             seeAllHref="/shop?category=disposables"
             products={disposables}
           />
 
-          {/* ================= 6. EDIBLES ================= */}
           <ProductSlider
-            id="section-edibles"
+            id="concentrates"
+            title="Concentrates"
+            seeAllHref="/shop?category=concentrates"
+            products={concentrates}
+          />
+
+          <ProductSlider
+            id="edibles"
             title="Edibles"
             seeAllHref="/shop?category=edibles"
             products={edibles}
           />
 
-          {/* ================= 7. MUSHROOMS ================= */}
           <ProductSlider
-            id="section-mushrooms"
+            id="mushrooms"
             title="Mushrooms"
             seeAllHref="/shop?category=mushrooms"
             products={mushrooms}
           />
+        </div>
 
-          {/* ================= LEGAL COMPLIANCE BOX ================= */}
-          <div className="rounded-3xl bg-neutral-100/70 border border-neutral-200/80 p-6 sm:p-8 space-y-4 text-neutral-800">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-[#5A805B]/15 text-[#5A805B] flex items-center justify-center shrink-0">
-                <Info className="w-4 h-4" />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-neutral-900">
-                Our Organization and Washington D.C. Delivery
-              </h3>
-            </div>
-
-            <div className="text-xs sm:text-sm text-neutral-600 leading-relaxed space-y-3">
-              <p>
-                Torch operates in strict compliance with Washington D.C. cannabis regulations. We are a premier Washington D.C. delivery service committed to providing safe, discreet, and reliable delivery of premium cannabis products directly to eligible adults aged 21 and older.
+        {/* Delivery Areas Rail */}
+        <div className="hoods">
+          <div className="sec__head">
+            <div>
+              <h2>DC Delivery Areas</h2>
+              <p className="hoods__sub">
+                Free weed delivery across all 4 quadrants of Washington, DC
               </p>
-              {showFullLegalText && (
-                <div className="space-y-3 animate-in fade-in duration-200">
-                  <p>
-                    Valid government-issued photo identification (Driver&apos;s License, Passport, or State ID) is required upon delivery or pickup. We do not deliver to federal lands, including the National Mall, military bases, or federal buildings.
-                  </p>
-                  <p>
-                    Payment is handled securely via Cash On Delivery (COD) upon inspection of your order. Our dedicated dispatchers ensure average delivery times of 35 to 45 minutes across Dupont Circle, Georgetown, Capitol Hill, Adams Morgan, Navy Yard, and greater Washington D.C.
-                  </p>
-                </div>
-              )}
             </div>
+          </div>
+          <div className="hoods__rail">
+            {DC_NEIGHBORHOODS.map((hood) => (
+              <Link key={hood.name} href={hood.href}>
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
+                  <circle cx="12" cy="9.5" r="2.5" />
+                </svg>
+                {hood.name}
+              </Link>
+            ))}
+          </div>
+        </div>
 
+        {/* About & FAQ Info */}
+        <div className="dinfo">
+          <div className="about">
+            <h2>About Torch Cannabis Delivery</h2>
+            <p>
+              Torch delivers premium cannabis directly to your door across Washington, DC. We stock lab-tested flowers across three curated tiers, whole-flower pre-rolls, disposable vapes, concentrates, and artisan edibles.
+            </p>
+            {showFullLegalText && (
+              <div className="space-y-3">
+                <p>
+                  No medical card required — all adults 21+ with a valid government photo ID can order online or call (202) 468-1966. Pay with cash at the door. Free delivery across every quadrant in the District.
+                </p>
+              </div>
+            )}
             <button
               type="button"
               onClick={() => setShowFullLegalText(!showFullLegalText)}
-              className="text-xs font-bold text-[#5A805B] hover:underline pt-1 inline-block cursor-pointer"
+              className="linkbtn"
             >
-              {showFullLegalText ? "Show Less" : "Read More"}
+              {showFullLegalText ? "Show less" : "Read more"}
             </button>
           </div>
 
-          {/* ================= FAQ ACCORDION ================= */}
-          <StoreFaqSection />
-        </main>
-
-        {/* ================= 3. DESKTOP RIGHT RAIL (Sticky Cart Sidebar) ================= */}
-        <div className="hidden xl:block shrink-0 sticky top-24 self-start">
-          <ShopCartSidebar />
+          <div className="faq">
+            <StoreFaqSection />
+          </div>
         </div>
-      </div>
+      </main>
 
-      {/* ================= MOBILE BOTTOM FLOATING CART PILL ================= */}
+      {/* 3. Right Cart Column */}
+      <ShopCartSidebar />
+
+      {/* 4. Mobile Floating Cart Bar */}
       <ShopStickyCartBar />
     </div>
   );

@@ -13,6 +13,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      { source: "/shop-now", destination: "/shop", permanent: false },
+      { source: "/shop-now/", destination: "/shop", permanent: false },
+      { source: "/about-us", destination: "/about", permanent: false },
+      { source: "/about-us/", destination: "/about", permanent: false },
+      { source: "/cannabis-faq-dc", destination: "/faq", permanent: false },
+      { source: "/cannabis-faq-dc/", destination: "/faq", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;

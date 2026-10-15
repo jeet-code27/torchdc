@@ -216,11 +216,22 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
       rStrain = "Hybrid";
     }
 
+    // Determine starting price for related product
+    let rPrice = r.price || 0;
+    if (r.variants && r.variants.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const valid = r.variants.filter((v: any) => typeof v.price === "number" && v.price > 0);
+      if (valid.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        rPrice = Math.min(...valid.map((v: any) => v.price));
+      }
+    }
+
     return {
       id: r._id.toString(),
       name: r.name,
       slug: r.slug,
-      price: r.price || (r.variants && r.variants[0]?.price) || 0,
+      price: rPrice,
       image:
         r.images?.find((img: { isPrimary?: boolean; url: string }) => img.isPrimary)?.url ||
         r.images?.[0]?.url ||
@@ -230,21 +241,28 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     };
   });
 
-  // Use only real variants if product has them
+  // Use only real variants if product has them, sorted by price ascending (e.g. 3.5g -> 7g -> 14g -> 1 oz)
   const rawVariants = Array.isArray(productDoc.variants) ? productDoc.variants : [];
-  const variants = rawVariants.map((v: {
-    name: string;
-    price: number;
-    salePrice?: number | null;
-    stock?: number;
-    inStock?: boolean;
-  }) => ({
-    name: v.name,
-    price: v.price,
-    salePrice: v.salePrice || null,
-    stock: v.stock,
-    inStock: v.inStock !== false,
-  }));
+  const variants = rawVariants
+    .map((v: {
+      name: string;
+      price: number;
+      salePrice?: number | null;
+      stock?: number;
+      inStock?: boolean;
+    }) => ({
+      name: v.name,
+      price: v.price,
+      salePrice: v.salePrice || null,
+      stock: v.stock,
+      inStock: v.inStock !== false,
+    }))
+    .sort((a: { price: number }, b: { price: number }) => a.price - b.price);
+
+  const startingPrice =
+    variants.length > 0 ? variants[0].price : productDoc.price || 0;
+  const startingSalePrice =
+    variants.length > 0 ? variants[0].salePrice : productDoc.salePrice || null;
 
   const productData: ProductDetailData = {
     _id: productDoc._id.toString(),
@@ -252,8 +270,8 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     slug: productDoc.slug,
     description: productDoc.description,
     shortDescription: productDoc.shortDescription,
-    price: productDoc.price || (variants[0] && variants[0].price) || 0,
-    salePrice: productDoc.salePrice || null,
+    price: startingPrice,
+    salePrice: startingSalePrice,
     images:
       productDoc.images && productDoc.images.length > 0
         ? productDoc.images

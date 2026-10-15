@@ -47,7 +47,8 @@ export function ShopFlowerTiers({
     <div
       role="group"
       aria-label="Flower quality tiers"
-      className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4"
+      className="tiers"
+      style={{ margin: "14px 0 18px", padding: 0 }}
     >
       {FLOWER_TIERS.map((tier) => {
         const isActive = activeTier === tier.slug;
@@ -56,44 +57,13 @@ export function ShopFlowerTiers({
             key={tier.slug}
             type="button"
             onClick={() => onSelectTier(isActive ? "all" : tier.slug)}
-            className={`flex items-center justify-between p-3.5 sm:p-4 rounded-2xl text-left transition-all cursor-pointer border ${
-              isActive
-                ? "bg-[#557754] text-white border-[#557754] shadow-md shadow-[#557754]/20 scale-[1.01]"
-                : "bg-white text-neutral-900 border-neutral-200/90 hover:border-neutral-300 hover:shadow-xs"
-            }`}
+            className={`tier ${isActive ? "is-on" : ""}`}
           >
-            <div>
-              <strong className="block text-[15px] sm:text-[16px] font-black">
-                {tier.name}
-              </strong>
-              <span
-                className={`block text-[12px] mt-0.5 line-clamp-1 ${
-                  isActive ? "text-white/80" : "text-neutral-500"
-                }`}
-              >
-                {tier.subtitle}
-              </span>
-            </div>
-
-            <div className="text-right pl-2">
-              <span
-                className={`text-[11px] block font-medium ${
-                  isActive ? "text-white/80" : "text-neutral-400"
-                }`}
-              >
-                from
-              </span>
-              <span className="text-[17px] font-black leading-none">
-                ${tier.priceFrom}
-              </span>
-              <span
-                className={`text-[10px] block mt-0.5 ${
-                  isActive ? "text-white/70" : "text-neutral-400"
-                }`}
-              >
-                {tier.strainCount}
-              </span>
-            </div>
+            <span className="tier__l">
+              <span className="tier__n">{tier.name}</span>
+              <span className="tier__d">{tier.subtitle}</span>
+            </span>
+            <span className="tier__c">{tier.strainCount}</span>
           </button>
         );
       })}
