@@ -190,6 +190,35 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
 
         {/* Sections synced with menu IDs */}
         <div className="space-y-6 pt-4">
+          {/* Desktop-Only Delivery Areas Strip (Directly above Best Sellers) */}
+          <section className="hoods hoods--desktop hidden lg:block" aria-labelledby="hoods-desktop-h">
+            <div className="sec__head">
+              <h2 id="hoods-desktop-h">We deliver to your neighborhood</h2>
+            </div>
+            <p className="hoods__sub">Free same-day delivery across DC. Tap yours.</p>
+            <div className="hoods__rail">
+              {DC_NEIGHBORHOODS.map((hood) => (
+                <Link key={hood.name} href={hood.href}>
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
+                    <circle cx="12" cy="9.5" r="2.5" />
+                  </svg>
+                  <span>{hood.name}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
           <ProductSlider
             id="best"
             title="Best Sellers"
@@ -249,13 +278,13 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
           />
         </div>
 
-        {/* Delivery Areas Rail */}
-        <div className="hoods">
+        {/* Mobile Delivery Areas Rail */}
+        <div className="hoods lg:hidden">
           <div className="sec__head">
             <div>
-              <h2>DC Delivery Areas</h2>
+              <h2>We deliver to your neighborhood</h2>
               <p className="hoods__sub">
-                Free weed delivery across all 4 quadrants of Washington, DC
+                Free same-day delivery across DC. Tap yours.
               </p>
             </div>
           </div>
@@ -276,7 +305,7 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
                   <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
                   <circle cx="12" cy="9.5" r="2.5" />
                 </svg>
-                {hood.name}
+                <span>{hood.name}</span>
               </Link>
             ))}
           </div>

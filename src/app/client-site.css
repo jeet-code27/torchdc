@@ -723,11 +723,21 @@ body[data-page="area"] .orderbtns { margin-top: 14px; }
 /* Homepage: delivery areas strip */
 .hoods { padding: 26px 16px 0; }
 .hoods .sec__head { padding: 0; }
+.hoods .sec__head h2 { font-size: 22px; font-weight: 800; color: var(--ink); margin: 0; }
 .hoods__sub { margin: 4px 0 0; font-size: 14px; color: var(--site-muted); }
 .hoods__rail { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, auto); gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 14px -16px 0; padding: 0 16px 4px; }
 .hoods__rail::-webkit-scrollbar { display: none; }
-.hoods__rail a { display: flex; align-items: center; gap: 7px; white-space: nowrap; padding: 10px 14px; border-radius: 999px; background: #F4F8F3; border: 1px solid #DCE8DB; color: var(--green-dark); text-decoration: none; font-size: 14px; font-weight: 600; }
+.hoods__rail a { display: flex; align-items: center; gap: 7px; white-space: nowrap; padding: 10px 14px; border-radius: 999px; background: #F4F8F3; border: 1px solid #DCE8DB; color: var(--green-dark); text-decoration: none; font-size: 14px; font-weight: 600; transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease; }
+.hoods__rail a:hover { background: #EAF3E8; border-color: #BED8BD; transform: translateY(-1px); }
 .hoods__rail a svg { color: var(--orange); flex: none; }
+
+/* Desktop-specific hoods section above Best Sellers */
+.hoods--desktop { padding: 28px 0 8px; margin: 0; max-width: none; }
+.hoods--desktop .sec__head { padding: 0; }
+.hoods--desktop .sec__head h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.3px; color: var(--ink); margin: 0; }
+.hoods--desktop .hoods__sub { margin: 4px 0 0; font-size: 14px; color: var(--site-muted); }
+.hoods--desktop .hoods__rail { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; padding: 0; overflow: visible; }
+.hoods--desktop .hoods__rail a { display: inline-flex; align-items: center; gap: 7px; padding: 10px 14px; border-radius: 999px; background: #F4F8F3; border: 1px solid #DCE8DB; color: var(--green-dark); text-decoration: none; font-size: 14px; font-weight: 600; }
 
 /* Open bar: tap to call on phones */
 .openbar__call { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 11px; border-radius: 13px; background: var(--green); color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 13px; }

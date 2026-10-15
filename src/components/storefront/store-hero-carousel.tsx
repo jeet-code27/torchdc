@@ -1103,6 +1103,21 @@ export function StoreHeroCarousel() {
           </div>
         </div>
       </div>
+
+      {/* Desktop Dots */}
+      <div className="dots hero--desktop-dots">
+        {[0, 1].map((idx) => (
+          <button
+            key={idx}
+            type="button"
+            aria-label={`Go to slide ${idx + 1}`}
+            aria-current={currentSlide === idx ? "true" : "false"}
+            onClick={() => goToSlide(idx)}
+          >
+            <span />
+          </button>
+        ))}
+      </div>
     </>
   );
 }
