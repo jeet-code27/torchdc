@@ -322,7 +322,7 @@ export function StoreAddedToCartSheet() {
     lastAddedItem?.name?.toLowerCase().split(/[\s(]+/)[0] || "";
 
   const availablePicks = React.useMemo(() => {
-    if (!effectiveTier) return [];
+    if (!effectiveTier || (unit !== "h" && unit !== "o")) return [];
 
     // Filter database flowers for this tier
     const matchingDb = dbFlowers.filter(
@@ -349,7 +349,7 @@ export function StoreAddedToCartSheet() {
     // Random shuffle on every addition
     const shuffled = [...pool].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 3);
-  }, [effectiveTier, currentFirstWord, dbFlowers, lastAddedItem]);
+  }, [effectiveTier, currentFirstWord, dbFlowers, lastAddedItem, unit]);
 
   // Touch handlers for mobile swipe down to close
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -371,8 +371,9 @@ export function StoreAddedToCartSheet() {
     return null;
   }
 
-  // Determine active deal type (ounces vs half-ounces)
+  // A deal only applies to half-ounces (14g) or full-ounces (28g / 1 oz)
   const isOzDeal = unit === "o";
+  const hasDeal = Boolean(effectiveTier && isFlower && (unit === "h" || unit === "o"));
   const targetUnit = isOzDeal ? "o" : "h";
   const targetWeight = isOzDeal ? "1 oz" : "14g";
   const targetWeightLabel = isOzDeal ? "1 oz" : "½ oz";
@@ -455,7 +456,7 @@ export function StoreAddedToCartSheet() {
         </div>
 
         {/* ================= FLOWER DEAL BOX (LIVE INTERACTIVE PROGRESS) ================= */}
-        {effectiveTier && isFlower && (
+        {hasDeal && effectiveTier && (
           <div className="dealbox">
             <div className="dealbox__top">
               <span className="dealbox__tag">
@@ -561,7 +562,7 @@ export function StoreAddedToCartSheet() {
                             slug: base.slug,
                             price: pickPrice,
                             weight: targetWeight,
-                            tier: effectiveTier,
+                            tier: effectiveTier || undefined,
                             category: "flowers",
                             image: base.image || "/assets/img/flower.webp",
                           },
