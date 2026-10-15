@@ -363,27 +363,182 @@ export function StoreHeroCarousel() {
               viewBox="0 0 358 236"
               preserveAspectRatio="xMaxYMax meet"
               aria-hidden="true"
-              style={{ position: "absolute", inset: 0, zIndex: 1 }}
+              style={{ position: "absolute", inset: 0, zIndex: 0 }}
             >
-              <circle cx="300" cy="56" r="26" fill="#FFF4DE" />
-              <g
-                fill="none"
-                stroke="#E9DFC9"
-                strokeWidth="1.6"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                opacity="0.75"
-              >
+              <defs>
+                <radialGradient id="mglow" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0" stopColor="#FFF4DE" stopOpacity="0.45" />
+                  <stop offset="1" stopColor="#E9DFC9" stopOpacity="0" />
+                </radialGradient>
+                <radialGradient id="haze" cx="0.75" cy="1" r="0.8">
+                  <stop offset="0" stopColor="#E9DFC9" stopOpacity="0.10" />
+                  <stop offset="1" stopColor="#E9DFC9" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="shoot2" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stopColor="#FFFFFF" stopOpacity="0" />
+                  <stop offset="1" stopColor="#FFFFFF" stopOpacity="0.9" />
+                </linearGradient>
+                <mask id="moonCut2">
+                  <rect x="0" y="0" width="358" height="236" fill="#FFFFFF" />
+                  <circle cx="312" cy="48" r="24" fill="#000000" />
+                </mask>
+                <linearGradient id="cityglowM" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#F2B45E" stopOpacity="0" />
+                  <stop offset="1" stopColor="#F2B45E" stopOpacity="0.22" />
+                </linearGradient>
+                <radialGradient id="lampM" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0" stopColor="#FFD58A" stopOpacity="0.75" />
+                  <stop offset="1" stopColor="#FFD58A" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="beamM" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stopColor="#FFE3A8" stopOpacity="0.7" />
+                  <stop offset="1" stopColor="#FFE3A8" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <rect x="0" y="0" width="358" height="236" fill="url(#haze)" />
+              <g>
+                <circle cx="162.3" cy="91.3" r="1.2" fill="#FFFFFF" opacity="0.62" className="tw tw0" />
+                <circle cx="303.3" cy="33.6" r="1.6" fill="#FFFFFF" opacity="0.64" />
+                <circle cx="218.9" cy="33.0" r="1.2" fill="#FFFFFF" opacity="0.53" />
+                <circle cx="35.7" cy="130.3" r="0.8" fill="#FFFFFF" opacity="0.71" />
+                <circle cx="142.7" cy="74.7" r="1.6" fill="#FFFFFF" opacity="0.74" className="tw tw1" />
+                <circle cx="222.1" cy="133.7" r="0.8" fill="#FFFFFF" opacity="0.39" />
+                <circle cx="70.6" cy="41.7" r="0.8" fill="#FFFFFF" opacity="0.82" />
+                <circle cx="118.2" cy="96.2" r="1" fill="#FFFFFF" opacity="0.66" />
+                <circle cx="228.1" cy="82.0" r="0.8" fill="#FFFFFF" opacity="0.62" className="tw tw2" />
+                <circle cx="101.4" cy="159.6" r="0.8" fill="#FFFFFF" opacity="0.77" />
+                <circle cx="114.3" cy="39.8" r="1" fill="#FFFFFF" opacity="0.37" />
+                <circle cx="201.1" cy="20.8" r="0.8" fill="#FFFFFF" opacity="0.86" />
+                <circle cx="139.3" cy="153.5" r="0.8" fill="#FFFFFF" opacity="0.48" className="tw tw0" />
+                <circle cx="328.5" cy="12.2" r="1.2" fill="#FFFFFF" opacity="0.94" />
+                <circle cx="143.1" cy="15.4" r="1" fill="#FFFFFF" opacity="0.82" />
+                <circle cx="98.4" cy="17.6" r="1" fill="#FFFFFF" opacity="0.36" />
+                <circle cx="147.5" cy="148.0" r="1" fill="#FFFFFF" opacity="0.50" className="tw tw1" />
+                <circle cx="39.4" cy="13.3" r="1.2" fill="#FFFFFF" opacity="0.46" />
+                <circle cx="199.8" cy="73.8" r="1" fill="#FFFFFF" opacity="0.94" />
+                <circle cx="273.3" cy="69.4" r="1.2" fill="#FFFFFF" opacity="0.42" />
+                <circle cx="151.3" cy="37.2" r="1" fill="#FFFFFF" opacity="0.87" className="tw tw2" />
+                <circle cx="345.2" cy="96.5" r="0.8" fill="#FFFFFF" opacity="0.48" />
+                <circle cx="142.0" cy="137.3" r="1.6" fill="#FFFFFF" opacity="0.41" />
+                <circle cx="350.3" cy="37.3" r="1" fill="#FFFFFF" opacity="0.36" />
+                <circle cx="217.6" cy="133.5" r="1.2" fill="#FFFFFF" opacity="0.39" className="tw tw0" />
+                <circle cx="35.5" cy="94.9" r="1" fill="#FFFFFF" opacity="0.36" />
+                <circle cx="133.0" cy="101.1" r="1" fill="#FFFFFF" opacity="0.93" />
+                <circle cx="173.3" cy="93.6" r="1.2" fill="#FFFFFF" opacity="0.46" />
+                <circle cx="57.9" cy="145.7" r="1.6" fill="#FFFFFF" opacity="0.50" className="tw tw1" />
+                <circle cx="70.4" cy="119.4" r="1.6" fill="#FFFFFF" opacity="0.47" />
+                <circle cx="336.5" cy="141.6" r="1.6" fill="#FFFFFF" opacity="0.40" />
+                <circle cx="20.6" cy="21.0" r="1.6" fill="#FFFFFF" opacity="0.93" />
+                <circle cx="87.4" cy="113.9" r="1" fill="#FFFFFF" opacity="0.60" className="tw tw2" />
+                <circle cx="320.7" cy="80.6" r="1.6" fill="#FFFFFF" opacity="0.46" />
+                <circle cx="256.1" cy="14.7" r="1" fill="#FFFFFF" opacity="0.64" />
+                <circle cx="232.7" cy="100.1" r="0.8" fill="#FFFFFF" opacity="0.52" />
+                <circle cx="325.1" cy="35.8" r="0.8" fill="#FFFFFF" opacity="0.39" className="tw tw0" />
+                <circle cx="148.0" cy="42.9" r="0.8" fill="#FFFFFF" opacity="0.46" />
+                <circle cx="133.1" cy="93.3" r="1" fill="#FFFFFF" opacity="0.41" />
+                <circle cx="52.4" cy="74.3" r="1" fill="#FFFFFF" opacity="0.74" />
+                <circle cx="245.9" cy="95.2" r="1" fill="#FFFFFF" opacity="0.70" className="tw tw1" />
+                <circle cx="327.3" cy="78.1" r="1" fill="#FFFFFF" opacity="0.77" />
+                <circle cx="341.0" cy="7.3" r="0.8" fill="#FFFFFF" opacity="0.64" />
+                <circle cx="259.7" cy="53.7" r="0.8" fill="#FFFFFF" opacity="0.40" />
+                <circle cx="195.1" cy="119.0" r="1" fill="#FFFFFF" opacity="0.83" className="tw tw2" />
+                <circle cx="324.3" cy="58.9" r="1.2" fill="#FFFFFF" opacity="0.89" />
+                <circle cx="308.9" cy="69.1" r="0.8" fill="#FFFFFF" opacity="0.87" />
+                <circle cx="204.5" cy="101.5" r="1.2" fill="#FFFFFF" opacity="0.58" />
+                <circle cx="8.4" cy="15.3" r="0.8" fill="#FFFFFF" opacity="0.73" className="tw tw0" />
+                <circle cx="351.7" cy="141.2" r="1" fill="#FFFFFF" opacity="0.58" />
+                <circle cx="261.3" cy="94.6" r="1.2" fill="#FFFFFF" opacity="0.63" />
+                <circle cx="193.4" cy="84.9" r="1.6" fill="#FFFFFF" opacity="0.37" />
+              </g>
+              <path d="M168 22 L212 38" stroke="url(#shoot2)" strokeWidth="2" strokeLinecap="round" />
+              <circle cx="300" cy="56" r="58" fill="url(#mglow)" />
+              <circle cx="300" cy="56" r="26" fill="#FFF4DE" mask="url(#moonCut2)" />
+              <g fill="none" stroke="#E9DFC9" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" opacity="0.75">
                 <path d="M0 234 H358" />
-                <path d="M176 234 V204 H188 V198 L194 192 L200 198 V204 H212 V196 H226 V234" />
+                <path d="M0 234 V220 H16 V214 H30 V220 H42 V212 H58 V234" />
+                <path d="M176 234 V204 H188 V198 L194 192 L200 198 V204 H212 V196 H226 V234 M188 204 V234 M212 204 V234" />
                 <path d="M234 234 V106 L240 92 L246 106 V234" />
-                <path d="M284 234 V206 H358 M292 206 V198 H350 V206 M298 198 V190 H344 V198" />
+                <path d="M254 234 V200 H262 V188 H274 V200 H280 V234" />
+                <path d="M284 234 V206 H358 M292 206 V198 H350 V206 M298 198 V190 H344 V198 M301 190 A20 20 0 0 1 341 190 M316 170 H326 V164 L321 156 L316 164 Z" />
+                <path d="M300 206 V234 M312 206 V234 M330 206 V234 M342 206 V234" />
               </g>
               <g fill="#FFC56B" opacity="0.9">
                 <rect x="182" y="210" width="3" height="4" />
                 <rect x="204" y="212" width="3" height="4" />
+                <rect x="218" y="202" width="3" height="4" />
+                <rect x="218" y="214" width="3" height="4" />
                 <rect x="258" y="206" width="3" height="4" />
+                <rect x="268" y="194" width="3" height="4" />
                 <rect x="304" y="214" width="3" height="4" />
+                <rect x="334" y="214" width="3" height="4" />
+                <rect x="20" y="224" width="3" height="4" />
+                <rect x="48" y="218" width="3" height="4" />
+              </g>
+              <g>
+                <rect x="-340" y="150" width="698" height="86" fill="url(#cityglowM)" />
+                <g fill="#E6EFE4" opacity="0.16">
+                  <ellipse cx="262" cy="74" rx="34" ry="7" />
+                  <ellipse cx="282" cy="68" rx="20" ry="6" />
+                  <ellipse cx="336" cy="30" rx="26" ry="5" />
+                  <ellipse cx="-150" cy="60" rx="40" ry="7" />
+                  <ellipse cx="-128" cy="54" rx="22" ry="6" />
+                </g>
+                <g fill="#FFF6E0">
+                  <path d="M150 26 l1.4 4.2 4.2 1.4 -4.2 1.4 -1.4 4.2 -1.4 -4.2 -4.2 -1.4 4.2 -1.4z" opacity="0.9" />
+                  <path d="M208 74 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z" opacity="0.8" />
+                  <path d="M352 112 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z" opacity="0.7" />
+                  <path d="M-110 30 l1.4 4.2 4.2 1.4 -4.2 1.4 -1.4 4.2 -1.4 -4.2 -4.2 -1.4 4.2 -1.4z" opacity="0.85" />
+                  <path d="M-40 96 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z" opacity="0.7" />
+                  <path d="M-250 70 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z" opacity="0.7" />
+                </g>
+                <g fill="#FFC56B">
+                  <rect x="180" y="208" width="3" height="4" />
+                  <rect x="180" y="220" width="3" height="4" />
+                  <rect x="216" y="204" width="3" height="4" />
+                  <rect x="216" y="216" width="3" height="4" />
+                  <rect x="220" y="226" width="3" height="4" />
+                  <rect x="258" y="194" width="3" height="4" />
+                  <rect x="266" y="206" width="3" height="4" />
+                  <rect x="272" y="218" width="3" height="4" />
+                  <rect x="292" y="212" width="3" height="4" />
+                  <rect x="304" y="222" width="3" height="4" />
+                  <rect x="320" y="212" width="3" height="4" />
+                  <rect x="334" y="222" width="3" height="4" />
+                  <rect x="348" y="212" width="3" height="4" />
+                  <rect x="6" y="224" width="3" height="4" />
+                  <rect x="34" y="218" width="3" height="4" />
+                  <rect x="48" y="216" width="3" height="4" />
+                  <rect x="-100" y="224" width="3" height="4" />
+                  <rect x="-70" y="218" width="3" height="4" />
+                </g>
+                <g>
+                  <circle cx="165" cy="212" r="12" fill="url(#lampM)" />
+                  <circle cx="252" cy="212" r="12" fill="url(#lampM)" />
+                  <circle cx="-180" cy="212" r="12" fill="url(#lampM)" />
+                  <g stroke="#E9DFC9" strokeWidth="1.4" strokeLinecap="round" opacity="0.85">
+                    <path d="M165 234 V213 M165 213 h3" />
+                    <path d="M252 234 V213 M252 213 h-3" />
+                    <path d="M-180 234 V213 M-180 213 h3" />
+                  </g>
+                  <g fill="#FFE3A8">
+                    <circle cx="168" cy="214" r="1.6" />
+                    <circle cx="249" cy="214" r="1.6" />
+                    <circle cx="-177" cy="214" r="1.6" />
+                  </g>
+                </g>
+                <g transform="translate(112 0)">
+                  <path d="M30 226 L64 219 L64 233 Z" fill="url(#beamM)" />
+                  <g fill="none" stroke="#E9DFC9" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="10" cy="230.5" r="3.5" />
+                    <circle cx="26" cy="230.5" r="3.5" />
+                    <path d="M10 230.5 H22 L26 222 H29 M24 222 L27 230.5" />
+                    <path d="M8 224 H16 V230" />
+                    <path d="M13 224 L16 216 L20 217 L22 222" />
+                  </g>
+                  <circle cx="18" cy="213" r="3" fill="#E9DFC9" />
+                  <circle cx="29.5" cy="225.5" r="1.4" fill="#FFE3A8" />
+                  <rect x="6" y="219" width="7" height="5" rx="1" fill="#E8561E" />
+                </g>
               </g>
             </svg>
           </div>
@@ -724,28 +879,225 @@ export function StoreHeroCarousel() {
               viewBox="-340 0 698 236"
               preserveAspectRatio="xMaxYMax slice"
               aria-hidden="true"
-              style={{ position: "absolute", inset: 0, zIndex: 1 }}
+              style={{ position: "absolute", inset: 0, zIndex: 0 }}
             >
-              <circle cx="300" cy="56" r="26" fill="#FFF4DE" />
-              <g
-                fill="none"
-                stroke="#E9DFC9"
-                strokeWidth="1.6"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                opacity="0.75"
-              >
-                <path d="M-340 234 H0" />
+              <defs>
+                <radialGradient id="mglowD" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0" stopColor="#FFF4DE" stopOpacity="0.45" />
+                  <stop offset="1" stopColor="#E9DFC9" stopOpacity="0" />
+                </radialGradient>
+                <radialGradient id="hazeD" cx="0.75" cy="1" r="0.8">
+                  <stop offset="0" stopColor="#E9DFC9" stopOpacity="0.10" />
+                  <stop offset="1" stopColor="#E9DFC9" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="shoot2D" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stopColor="#FFFFFF" stopOpacity="0" />
+                  <stop offset="1" stopColor="#FFFFFF" stopOpacity="0.9" />
+                </linearGradient>
+                <mask id="moonCutD">
+                  <rect x="0" y="0" width="358" height="236" fill="#FFFFFF" />
+                  <circle cx="312" cy="48" r="24" fill="#000000" />
+                </mask>
+                <linearGradient id="cityglowD" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#F2B45E" stopOpacity="0" />
+                  <stop offset="1" stopColor="#F2B45E" stopOpacity="0.22" />
+                </linearGradient>
+                <radialGradient id="lampD" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0" stopColor="#FFD58A" stopOpacity="0.75" />
+                  <stop offset="1" stopColor="#FFD58A" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="beamD" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stopColor="#FFE3A8" stopOpacity="0.7" />
+                  <stop offset="1" stopColor="#FFE3A8" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <rect x="-340" y="0" width="698" height="236" fill="url(#hazeD)" />
+              <g>
+                <circle cx="-9.2" cy="189.9" r="0.8" fill="#FFFFFF" opacity="0.31" />
+                <circle cx="-84.6" cy="78.3" r="1" fill="#FFFFFF" opacity="0.37" />
+                <circle cx="-98.6" cy="91.1" r="0.8" fill="#FFFFFF" opacity="0.64" />
+                <circle cx="-12.0" cy="24.8" r="1.2" fill="#FFFFFF" opacity="0.57" />
+                <circle cx="-119.6" cy="127.0" r="1" fill="#FFFFFF" opacity="0.50" />
+                <circle cx="-115.0" cy="157.5" r="1.2" fill="#FFFFFF" opacity="0.50" />
+                <circle cx="-101.0" cy="46.3" r="1.2" fill="#FFFFFF" opacity="0.50" />
+                <circle cx="-29.3" cy="76.3" r="1.2" fill="#FFFFFF" opacity="0.45" />
+                <circle cx="-3.1" cy="116.3" r="1" fill="#FFFFFF" opacity="0.40" />
+                <circle cx="-63.1" cy="159.1" r="1.2" fill="#FFFFFF" opacity="0.65" />
+                <circle cx="-99.8" cy="39.0" r="1" fill="#FFFFFF" opacity="0.67" />
+                <circle cx="-58.6" cy="118.1" r="0.8" fill="#FFFFFF" opacity="0.35" />
+                <circle cx="-117.3" cy="58.0" r="1.2" fill="#FFFFFF" opacity="0.45" />
+                <circle cx="-50.0" cy="25.4" r="1" fill="#FFFFFF" opacity="0.60" />
+                <circle cx="-12.9" cy="93.1" r="0.8" fill="#FFFFFF" opacity="0.44" />
+                <circle cx="-108.9" cy="157.6" r="1.2" fill="#FFFFFF" opacity="0.74" />
+                <circle cx="-61.9" cy="68.3" r="0.8" fill="#FFFFFF" opacity="0.81" />
+                <circle cx="-49.7" cy="189.3" r="0.8" fill="#FFFFFF" opacity="0.55" />
+                <circle cx="162.3" cy="91.3" r="1.2" fill="#FFFFFF" opacity="0.62" className="tw tw0" />
+                <circle cx="303.3" cy="33.6" r="1.6" fill="#FFFFFF" opacity="0.64" />
+                <circle cx="218.9" cy="33.0" r="1.2" fill="#FFFFFF" opacity="0.53" />
+                <circle cx="35.7" cy="130.3" r="0.8" fill="#FFFFFF" opacity="0.71" />
+                <circle cx="142.7" cy="74.7" r="1.6" fill="#FFFFFF" opacity="0.74" className="tw tw1" />
+                <circle cx="222.1" cy="133.7" r="0.8" fill="#FFFFFF" opacity="0.39" />
+                <circle cx="70.6" cy="41.7" r="0.8" fill="#FFFFFF" opacity="0.82" />
+                <circle cx="118.2" cy="96.2" r="1" fill="#FFFFFF" opacity="0.66" />
+                <circle cx="228.1" cy="82.0" r="0.8" fill="#FFFFFF" opacity="0.62" className="tw tw2" />
+                <circle cx="101.4" cy="159.6" r="0.8" fill="#FFFFFF" opacity="0.77" />
+                <circle cx="114.3" cy="39.8" r="1" fill="#FFFFFF" opacity="0.37" />
+                <circle cx="201.1" cy="20.8" r="0.8" fill="#FFFFFF" opacity="0.86" />
+                <circle cx="139.3" cy="153.5" r="0.8" fill="#FFFFFF" opacity="0.48" className="tw tw0" />
+                <circle cx="328.5" cy="12.2" r="1.2" fill="#FFFFFF" opacity="0.94" />
+                <circle cx="143.1" cy="15.4" r="1" fill="#FFFFFF" opacity="0.82" />
+                <circle cx="98.4" cy="17.6" r="1" fill="#FFFFFF" opacity="0.36" />
+                <circle cx="147.5" cy="148.0" r="1" fill="#FFFFFF" opacity="0.50" className="tw tw1" />
+                <circle cx="39.4" cy="13.3" r="1.2" fill="#FFFFFF" opacity="0.46" />
+                <circle cx="199.8" cy="73.8" r="1" fill="#FFFFFF" opacity="0.94" />
+                <circle cx="273.3" cy="69.4" r="1.2" fill="#FFFFFF" opacity="0.42" />
+                <circle cx="151.3" cy="37.2" r="1" fill="#FFFFFF" opacity="0.87" className="tw tw2" />
+                <circle cx="345.2" cy="96.5" r="0.8" fill="#FFFFFF" opacity="0.48" />
+                <circle cx="142.0" cy="137.3" r="1.6" fill="#FFFFFF" opacity="0.41" />
+                <circle cx="350.3" cy="37.3" r="1" fill="#FFFFFF" opacity="0.36" />
+                <circle cx="217.6" cy="133.5" r="1.2" fill="#FFFFFF" opacity="0.39" className="tw tw0" />
+                <circle cx="35.5" cy="94.9" r="1" fill="#FFFFFF" opacity="0.36" />
+                <circle cx="133.0" cy="101.1" r="1" fill="#FFFFFF" opacity="0.93" />
+                <circle cx="173.3" cy="93.6" r="1.2" fill="#FFFFFF" opacity="0.46" />
+                <circle cx="57.9" cy="145.7" r="1.6" fill="#FFFFFF" opacity="0.50" className="tw tw1" />
+                <circle cx="70.4" cy="119.4" r="1.6" fill="#FFFFFF" opacity="0.47" />
+                <circle cx="336.5" cy="141.6" r="1.6" fill="#FFFFFF" opacity="0.40" />
+                <circle cx="20.6" cy="21.0" r="1.6" fill="#FFFFFF" opacity="0.93" />
+                <circle cx="87.4" cy="113.9" r="1" fill="#FFFFFF" opacity="0.60" className="tw tw2" />
+                <circle cx="320.7" cy="80.6" r="1.6" fill="#FFFFFF" opacity="0.46" />
+                <circle cx="256.1" cy="14.7" r="1" fill="#FFFFFF" opacity="0.64" />
+                <circle cx="232.7" cy="100.1" r="0.8" fill="#FFFFFF" opacity="0.52" />
+                <circle cx="325.1" cy="35.8" r="0.8" fill="#FFFFFF" opacity="0.39" className="tw tw0" />
+                <circle cx="148.0" cy="42.9" r="0.8" fill="#FFFFFF" opacity="0.46" />
+                <circle cx="133.1" cy="93.3" r="1" fill="#FFFFFF" opacity="0.41" />
+                <circle cx="52.4" cy="74.3" r="1" fill="#FFFFFF" opacity="0.74" />
+                <circle cx="245.9" cy="95.2" r="1" fill="#FFFFFF" opacity="0.70" className="tw tw1" />
+                <circle cx="327.3" cy="78.1" r="1" fill="#FFFFFF" opacity="0.77" />
+                <circle cx="341.0" cy="7.3" r="0.8" fill="#FFFFFF" opacity="0.64" />
+                <circle cx="259.7" cy="53.7" r="0.8" fill="#FFFFFF" opacity="0.40" />
+                <circle cx="195.1" cy="119.0" r="1" fill="#FFFFFF" opacity="0.83" className="tw tw2" />
+                <circle cx="324.3" cy="58.9" r="1.2" fill="#FFFFFF" opacity="0.89" />
+                <circle cx="308.9" cy="69.1" r="0.8" fill="#FFFFFF" opacity="0.87" />
+                <circle cx="204.5" cy="101.5" r="1.2" fill="#FFFFFF" opacity="0.58" />
+                <circle cx="8.4" cy="15.3" r="0.8" fill="#FFFFFF" opacity="0.73" className="tw tw0" />
+                <circle cx="351.7" cy="141.2" r="1" fill="#FFFFFF" opacity="0.58" />
+                <circle cx="261.3" cy="94.6" r="1.2" fill="#FFFFFF" opacity="0.63" />
+                <circle cx="193.4" cy="84.9" r="1.6" fill="#FFFFFF" opacity="0.37" />
+              </g>
+              <g>
+                <circle cx="-269.3" cy="35.3" r="1.2" fill="#FFFFFF" opacity="0.32" />
+                <circle cx="-163.9" cy="24.3" r="1.2" fill="#FFFFFF" opacity="0.33" />
+                <circle cx="-230.4" cy="13.3" r="1.0" fill="#FFFFFF" opacity="0.49" />
+                <circle cx="-287.0" cy="112.9" r="0.8" fill="#FFFFFF" opacity="0.67" />
+                <circle cx="-311.8" cy="49.3" r="1.2" fill="#FFFFFF" opacity="0.56" />
+                <circle cx="-324.9" cy="119.6" r="0.8" fill="#FFFFFF" opacity="0.74" />
+                <circle cx="-328.1" cy="172.5" r="1.0" fill="#FFFFFF" opacity="0.49" />
+                <circle cx="-223.4" cy="116.8" r="1.2" fill="#FFFFFF" opacity="0.67" />
+                <circle cx="-299.7" cy="118.8" r="1.2" fill="#FFFFFF" opacity="0.38" />
+                <circle cx="-317.3" cy="144.1" r="1.2" fill="#FFFFFF" opacity="0.33" />
+                <circle cx="-294.3" cy="138.0" r="1.0" fill="#FFFFFF" opacity="0.65" />
+                <circle cx="-239.3" cy="185.1" r="1.0" fill="#FFFFFF" opacity="0.43" />
+                <circle cx="-169.6" cy="141.6" r="0.8" fill="#FFFFFF" opacity="0.34" />
+                <circle cx="-274.3" cy="102.1" r="1.0" fill="#FFFFFF" opacity="0.63" />
+                <circle cx="-277.0" cy="196.2" r="0.8" fill="#FFFFFF" opacity="0.53" />
+                <circle cx="-303.0" cy="72.4" r="1.0" fill="#FFFFFF" opacity="0.49" />
+                <circle cx="-134.1" cy="21.1" r="1.2" fill="#FFFFFF" opacity="0.56" />
+                <circle cx="-152.4" cy="66.9" r="1.2" fill="#FFFFFF" opacity="0.46" />
+                <circle cx="-232.7" cy="160.6" r="0.8" fill="#FFFFFF" opacity="0.68" />
+                <circle cx="-137.7" cy="98.0" r="1.2" fill="#FFFFFF" opacity="0.33" />
+                <circle cx="-183.0" cy="66.1" r="1.2" fill="#FFFFFF" opacity="0.75" />
+                <circle cx="-163.8" cy="61.2" r="1.0" fill="#FFFFFF" opacity="0.70" />
+              </g>
+              <path d="M168 22 L212 38" stroke="url(#shoot2D)" strokeWidth="2" strokeLinecap="round" />
+              <circle cx="300" cy="56" r="58" fill="url(#mglowD)" />
+              <circle cx="300" cy="56" r="26" fill="#FFF4DE" mask="url(#moonCutD)" />
+              <g fill="none" stroke="#E9DFC9" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" opacity="0.75">
+                <path d="M-340 234 H0 M-124 234 V222 H-104 V216 H-90 V222 H-76 V212 H-60 V234 M-40 234 V224 H-20 V234" />
                 <path d="M0 234 H358" />
-                <path d="M176 234 V204 H188 V198 L194 192 L200 198 V204 H212 V196 H226 V234" />
+                <path d="M0 234 V220 H16 V214 H30 V220 H42 V212 H58 V234" />
+                <path d="M176 234 V204 H188 V198 L194 192 L200 198 V204 H212 V196 H226 V234 M188 204 V234 M212 204 V234" />
                 <path d="M234 234 V106 L240 92 L246 106 V234" />
-                <path d="M284 234 V206 H358 M292 206 V198 H350 V206 M298 198 V190 H344 V198" />
+                <path d="M254 234 V200 H262 V188 H274 V200 H280 V234" />
+                <path d="M284 234 V206 H358 M292 206 V198 H350 V206 M298 198 V190 H344 V198 M301 190 A20 20 0 0 1 341 190 M316 170 H326 V164 L321 156 L316 164 Z" />
+                <path d="M300 206 V234 M312 206 V234 M330 206 V234 M342 206 V234" />
               </g>
               <g fill="#FFC56B" opacity="0.9">
                 <rect x="182" y="210" width="3" height="4" />
                 <rect x="204" y="212" width="3" height="4" />
+                <rect x="218" y="202" width="3" height="4" />
+                <rect x="218" y="214" width="3" height="4" />
                 <rect x="258" y="206" width="3" height="4" />
+                <rect x="268" y="194" width="3" height="4" />
                 <rect x="304" y="214" width="3" height="4" />
+                <rect x="334" y="214" width="3" height="4" />
+                <rect x="20" y="224" width="3" height="4" />
+                <rect x="48" y="218" width="3" height="4" />
+              </g>
+              <g>
+                <rect x="-340" y="150" width="698" height="86" fill="url(#cityglowD)" />
+                <g fill="#E6EFE4" opacity="0.16">
+                  <ellipse cx="262" cy="74" rx="34" ry="7" />
+                  <ellipse cx="282" cy="68" rx="20" ry="6" />
+                  <ellipse cx="336" cy="30" rx="26" ry="5" />
+                  <ellipse cx="-150" cy="60" rx="40" ry="7" />
+                  <ellipse cx="-128" cy="54" rx="22" ry="6" />
+                </g>
+                <g fill="#FFF6E0">
+                  <path d="M150 26 l1.4 4.2 4.2 1.4 -4.2 1.4 -1.4 4.2 -1.4 -4.2 -4.2 -1.4 4.2 -1.4z" opacity="0.9" />
+                  <path d="M208 74 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z" opacity="0.8" />
+                  <path d="M352 112 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z" opacity="0.7" />
+                  <path d="M-110 30 l1.4 4.2 4.2 1.4 -4.2 1.4 -1.4 4.2 -1.4 -4.2 -4.2 -1.4 4.2 -1.4z" opacity="0.85" />
+                  <path d="M-40 96 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z" opacity="0.7" />
+                  <path d="M-250 70 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1z" opacity="0.7" />
+                </g>
+                <g fill="#FFC56B">
+                  <rect x="180" y="208" width="3" height="4" />
+                  <rect x="180" y="220" width="3" height="4" />
+                  <rect x="216" y="204" width="3" height="4" />
+                  <rect x="216" y="216" width="3" height="4" />
+                  <rect x="220" y="226" width="3" height="4" />
+                  <rect x="258" y="194" width="3" height="4" />
+                  <rect x="266" y="206" width="3" height="4" />
+                  <rect x="272" y="218" width="3" height="4" />
+                  <rect x="292" y="212" width="3" height="4" />
+                  <rect x="304" y="222" width="3" height="4" />
+                  <rect x="320" y="212" width="3" height="4" />
+                  <rect x="334" y="222" width="3" height="4" />
+                  <rect x="348" y="212" width="3" height="4" />
+                  <rect x="6" y="224" width="3" height="4" />
+                  <rect x="34" y="218" width="3" height="4" />
+                  <rect x="48" y="216" width="3" height="4" />
+                  <rect x="-100" y="224" width="3" height="4" />
+                  <rect x="-70" y="218" width="3" height="4" />
+                </g>
+                <g>
+                  <circle cx="165" cy="212" r="12" fill="url(#lampD)" />
+                  <circle cx="252" cy="212" r="12" fill="url(#lampD)" />
+                  <circle cx="-180" cy="212" r="12" fill="url(#lampD)" />
+                  <g stroke="#E9DFC9" strokeWidth="1.4" strokeLinecap="round" opacity="0.85">
+                    <path d="M165 234 V213 M165 213 h3" />
+                    <path d="M252 234 V213 M252 213 h-3" />
+                    <path d="M-180 234 V213 M-180 213 h3" />
+                  </g>
+                  <g fill="#FFE3A8">
+                    <circle cx="168" cy="214" r="1.6" />
+                    <circle cx="249" cy="214" r="1.6" />
+                    <circle cx="-177" cy="214" r="1.6" />
+                  </g>
+                </g>
+                <g transform="translate(112 0)">
+                  <path d="M30 226 L64 219 L64 233 Z" fill="url(#beamD)" />
+                  <g fill="none" stroke="#E9DFC9" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="10" cy="230.5" r="3.5" />
+                    <circle cx="26" cy="230.5" r="3.5" />
+                    <path d="M10 230.5 H22 L26 222 H29 M24 222 L27 230.5" />
+                    <path d="M8 224 H16 V230" />
+                    <path d="M13 224 L16 216 L20 217 L22 222" />
+                  </g>
+                  <circle cx="18" cy="213" r="3" fill="#E9DFC9" />
+                  <circle cx="29.5" cy="225.5" r="1.4" fill="#FFE3A8" />
+                  <rect x="6" y="219" width="7" height="5" rx="1" fill="#E8561E" />
+                </g>
               </g>
             </svg>
           </div>
