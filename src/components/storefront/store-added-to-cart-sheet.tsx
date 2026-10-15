@@ -182,35 +182,92 @@ export function StoreAddedToCartSheet() {
   // Fetch real active flowers from store database
   React.useEffect(() => {
     let mounted = true;
-    fetch("/api/products?limit=80")
+    fetch("/api/products?category=flowers&limit=100")
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.products) && mounted) {
+          const nonFlowerKeywords = [
+            "pre-roll",
+            "preroll",
+            "roll",
+            "joint",
+            "disposable",
+            "stick",
+            "vape",
+            "cartridge",
+            "pod",
+            "edible",
+            "gummy",
+            "gummies",
+            "chocolate",
+            "mushroom",
+            "concentrate",
+            "wax",
+            "badder",
+            "sugar",
+            "diamonds",
+            "live resin",
+            "shatter",
+          ];
+
           const flowers: FlowerBase[] = data.products
             .filter((p: any) => {
               const nameLower = (p.name || "").toLowerCase();
-              const catSlug = (
-                p.categoryIds?.[0]?.slug ||
-                p.category?.slug ||
-                ""
-              ).toLowerCase();
-              return (
-                catSlug.includes("flower") ||
-                /(\bsativa|\bindica|\bhybrid|\bmidshelf|\btopshelf|\bprivate reserve|\bexotic)/i.test(
-                  nameLower
-                )
+              const slugs: string[] = Array.isArray(p.categoryIds)
+                ? p.categoryIds.map((c: any) =>
+                    (typeof c === "string" ? c : c?.slug || "").toLowerCase()
+                  )
+                : [];
+
+              // Exclude anything containing non-flower keywords
+              const isNonFlowerName = nonFlowerKeywords.some((kw) =>
+                nameLower.includes(kw)
               );
+              if (isNonFlowerName) return false;
+
+              // Must belong to flowers category
+              const hasFlowerCategory = slugs.includes("flowers");
+              const hasOtherCategory = slugs.some((s) =>
+                [
+                  "pre-rolls",
+                  "disposables",
+                  "cartridges",
+                  "edibles",
+                  "concentrates",
+                  "mushrooms",
+                ].includes(s)
+              );
+              if (hasOtherCategory && !hasFlowerCategory) return false;
+
+              return hasFlowerCategory;
             })
             .map((p: any) => {
+              const nameLower = (p.name || "").toLowerCase();
+              const slugs: string[] = Array.isArray(p.categoryIds)
+                ? p.categoryIds.map((c: any) =>
+                    (typeof c === "string" ? c : c?.slug || "").toLowerCase()
+                  )
+                : [];
+
               let type = "Hybrid";
-              const lower = (p.name || "").toLowerCase();
-              if (lower.includes("sativa")) type = "Sativa";
-              else if (lower.includes("indica")) type = "Indica";
+              if (slugs.includes("sativa") || nameLower.includes("sativa")) {
+                type = "Sativa";
+              } else if (slugs.includes("indica") || nameLower.includes("indica")) {
+                type = "Indica";
+              }
 
               let tier: FlowerTier = "Topshelf";
-              if (lower.includes("midshelf")) tier = "Midshelf";
-              else if (lower.includes("private") || lower.includes("exotic"))
+              if (slugs.includes("midshelf") || nameLower.includes("midshelf")) {
+                tier = "Midshelf";
+              } else if (
+                slugs.includes("private-reserve") ||
+                nameLower.includes("private reserve") ||
+                nameLower.includes("exotic")
+              ) {
                 tier = "Private Reserve";
+              } else if (slugs.includes("topshelf") || nameLower.includes("topshelf")) {
+                tier = "Topshelf";
+              }
 
               const resolvedImg =
                 p.images?.find((img: any) => img?.isPrimary && img?.url)?.url ||
