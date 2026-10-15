@@ -77,7 +77,7 @@ export function DealsView() {
         </div>
 
         {/* ================= PAGE TITLE & TAGLINE ================= */}
-        <div className="dealhead px-4 lg:px-0">
+        <div className="dealhead !px-4 lg:!px-0">
           <span className="eyebrow" style={{ color: "var(--green)", fontWeight: 800, fontSize: "11px", letterSpacing: "0.8px" }}>
             BULK SAVINGS
           </span>
