@@ -238,23 +238,21 @@ export function StoreAddedToCartSheet() {
     };
   }, []);
 
-  if (!isAddedSheetOpen || !lastAddedItem) {
-    return null;
-  }
+  const rawTier = lastAddedItem?.tier || (lastAddedItem as any)?.flowerTier;
+  const unit = lastAddedItem ? unitOf(lastAddedItem.weight) : "";
 
-  const rawTier = lastAddedItem.tier || (lastAddedItem as any).flowerTier;
-  const unit = unitOf(lastAddedItem.weight);
-
-  const isFlower =
-    lastAddedItem.category === "flowers" ||
-    Boolean(rawTier) ||
-    (lastAddedItem as any).flowerTier !== undefined ||
-    /(\bflower|\bsativa|\bindica|\bhybrid|\bmidshelf|\btopshelf|\bprivate reserve|\bexotic)/i.test(
-      lastAddedItem.name
-    );
+  const isFlower = Boolean(
+    lastAddedItem &&
+      (lastAddedItem.category === "flowers" ||
+        Boolean(rawTier) ||
+        (lastAddedItem as any).flowerTier !== undefined ||
+        /(\bflower|\bsativa|\bindica|\bhybrid|\bmidshelf|\btopshelf|\bprivate reserve|\bexotic)/i.test(
+          lastAddedItem.name
+        ))
+  );
 
   let effectiveTier: FlowerTier | null = normalizeTier(rawTier);
-  if (!effectiveTier && isFlower) {
+  if (!effectiveTier && isFlower && lastAddedItem) {
     const lower = lastAddedItem.name.toLowerCase();
     if (lower.includes("midshelf")) effectiveTier = "Midshelf";
     else if (lower.includes("private") || lower.includes("exotic"))
@@ -262,35 +260,9 @@ export function StoreAddedToCartSheet() {
     else effectiveTier = "Topshelf";
   }
 
-  // Determine active deal type (ounces vs half-ounces)
-  const isOzDeal = unit === "o";
-  const targetUnit = isOzDeal ? "o" : "h";
-  const targetWeight = isOzDeal ? "1 oz" : "14g";
-  const targetWeightLabel = isOzDeal ? "1 oz" : "½ oz";
-
-  // Compute live count of strains in cart for effective tier
-  let halfCount = 0;
-  let ozCount = 0;
-  if (effectiveTier) {
-    items.forEach((item) => {
-      const itemTier = normalizeTier(item.tier || (item as any).flowerTier);
-      if (itemTier === effectiveTier) {
-        const u = unitOf(item.weight);
-        if (u === "h") halfCount += item.quantity;
-        if (u === "o") ozCount += item.quantity;
-      }
-    });
-  }
-
-  const pickPrice = effectiveTier
-    ? TIER_PRICES[effectiveTier][targetUnit]
-    : isOzDeal
-    ? 140
-    : 70;
-
   // Dynamically select and shuffle 3 flower strains for recommendations
   const currentFirstWord =
-    lastAddedItem.name.toLowerCase().split(/[\s(]+/)[0] || "";
+    lastAddedItem?.name?.toLowerCase().split(/[\s(]+/)[0] || "";
 
   const availablePicks = React.useMemo(() => {
     if (!effectiveTier) return [];
@@ -336,6 +308,37 @@ export function StoreAddedToCartSheet() {
     }
     setTouchStartY(null);
   };
+
+  // Safe early return AFTER all hooks
+  if (!isAddedSheetOpen || !lastAddedItem) {
+    return null;
+  }
+
+  // Determine active deal type (ounces vs half-ounces)
+  const isOzDeal = unit === "o";
+  const targetUnit = isOzDeal ? "o" : "h";
+  const targetWeight = isOzDeal ? "1 oz" : "14g";
+  const targetWeightLabel = isOzDeal ? "1 oz" : "½ oz";
+
+  // Compute live count of strains in cart for effective tier
+  let halfCount = 0;
+  let ozCount = 0;
+  if (effectiveTier) {
+    items.forEach((item) => {
+      const itemTier = normalizeTier(item.tier || (item as any).flowerTier);
+      if (itemTier === effectiveTier) {
+        const u = unitOf(item.weight);
+        if (u === "h") halfCount += item.quantity;
+        if (u === "o") ozCount += item.quantity;
+      }
+    });
+  }
+
+  const pickPrice = effectiveTier
+    ? TIER_PRICES[effectiveTier][targetUnit]
+    : isOzDeal
+    ? 140
+    : 70;
 
   return (
     <div

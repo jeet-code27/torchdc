@@ -8,36 +8,42 @@ const MOBILE_CATEGORIES = [
   {
     name: "FLOWERS",
     slug: "flowers",
+    href: "/flowers",
     image:
       "https://res.cloudinary.com/omtao1np/image/upload/v1791349254/torch/categories/hc9na7l6op0v2boshuh1.png",
   },
   {
     name: "PRE-ROLLS",
     slug: "pre-rolls",
+    href: "/shop?category=pre-rolls",
     image:
       "https://res.cloudinary.com/omtao1np/image/upload/v1791349257/torch/categories/klbrtn83a7r3duyyv2o3.jpg",
   },
   {
     name: "DISPOSABLES",
     slug: "disposables",
+    href: "/shop?category=disposables",
     image:
       "https://res.cloudinary.com/omtao1np/image/upload/v1791349258/torch/categories/lf2ds9mohuoixwdrl4ri.jpg",
   },
   {
     name: "CONCENTRATES",
     slug: "concentrates",
+    href: "/shop?category=concentrates",
     image:
       "https://res.cloudinary.com/omtao1np/image/upload/v1791349260/torch/categories/oqss4sy7kolhfwcg3kjn.jpg",
   },
   {
     name: "EDIBLES",
     slug: "edibles",
+    href: "/shop?category=edibles",
     image:
       "https://res.cloudinary.com/omtao1np/image/upload/v1791349263/torch/categories/xmal5v2rlltdqdopq4o4.jpg",
   },
   {
     name: "MUSHROOMS",
     slug: "mushrooms",
+    href: "/shop?category=mushrooms",
     image:
       "https://res.cloudinary.com/omtao1np/image/upload/v1791349265/torch/categories/t45kec3opwajrg8draun.jpg",
   },
@@ -62,7 +68,7 @@ export function MobileCategoryGrid() {
         {MOBILE_CATEGORIES.map((cat) => (
           <Link
             key={cat.slug}
-            href={`/shop?category=${cat.slug}`}
+            href={cat.href}
             className="bg-white rounded-[22px] sm:rounded-2xl p-2.5 sm:p-3 border border-neutral-100 shadow-xs flex flex-col items-center justify-between aspect-square hover:border-[#5A805B]/30 hover:shadow-sm transition-all group active:scale-95"
           >
             <div className="relative w-full flex-1 flex items-center justify-center min-h-0">

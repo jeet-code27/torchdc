@@ -77,7 +77,7 @@ export function StoreCategoryGrid() {
         {DEFAULT_CATEGORIES.map((cat) => (
           <Link
             key={cat.id}
-            href={`/category/${cat.slug}`}
+            href={cat.slug === "flowers" ? "/flowers" : `/shop?category=${cat.slug}`}
             className="group flex flex-col items-center bg-white rounded-2xl sm:rounded-3xl border border-gray-100/90 shadow-2xs hover:shadow-md transition-all duration-300 hover:-translate-y-1 p-3 sm:p-4 text-center cursor-pointer"
           >
             {/* Image Container */}
