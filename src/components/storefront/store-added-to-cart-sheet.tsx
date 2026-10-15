@@ -9,118 +9,83 @@ import {
   nextStep,
   nextStepOz,
   normalizeTier,
-  WEIGHTS,
   FlowerTier,
 } from "@/lib/deals";
 
-interface FlowerPick {
-  id: string;
+interface FlowerBase {
   name: string;
   slug: string;
-  tier: FlowerTier;
   type: string;
-  weight: string;
-  price: number;
   image: string;
 }
 
-const TIER_FLOWERS: Record<FlowerTier, FlowerPick[]> = {
+const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
   Midshelf: [
     {
-      id: "tangie-sativa-14g",
       name: "Tangie (Sativa)",
       slug: "tangie-sativa",
-      tier: "Midshelf",
       type: "Sativa",
-      weight: "14g",
-      price: 70,
       image: "https://torchdc.co/wp-content/uploads/2025/09/Tangie-strain-Sativa.png",
     },
     {
-      id: "acapulco-gold-sativa-14g",
       name: "Acapulco Gold (Sativa)",
       slug: "acapulco-gold-sativa",
-      tier: "Midshelf",
       type: "Sativa",
-      weight: "14g",
-      price: 70,
       image: "https://torchdc.co/wp-content/uploads/2025/09/Acapulco-Gold-Sativa.png",
     },
     {
-      id: "death-star-indica-14g",
       name: "Death Star (Indica)",
       slug: "death-star-indica",
-      tier: "Midshelf",
       type: "Indica",
-      weight: "14g",
-      price: 70,
       image: "https://torchdc.co/wp-content/uploads/2025/09/Death-Star-Indica.png",
     },
   ],
   Topshelf: [
     {
-      id: "super-silver-haze-sativa-14g",
       name: "Super Silver Haze (Sativa)",
       slug: "super-silver-haze-sativa",
-      tier: "Topshelf",
       type: "Sativa",
-      weight: "14g",
-      price: 100,
       image: "https://torchdc.co/wp-content/uploads/2025/09/Super-Silver-Haze-Sativa.png",
     },
     {
-      id: "sour-diesel-sativa-14g",
       name: "Sour Diesel (Sativa)",
       slug: "sour-diesel-sativa",
-      tier: "Topshelf",
       type: "Sativa",
-      weight: "14g",
-      price: 100,
       image: "https://torchdc.co/wp-content/uploads/2025/09/Sour-Diesel-Sativa.png",
     },
     {
-      id: "gorilla-glue-hybrid-14g",
       name: "Gorilla Glue (Hybrid)",
       slug: "gorilla-glue-hybrid",
-      tier: "Topshelf",
       type: "Hybrid",
-      weight: "14g",
-      price: 100,
       image: "https://torchdc.co/wp-content/uploads/2025/09/Gorilla-Glue-Hybrid.png",
     },
   ],
   "Private Reserve": [
     {
-      id: "rainbow-belts-hybrid-14g",
       name: "Rainbow Belts (Hybrid)",
       slug: "rainbow-belts-hybrid",
-      tier: "Private Reserve",
       type: "Hybrid",
-      weight: "14g",
-      price: 140,
       image: "https://torchdc.co/wp-content/uploads/2025/09/Rainbow-Belts-Hybrid.png",
     },
     {
-      id: "cereal-milk-hybrid-14g",
       name: "Cereal Milk (Hybrid)",
       slug: "cereal-milk-hybrid",
-      tier: "Private Reserve",
       type: "Hybrid",
-      weight: "14g",
-      price: 140,
       image: "https://torchdc.co/wp-content/uploads/2025/09/Cereal-Milk-Hybrid.png",
     },
     {
-      id: "ice-cream-cake-indica-14g",
       name: "Ice Cream Cake (Indica)",
       slug: "ice-cream-cake-indica",
-      tier: "Private Reserve",
       type: "Indica",
-      weight: "14g",
-      price: 140,
       image: "https://torchdc.co/wp-content/uploads/2025/09/Ice-Cream-Cake-Indica.png",
     },
   ],
+};
+
+const TIER_PRICES: Record<FlowerTier, { h: number; o: number }> = {
+  Midshelf: { h: 70, o: 100 },
+  Topshelf: { h: 100, o: 140 },
+  "Private Reserve": { h: 140, o: 220 },
 };
 
 const ADDONS = [
@@ -171,16 +136,37 @@ export function StoreAddedToCartSheet() {
   }
 
   const rawTier = lastAddedItem.tier || (lastAddedItem as any).flowerTier;
-  const tier = normalizeTier(rawTier);
   const unit = unitOf(lastAddedItem.weight);
 
-  // Compute flower counts for the active tier
+  const isFlower =
+    lastAddedItem.category === "flowers" ||
+    Boolean(rawTier) ||
+    (lastAddedItem as any).flowerTier !== undefined ||
+    /(\bflower|\bsativa|\bindica|\bhybrid|\bmidshelf|\btopshelf|\bprivate reserve|\bexotic)/i.test(
+      lastAddedItem.name
+    );
+
+  let effectiveTier: FlowerTier | null = normalizeTier(rawTier);
+  if (!effectiveTier && isFlower) {
+    const lower = lastAddedItem.name.toLowerCase();
+    if (lower.includes("midshelf")) effectiveTier = "Midshelf";
+    else if (lower.includes("private") || lower.includes("exotic")) effectiveTier = "Private Reserve";
+    else effectiveTier = "Topshelf";
+  }
+
+  // Determine active deal type (ounces vs half-ounces)
+  const isOzDeal = unit === "o";
+  const targetUnit = isOzDeal ? "o" : "h";
+  const targetWeight = isOzDeal ? "1 oz" : "14g";
+  const targetWeightLabel = isOzDeal ? "1 oz" : "½ oz";
+
+  // Compute live count of strains in cart for effective tier
   let halfCount = 0;
   let ozCount = 0;
-  if (tier) {
+  if (effectiveTier) {
     items.forEach((item) => {
       const itemTier = normalizeTier(item.tier || (item as any).flowerTier);
-      if (itemTier === tier) {
+      if (itemTier === effectiveTier) {
         const u = unitOf(item.weight);
         if (u === "h") halfCount += item.quantity;
         if (u === "o") ozCount += item.quantity;
@@ -188,11 +174,14 @@ export function StoreAddedToCartSheet() {
     });
   }
 
-  // Pick rows for half ounce
-  const availablePicks = tier
-    ? TIER_FLOWERS[tier].filter(
-        (p) =>
-          !lastAddedItem.name.toLowerCase().includes(p.name.toLowerCase().split(" ")[0])
+  const activeCount = isOzDeal ? ozCount : halfCount;
+  const pickPrice = effectiveTier ? TIER_PRICES[effectiveTier][targetUnit] : (isOzDeal ? 140 : 70);
+
+  // Available strain picks for this tier (exclude current product)
+  const currentFirstWord = lastAddedItem.name.toLowerCase().split(/[\s(]+/)[0] || "";
+  const availablePicks = effectiveTier
+    ? TIER_BASE_FLOWERS[effectiveTier].filter(
+        (p) => !p.name.toLowerCase().startsWith(currentFirstWord)
       )
     : [];
 
@@ -223,37 +212,75 @@ export function StoreAddedToCartSheet() {
           </span>
         </div>
 
-        {/* DOUBLE UP Deal Box for Half Ounces */}
-        {tier && unit === "h" && (
+        {/* ================= FLOWER DEAL BOX (LIVE INTERACTIVE PROGRESS) ================= */}
+        {effectiveTier && isFlower && (
           <div className="dealbox">
-            <span className="dealbox__tag">DOUBLE UP</span>
-            <strong>
-              {nextStep(tier, halfCount)?.title ||
-                `Best deal unlocked: 4 half ounces for $${
-                  tier === "Midshelf" ? 250 : tier === "Topshelf" ? 340 : 480
-                }`}
-            </strong>
-            <span className="muted">
-              Mix any {tier} strains by the half ounce.
-            </span>
-
-            {/* Progress meter */}
-            <div className="meter">
-              <span style={{ width: `${Math.min(halfCount, 4) * 25}%` }} />
+            <div className="dealbox__top">
+              <span className="dealbox__tag">
+                {isOzDeal
+                  ? ozCount >= 8
+                    ? "HALF-POUND HAUL"
+                    : "STACK & SAVE"
+                  : "DOUBLE UP"}
+              </span>
+              <span className="muted">
+                {isOzDeal
+                  ? `${effectiveTier} · ${Math.min(ozCount, 8)} oz`
+                  : `${effectiveTier} · ${Math.min(halfCount, 4)} of 4 half oz`}
+              </span>
             </div>
 
-            {/* Recommended strain picks */}
-            {availablePicks.slice(0, 3).map((pick) => {
+            <strong>
+              {isOzDeal
+                ? nextStepOz(effectiveTier, ozCount)?.title ||
+                  `Mix any ${effectiveTier} strains by the ounce.`
+                : nextStep(effectiveTier, halfCount)?.title ||
+                  `Best deal unlocked: 4 half ounces for $${
+                    effectiveTier === "Midshelf"
+                      ? 250
+                      : effectiveTier === "Topshelf"
+                      ? 340
+                      : 480
+                  }`}
+            </strong>
+
+            <span className="muted">
+              {isOzDeal
+                ? `Mix any ${effectiveTier} strains by the ounce.`
+                : `Mix any ${effectiveTier} strains by the half ounce.`}
+            </span>
+
+            {/* Live Progress Meter Bar */}
+            <div className="meter">
+              <span
+                style={{
+                  width: `${Math.min(
+                    100,
+                    (isOzDeal ? Math.min(ozCount, 4) : Math.min(halfCount, 4)) * 25
+                  )}%`,
+                }}
+              />
+            </div>
+
+            {/* Recommended Strain Picks with Live + Add */}
+            {availablePicks.slice(0, 3).map((base) => {
+              const pickId = `${base.slug}-${targetWeight.replace(/\s+/g, "")}`;
+              const baseKeyword = base.name.toLowerCase().split(/[\s(]+/)[0];
+
               const inCart = items.some(
-                (i) => i.id === pick.id || (i.name === pick.name && i.weight === pick.weight)
+                (i) =>
+                  (i.id === pickId ||
+                    i.slug === base.slug ||
+                    i.name.toLowerCase().includes(baseKeyword)) &&
+                  unitOf(i.weight) === targetUnit
               );
 
               return (
-                <div key={pick.id} className="pickrow">
+                <div key={base.slug} className="pickrow">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={pick.image}
-                    alt={pick.name}
+                    src={base.image}
+                    alt={base.name}
                     width={42}
                     height={42}
                     onError={(e) => {
@@ -261,9 +288,9 @@ export function StoreAddedToCartSheet() {
                     }}
                   />
                   <span>
-                    <strong>{pick.name}</strong>
+                    <strong>{base.name}</strong>
                     <span>
-                      {pick.type} · ½ oz · ${pick.price}
+                      {base.type} · {targetWeightLabel} · ${pickPrice}
                     </span>
                   </span>
                   <button
@@ -271,18 +298,27 @@ export function StoreAddedToCartSheet() {
                     className={`smallpill ${inCart ? "is-on" : ""}`}
                     onClick={() => {
                       if (inCart) {
-                        removeItem(pick.id, pick.weight);
+                        const match = items.find(
+                          (i) =>
+                            (i.id === pickId ||
+                              i.slug === base.slug ||
+                              i.name.toLowerCase().includes(baseKeyword)) &&
+                            unitOf(i.weight) === targetUnit
+                        );
+                        if (match) {
+                          removeItem(match.id, match.weight);
+                        }
                       } else {
                         addItem(
                           {
-                            id: pick.id,
-                            name: pick.name,
-                            slug: pick.slug,
-                            price: pick.price,
-                            weight: pick.weight,
-                            tier: pick.tier,
+                            id: pickId,
+                            name: base.name,
+                            slug: base.slug,
+                            price: pickPrice,
+                            weight: targetWeight,
+                            tier: effectiveTier,
                             category: "flowers",
-                            image: pick.image,
+                            image: base.image,
                           },
                           1,
                           { showSheet: false }
@@ -298,24 +334,7 @@ export function StoreAddedToCartSheet() {
           </div>
         )}
 
-        {/* STACK & SAVE / HALF-POUND HAUL Deal Box for Ounces */}
-        {tier && unit === "o" && (
-          <div className="dealbox">
-            <span className="dealbox__tag">
-              {ozCount >= 8 ? "HALF-POUND HAUL" : "STACK & SAVE"}
-            </span>
-            <strong>
-              {nextStepOz(tier, ozCount)?.title ||
-                `Mix any ${tier} strains by the ounce.`}
-            </strong>
-            <span className="muted">Mix any {tier} strains by the ounce.</span>
-            <div className="meter">
-              <span style={{ width: `${Math.min(ozCount, 4) * 25}%` }} />
-            </div>
-          </div>
-        )}
-
-        {/* Goes great with section */}
+        {/* ================= GOES GREAT WITH (ADD-ONS) ================= */}
         <span className="lbl">Goes great with</span>
         <div className="addons">
           {ADDONS.map((addon) => {
@@ -360,7 +379,7 @@ export function StoreAddedToCartSheet() {
           })}
         </div>
 
-        {/* Bottom Actions */}
+        {/* ================= BOTTOM ACTION BUTTONS ================= */}
         <div className="sheet__btns">
           <button
             type="button"
