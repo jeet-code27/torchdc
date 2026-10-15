@@ -393,6 +393,7 @@ button { font-family: inherit; cursor: pointer; }
 .type { align-self: flex-start; font-size: 11px; font-weight: 700; letter-spacing: 0.4px; padding: 3px 9px; border-radius: 999px; }
 .type--sativa { background: #FDF1EA; color: #A3400F; }
 .type--indica { background: #EEEAF6; color: #4B3C78; }
+.type--hybrid { background: #E8F3E8 !important; color: #2D5A2E !important; }
 .crumbs { display: block; font-size: 13px; color: var(--site-muted); margin-bottom: 2px; }
 .crumbs a { color: var(--site-muted); text-decoration: none; }
 .crumbs a:hover { color: var(--ink); }
