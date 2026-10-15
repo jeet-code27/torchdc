@@ -38,17 +38,24 @@ export function DealsView() {
   const dealConfig = DEALS[selectedTier];
   const weightsConfig = WEIGHTS[selectedTier];
 
+  React.useEffect(() => {
+    document.body.setAttribute("data-page", "deals");
+    return () => {
+      document.body.removeAttribute("data-page");
+    };
+  }, []);
+
   // Base unit prices for calculating display savings
   const halfUnitPrice = weightsConfig["14g"] || 0;
   const ozUnitPrice = weightsConfig["1 oz"] || 0;
 
   return (
-    <div className="shell">
+    <div className="shell deals-page" data-page="deals">
       {/* ================= 1. DESKTOP LEFT RAIL (Menu Navigation) ================= */}
       <ShopSidebar activeCategory="deals" />
 
       {/* ================= 2. MAIN CENTER CONTENT (Deals Cards) ================= */}
-      <main className="shell__main" style={{ padding: "18px 0 40px" }}>
+      <main className="shell__main deals-main">
         {/* ================= TIER SWITCHER TABS ================= */}
         <div className="seg seg--3 seg--green" role="tablist" aria-label="Select flower tier">
           {(["Midshelf", "Topshelf", "Private Reserve"] as FlowerTier[]).map((tier) => {
@@ -60,7 +67,7 @@ export function DealsView() {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setSelectedTier(tier)}
-                className={isActive ? "is-on" : ""}
+                className={`text-[12.5px] sm:text-sm px-1 font-bold ${isActive ? "is-on" : ""}`}
                 style={isActive ? { color: "#FFFFFF" } : undefined}
               >
                 {tier}
@@ -70,7 +77,7 @@ export function DealsView() {
         </div>
 
         {/* ================= PAGE TITLE & TAGLINE ================= */}
-        <div className="dealhead">
+        <div className="dealhead px-4 lg:px-0">
           <span className="eyebrow" style={{ color: "var(--green)", fontWeight: 800, fontSize: "11px", letterSpacing: "0.8px" }}>
             BULK SAVINGS
           </span>
