@@ -247,12 +247,16 @@ export default function CartPage() {
                       boxes.push(
                         <div key={`${tier}-h`} className="dealbox">
                           <div className="dealbox__top">
-                            <span className="dealbox__tag">BUNDLE DEAL</span>
+                            <span className="dealbox__tag">DOUBLE UP</span>
                             <span className="muted">
-                              {tier} · {Math.min(c.h, 4)} of 4 half oz
+                              {Math.min(c.h, 4)} of 4 half oz
                             </span>
                           </div>
-                          <strong>{ns.title}</strong>
+                          <strong>
+                            {c.h >= 4
+                              ? `Best deal unlocked: 4 half ounces for $250`
+                              : ns.title}
+                          </strong>
                           <div className="steps4">
                             {[1, 2, 3, 4].map((s) => (
                               <span key={s} className={s <= c.h ? "is-on" : ""}>
@@ -328,9 +332,11 @@ export default function CartPage() {
                       <Link href={`/product/${item.slug || item.id}`}>
                         <strong>{item.name}</strong>
                       </Link>
-                      <span>
-                        {[item.tier, item.weight].filter(Boolean).join(" · ")}
-                      </span>
+                      {[item.tier, item.weight].filter(Boolean).length > 0 && (
+                        <span>
+                          {[item.tier, item.weight].filter(Boolean).join(" · ")}
+                        </span>
+                      )}
                       <b>${item.price * item.quantity}</b>
                     </span>
                     <span className="mini">

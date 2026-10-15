@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { StoreStatusBar } from "./store-statusbar";
 import { StoreNavbar } from "./store-navbar";
 import { StoreFooter } from "./store-footer";
+import { StoreAddedToCartSheet } from "./store-added-to-cart-sheet";
 
 interface StorefrontShellProps {
   children: React.ReactNode;
@@ -33,6 +34,9 @@ export function StorefrontShell({ children }: StorefrontShellProps) {
 
       {/* 4. Global Brand Footer */}
       <StoreFooter />
+
+      {/* 5. Global Added-to-Cart Slide-Up Sheet */}
+      <StoreAddedToCartSheet />
     </div>
   );
 }

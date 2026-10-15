@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCart } from "@/context/cart-context";
-import { nextStep, nextStepOz, unitOf, normalizeTier } from "@/lib/deals";
 import { ShopSidebar } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
 
@@ -62,7 +61,6 @@ interface ProductDetailViewProps {
 
 export function ProductDetailView({ product }: ProductDetailViewProps) {
   const { addItem, items, finalTotal } = useCart();
-  const [sheetOpen, setSheetOpen] = React.useState(false);
   const sliderRef = React.useRef<HTMLDivElement>(null);
 
   const scrollSlider = (direction: "left" | "right") => {
@@ -545,7 +543,6 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     );
 
     setIsAdded(true);
-    setSheetOpen(true);
     setTimeout(() => setIsAdded(false), 1500);
   };
 
@@ -553,26 +550,6 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     hasVariants && activeVariant.name !== "Standard"
       ? activeVariant.name
       : extractedWeightOrPotency || (isFlower ? "3.5g" : product.category?.name || "Standard");
-  const currentUnit = unitOf(itemWeight);
-  const normalizedTier = normalizeTier(tierTag || "");
-
-  const tierFlowerCount = React.useMemo(() => {
-    if (!normalizedTier) return { h: 0, o: 0 };
-    let h = 0;
-    let o = 0;
-    items.forEach((it) => {
-      if (normalizeTier(it.tier || "") === normalizedTier) {
-        const u = unitOf(it.weight);
-        if (u === "h") h += it.quantity;
-        if (u === "o") o += it.quantity;
-      }
-    });
-    return { h, o };
-  }, [items, normalizedTier]);
-
-  const ns = normalizedTier ? nextStep(normalizedTier, tierFlowerCount.h) : null;
-  const no = normalizedTier ? nextStepOz(normalizedTier, tierFlowerCount.o) : null;
-
   return (
     <>
       <div className="shell">
@@ -889,119 +866,6 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
           Add to cart · ${currentPrice * quantity}
         </button>
       </div>
-
-      {/* ================= ADDED TO CART SLIDE-UP SHEET ================= */}
-      {sheetOpen && (
-        <div className="sheet">
-          <div className="sheet__bg" onClick={() => setSheetOpen(false)} />
-          <div
-            className="sheet__card"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Added to cart"
-          >
-            <div className="sheet__grip" />
-            <div className="sheet__ok">
-              <span className="okdot">✓</span>
-              <span>
-                <strong>Added to cart</strong>
-                <span className="text-xs text-neutral-500">
-                  {cleanTitle} · {itemWeight} {quantity > 1 ? `x ${quantity}` : ""}
-                </span>
-              </span>
-            </div>
-
-            {/* If Flower & Ounce Deal */}
-            {isFlower && currentUnit === "o" && normalizedTier && no && (
-              <div className="dealbox">
-                <span className="dealbox__tag">
-                  {tierFlowerCount.o >= 8 ? "HALF-POUND HAUL" : "STACK & SAVE"}
-                </span>
-                <strong>{no.title}</strong>
-                <span className="muted">
-                  Mix any {normalizedTier} strains by the ounce.
-                </span>
-                <div className="meter">
-                  <span
-                    style={{ width: `${Math.min(tierFlowerCount.o, 4) * 25}%` }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* If Flower & Half-Ounce Deal */}
-            {isFlower && currentUnit === "h" && normalizedTier && ns && (
-              <div className="dealbox">
-                <span className="dealbox__tag">BUNDLE DEAL</span>
-                <strong>{ns.title}</strong>
-                <span className="muted">
-                  Mix any {normalizedTier} strains by the half ounce.
-                </span>
-                <div className="meter">
-                  <span
-                    style={{ width: `${Math.min(tierFlowerCount.h, 4) * 25}%` }}
-                  />
-                </div>
-
-                {product.relatedProducts &&
-                  product.relatedProducts.slice(0, 3).map((pick) => {
-                    const inCart = items.some((it) => it.id === pick.id);
-                    return (
-                      <div key={pick.id} className="pickrow">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={pick.image || "/assets/img/flower.webp"}
-                          alt={pick.name}
-                        />
-                        <span>
-                          <strong>{pick.name}</strong>
-                          <span>
-                            {pick.strain || "Flower"} · ½ oz · ${pick.price}
-                          </span>
-                        </span>
-                        <button
-                          type="button"
-                          className={`smallpill ${inCart ? "is-on" : ""}`}
-                          onClick={() => {
-                            addItem(
-                              {
-                                id: pick.id,
-                                name: pick.name,
-                                slug: pick.slug,
-                                price: pick.price,
-                                image: pick.image,
-                                weight: "14g",
-                                tier: normalizedTier,
-                                category: "flowers",
-                              },
-                              1
-                            );
-                          }}
-                        >
-                          {inCart ? "Added" : "+ Add"}
-                        </button>
-                      </div>
-                    );
-                  })}
-              </div>
-            )}
-
-            {/* Action buttons */}
-            <div className="sheet__btns">
-              <button
-                type="button"
-                className="ghostbtn"
-                onClick={() => setSheetOpen(false)}
-              >
-                Keep shopping
-              </button>
-              <Link className="checkoutbtn" href="/cart">
-                View cart · ${finalTotal}
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

@@ -45,13 +45,21 @@ interface CartContextType {
   hasPrerollBonus: boolean;
   setHasPrerollBonus: (val: boolean) => void;
   isCartDrawerOpen: boolean;
+  setIsCartDrawerOpen: (open: boolean) => void;
   isPickupEnabled: boolean;
   isPickupPausedModalOpen: boolean;
   setIsPickupPausedModalOpen: (open: boolean) => void;
   setFulfillment: (mode: FulfillmentType, force?: boolean) => void;
   setDeliveryZip: (zip: string) => void;
-  setIsCartDrawerOpen: (open: boolean) => void;
-  addItem: (product: Omit<CartItem, "quantity">, quantity?: number) => void;
+  isAddedSheetOpen: boolean;
+  setIsAddedSheetOpen: (open: boolean) => void;
+  lastAddedItem: CartItem | null;
+  openAddedSheet: (item: CartItem) => void;
+  addItem: (
+    product: Omit<CartItem, "quantity">,
+    quantity?: number,
+    options?: { showSheet?: boolean }
+  ) => void;
   removeItem: (id: string, weight?: string) => void;
   updateQuantity: (id: string, quantity: number, weight?: string) => void;
   clearCart: () => void;
@@ -91,6 +99,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [deliveryZip, setDeliveryZip] = React.useState("20004");
   const [customerInfo, setCustomerInfo] = React.useState<CartCustomerInfo>({});
   const [isCartDrawerOpen, setIsCartDrawerOpen] = React.useState(false);
+  const [isAddedSheetOpen, setIsAddedSheetOpen] = React.useState(false);
+  const [lastAddedItem, setLastAddedItem] = React.useState<CartItem | null>(null);
   const [isInitialized, setIsInitialized] = React.useState(false);
 
   const [hasPrerollBonus, setHasPrerollBonusState] = React.useState<boolean>(false);
@@ -248,16 +258,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [isPickupEnabled]
   );
 
+  const openAddedSheet = React.useCallback((item: CartItem) => {
+    setLastAddedItem(item);
+    setIsAddedSheetOpen(true);
+  }, []);
+
   const addItem = React.useCallback(
-    (product: Omit<CartItem, "quantity">, quantity = 1) => {
+    (
+      product: Omit<CartItem, "quantity">,
+      quantity = 1,
+      options?: { showSheet?: boolean }
+    ) => {
       const sanitizedImage =
         typeof product.image === "string" && product.image.trim() !== ""
           ? product.image
           : (product.image as any)?.url || "/images/placeholder-product.png";
 
-      const cleanProduct = {
+      const cleanProduct: CartItem = {
         ...product,
         image: sanitizedImage,
+        quantity,
       };
 
       setItems((prev) => {
@@ -274,8 +294,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           return updated;
         }
 
-        return [...prev, { ...cleanProduct, quantity }];
+        return [...prev, cleanProduct];
       });
+
+      if (options?.showSheet !== false) {
+        setLastAddedItem(cleanProduct);
+        setIsAddedSheetOpen(true);
+      }
     },
     []
   );
@@ -389,6 +414,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         hasPrerollBonus,
         setHasPrerollBonus,
         isCartDrawerOpen,
+        isAddedSheetOpen,
+        setIsAddedSheetOpen,
+        lastAddedItem,
+        openAddedSheet,
         isPickupEnabled,
         isPickupPausedModalOpen,
         setIsPickupPausedModalOpen,
