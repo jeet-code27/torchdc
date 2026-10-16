@@ -201,7 +201,7 @@ export function AreaPageView({ area, popularProducts }: AreaPageViewProps) {
                 </Link>
 
                 <span className="pcard__meta">
-                  {p.tier ? `${p.tier} · ${p.strain || "Flower"}` : p.subtitle || "Curated"}
+                  {p.subtitle || "Curated"}
                 </span>
 
                 <span className="pcard__price">

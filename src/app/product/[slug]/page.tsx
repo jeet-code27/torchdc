@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { connectToDatabase } from "@/lib/db";
 import { Product } from "@/models/Product";
 import { Category } from "@/models/Category";
+import { tierFromCategories, weightOptions } from "@/lib/deals";
 import {
   ProductDetailView,
   ProductDetailData,
@@ -144,25 +145,17 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     strain = "hybrid";
   }
 
-  // Determine tier (midshelf, topshelf, exotic / private reserve)
-  let tier: string | undefined;
-  if (
-    productCatSlugs.includes("private-reserve") ||
-    lowerName.includes("private reserve") ||
-    lowerName.includes("exotic")
-  ) {
-    tier = "exotic";
-  } else if (
-    productCatSlugs.includes("topshelf") ||
-    lowerName.includes("topshelf")
-  ) {
-    tier = "topshelf";
-  } else if (
-    productCatSlugs.includes("midshelf") ||
-    lowerName.includes("midshelf")
-  ) {
-    tier = "midshelf";
-  }
+  // Determine flower tier (Midshelf, Topshelf, Private Reserve). Only flowers have one.
+  const flowerTier =
+    mainCat.slug === "flowers" ? tierFromCategories(productCatSlugs, productDoc.name) : null;
+  const tier: string | undefined = flowerTier || undefined;
+  // Tiered flowers are sold by weight at the tier chart price, not the WooCommerce price
+  const tierWeights = flowerTier ? weightOptions(flowerTier) : null;
+  const tierCategorySlug =
+    flowerTier === "Private Reserve" ? "private-reserve" : flowerTier ? flowerTier.toLowerCase() : null;
+  const tierCategory = tierCategorySlug
+    ? categories.find((c) => c.slug === tierCategorySlug)
+    : undefined;
 
   // 3. Fetch Related Strains (More [Tier] Strains from same category or tier)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -171,7 +164,10 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     isActive: true,
   };
 
-  if (productDoc.categoryIds && productDoc.categoryIds.length > 0) {
+  if (tierCategory) {
+    // "More Private Reserve strains" only shows the same tier
+    relatedFilter.categoryIds = tierCategory._id;
+  } else if (productDoc.categoryIds && productDoc.categoryIds.length > 0) {
     relatedFilter.categoryIds = { $in: productDoc.categoryIds };
   }
 
@@ -181,7 +177,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     .limit(10)
     .lean();
 
-  if (relatedDocs.length < 6) {
+  if (relatedDocs.length < 6 && !tierCategory) {
     // Fallback to any active products if category had few
     const additional = await Product.find({
       _id: {
@@ -218,7 +214,9 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
     // Determine starting price for related product
     let rPrice = r.price || 0;
-    if (r.variants && r.variants.length > 0) {
+    if (tierWeights) {
+      rPrice = Math.min(...tierWeights.map((w) => w.price));
+    } else if (r.variants && r.variants.length > 0) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const valid = r.variants.filter((v: any) => typeof v.price === "number" && v.price > 0);
       if (valid.length > 0) {
@@ -237,13 +235,15 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         r.images?.[0]?.url ||
         "/images/placeholder-product.png",
       strain: rStrain,
-      tier: tier || "Midshelf",
+      tier,
     };
   });
 
   // Use only real variants if product has them, sorted by price ascending (e.g. 3.5g -> 7g -> 14g -> 1 oz)
   const rawVariants = Array.isArray(productDoc.variants) ? productDoc.variants : [];
-  const variants = rawVariants
+  const variants = tierWeights
+    ? tierWeights.map((w) => ({ name: w.label, price: w.price, salePrice: null, inStock: true }))
+    : rawVariants
     .map((v: {
       name: string;
       price: number;

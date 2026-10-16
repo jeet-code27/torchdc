@@ -18,6 +18,7 @@ export interface ShopProduct {
   strain?: "sativa" | "indica" | "hybrid" | string;
   weight?: string;
   subtitle?: string;
+  hasOptions?: boolean;
   isBestSeller?: boolean;
   isNewArrival?: boolean;
   badge?: string;
@@ -180,7 +181,7 @@ export function ShopProductCard({
         {product.name}
       </Link>
       <span className="pcard__meta">{metaText}</span>
-      <span className="pcard__price">${product.price}</span>
+      <span className="pcard__price">{product.hasOptions ? "from " : ""}${product.price}</span>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Cart } from "@/models/Cart";
 import { Coupon } from "@/models/Coupon";
 import { auth } from "@/auth";
 import { computeDeals, unitOf } from "@/lib/deals";
+import { verifyCartItems, CartItemError } from "@/lib/verify-cart-items";
 import {
   sendOrderConfirmationEmail,
   sendAdminNewOrderNotification,
@@ -71,19 +72,16 @@ export async function POST(request: Request) {
     const session = await auth();
     const userId = session?.user?.id || null;
 
-    // Sanitize items & compute server-verified subtotal
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const orderItems = items.map((it: any) => ({
-      productId: String(it.id || it.productId),
-      name: String(it.name),
-      slug: String(it.slug || ""),
-      price: Number(it.price),
-      quantity: Math.max(1, Number(it.quantity || 1)),
-      image: String(it.image || ""),
-      weight: String(it.weight || ""),
-      tier: String(it.tier || ""),
-      category: String(it.category || ""),
-    }));
+    // Re-price every line from the database (never trust browser prices or tiers)
+    let orderItems;
+    try {
+      orderItems = await verifyCartItems(items);
+    } catch (err) {
+      if (err instanceof CartItemError) {
+        return NextResponse.json({ success: false, error: err.message }, { status: 400 });
+      }
+      throw err;
+    }
 
     const subtotal = orderItems.reduce(
       (sum: number, it: { price: number; quantity: number }) =>

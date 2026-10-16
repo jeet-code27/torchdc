@@ -247,7 +247,7 @@ export default function CartPage() {
                       boxes.push(
                         <div key={`${tier}-h`} className="dealbox">
                           <div className="dealbox__top">
-                            <span className="dealbox__tag">DOUBLE UP</span>
+                            <span className="dealbox__tag">BUNDLE DEAL</span>
                             <span className="muted">
                               {Math.min(c.h, 4)} of 4 half oz
                             </span>

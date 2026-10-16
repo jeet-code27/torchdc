@@ -44,7 +44,7 @@ const CATEGORIES = [
 
 export function MobileCategoryGrid() {
   return (
-    <section className="sec lg:hidden" aria-labelledby="cats-h">
+    <section className="sec" aria-labelledby="cats-h">
       <div className="sec__head">
         <h2 id="cats-h">Shop By Category</h2>
         <Link href="/shop">Browse all</Link>

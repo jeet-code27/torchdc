@@ -2,6 +2,7 @@ import { connectToDatabase } from "@/lib/db";
 import { Product } from "@/models/Product";
 import { Category } from "@/models/Category";
 import { ShopProduct } from "@/components/storefront/shop-product-card";
+import { tierFromCategories, weightOptions } from "@/lib/deals";
 
 export async function getShopProducts(): Promise<ShopProduct[]> {
   try {
@@ -90,28 +91,22 @@ export async function getShopProducts(): Promise<ShopProduct[]> {
       }
 
       // Determine flower tier
-      let tier: "midshelf" | "topshelf" | "exotic" | undefined;
-      if (
-        catSlugs.includes("private-reserve") ||
-        lowerName.includes("private reserve") ||
-        lowerName.includes("exotic")
-      ) {
-        tier = "exotic";
-      } else if (
-        catSlugs.includes("topshelf") ||
-        lowerName.includes("topshelf")
-      ) {
-        tier = "topshelf";
-      } else if (
-        catSlugs.includes("midshelf") ||
-        lowerName.includes("midshelf")
-      ) {
-        tier = "midshelf";
-      }
+      // Only flowers have a tier ("Exotic 1G Pre-Rolls" is a pre-roll, not Private Reserve)
+      const flowerTier = category === "flowers" ? tierFromCategories(catSlugs, p.name) : null;
+      const tier: "midshelf" | "topshelf" | "exotic" | undefined =
+        flowerTier === "Private Reserve"
+          ? "exotic"
+          : flowerTier === "Topshelf"
+          ? "topshelf"
+          : flowerTier === "Midshelf"
+          ? "midshelf"
+          : undefined;
+      // Tiered flowers are sold by weight at the tier chart price
+      const tierWeights = flowerTier ? weightOptions(flowerTier) : null;
 
       // Weight detection
-      let weight = "";
-      if (p.variants && p.variants.length > 0) {
+      let weight = tierWeights ? tierWeights[0].label : "";
+      if (!weight && p.variants && p.variants.length > 0) {
         const v = p.variants[0];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const attrs = v.attributes as any;
@@ -137,11 +132,18 @@ export async function getShopProducts(): Promise<ShopProduct[]> {
       if (strain) {
         parts.push(strain.charAt(0).toUpperCase() + strain.slice(1));
       }
-      if (weight) {
-        parts.push(weight);
-      }
+      // Same as the client site card: "Tier · Strain", else the start of the short description
+      const shortText = String(p.shortDescription || "")
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\s+/g, " ")
+        // Client house style: no em or en dashes in shopper-facing copy
+        .replace(/\s+[—–]\s*/g, ", ")
+        .replace(/[—–]/g, "-")
+        .trim()
+        .slice(0, 40);
       const subtitle =
         parts.join(" · ") ||
+        shortText ||
         (category ? category.charAt(0).toUpperCase() + category.slice(1) : "");
 
       // Determine badge
@@ -154,8 +156,13 @@ export async function getShopProducts(): Promise<ShopProduct[]> {
       // Price calculation: Use lowest starting price if product has variants
       let price = p.price || 0;
       let salePrice = p.salePrice || undefined;
+      // "from $X" when the shopper picks between options (weights or variants)
+      const hasOptions = tierWeights ? tierWeights.length > 1 : (p.variants?.length || 0) > 1;
 
-      if (p.variants && p.variants.length > 0) {
+      if (tierWeights) {
+        price = Math.min(...tierWeights.map((w) => w.price));
+        salePrice = undefined;
+      } else if (p.variants && p.variants.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const validVariants = p.variants.filter((v: any) => typeof v.price === "number" && v.price > 0);
         if (validVariants.length > 0) {
@@ -184,6 +191,7 @@ export async function getShopProducts(): Promise<ShopProduct[]> {
         strain,
         weight,
         subtitle,
+        hasOptions,
         isBestSeller: Boolean(p.isBestSeller),
         isNewArrival: Boolean(p.isNewArrival),
         badge,

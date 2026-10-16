@@ -79,7 +79,6 @@ export function StoreNavbar() {
             <img
               src="/assets/img/logo.webp"
               alt="Torch Cannabis Delivery"
-              style={{ height: "32px", width: "auto", maxWidth: "115px", objectFit: "contain" }}
             />
           </Link>
 
@@ -196,7 +195,8 @@ export function StoreNavbar() {
             <img
               src="/assets/img/logo.webp"
               alt="Torch"
-              style={{ height: "30px", width: "auto", maxWidth: "105px", objectFit: "contain" }}
+              height={34}
+              style={{ height: "34px", width: "auto" }}
             />
             <button
               className="mnav__x"

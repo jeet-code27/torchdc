@@ -18,6 +18,7 @@ import { PickupPausedModal } from "@/components/storefront/pickup-paused-modal";
 import {
   computeDeals,
   unitOf,
+  applyTierPricing,
   DealComputationResult,
 } from "@/lib/deals";
 
@@ -170,13 +171,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (storedItems) {
         const parsed = JSON.parse(storedItems);
         if (Array.isArray(parsed)) {
-          const clean = parsed.map((item: any) => ({
-            ...item,
-            image:
-              typeof item.image === "string" && item.image.trim() !== ""
-                ? item.image
-                : item.image?.url || "/images/placeholder-product.png",
-          }));
+          const clean = parsed.map((item: any) =>
+            applyTierPricing({
+              ...item,
+              image:
+                typeof item.image === "string" && item.image.trim() !== ""
+                  ? item.image
+                  : item.image?.url || "/images/placeholder-product.png",
+            })
+          );
           setItems(clean);
         }
       }
@@ -274,11 +277,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           ? product.image
           : (product.image as any)?.url || "/images/placeholder-product.png";
 
-      const cleanProduct: CartItem = {
+      const cleanProduct: CartItem = applyTierPricing({
         ...product,
         image: sanitizedImage,
         quantity,
-      };
+      });
 
       setItems((prev) => {
         const itemIndex = prev.findIndex(
@@ -360,7 +363,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (data.success && data.cart?.items) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const merged: CartItem[] = data.cart.items.map((it: any) => ({
+        const merged: CartItem[] = data.cart.items.map((it: any) => applyTierPricing({
           id: it.productId,
           name: it.name,
           slug: it.slug,

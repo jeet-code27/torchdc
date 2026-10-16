@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 import { useCart } from "@/context/cart-context";
 import { ShopSidebar } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
+import { normalizeTier } from "@/lib/deals";
 
 export interface ProductDetailVariant {
   _id?: string;
@@ -118,12 +119,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
   const isFlower = React.useMemo(() => {
     if (isPreRoll || isEdible || isVape || isConcentrate || isMushroom) return false;
     if (catSlug === "flowers") return true;
-    if (
-      product.tier &&
-      ["midshelf", "topshelf", "exotic", "private-reserve"].includes(
-        product.tier.toLowerCase()
-      )
-    ) {
+    if (normalizeTier(product.tier)) {
       return true;
     }
     if (
@@ -145,14 +141,9 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     return null;
   }, [product.strain, product.name]);
 
-  // Determine flower tier tag
-  const tierTag = React.useMemo(() => {
-    const lower = (product.tier || product.category?.slug || product.name || "").toLowerCase();
-    if (lower.includes("private-reserve") || lower.includes("exotic")) return "EXOTIC";
-    if (lower.includes("topshelf")) return "TOPSHELF";
-    if (lower.includes("midshelf")) return "MIDSHELF";
-    return "TOPSHELF";
-  }, [product.tier, product.category, product.name]);
+  // Flower tier: "Midshelf" | "Topshelf" | "Private Reserve" (null when the flower has no tier)
+  const tierName = isFlower ? normalizeTier(product.tier) : null;
+  const tierTag = tierName ? tierName.toUpperCase() : "";
 
   // Variants calculation: Use DB variants if provided (sorted ascending by price), or standard flower weights
   const variants = React.useMemo(() => {
@@ -163,7 +154,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
       // If product.price is an ounce price (>= 90), scale starting 3.5g eighth realistically ($35-$59)
       const isOuncePrice = (product.price || 0) >= 90;
       const baseEighth = isOuncePrice
-        ? (tierTag === "MIDSHELF" ? 35 : tierTag === "EXOTIC" ? 60 : 49)
+        ? (tierTag === "MIDSHELF" ? 35 : tierTag === "PRIVATE RESERVE" ? 60 : 49)
         : product.price || 49;
 
       const ozPrice = isOuncePrice ? product.price : baseEighth * 3.5;
@@ -262,9 +253,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
           },
           spec3: { label: "BEST FOR", value: bestFor || "Anytime" },
           aboutHeading: "About this strain",
-          similarHeading: `More ${
-            tierTag.charAt(0) + tierTag.slice(1).toLowerCase()
-          } strains`,
+          similarHeading: `More ${tierName || "flower"} strains`,
         };
       }
 
@@ -371,6 +360,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
       isConcentrate,
       isMushroom,
       tierTag,
+      tierName,
       strainTag,
       topTerpene,
       bestFor,
@@ -536,7 +526,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
         price: currentPrice,
         image: primaryImage,
         weight: itemWeight,
-        tier: isFlower ? tierTag : undefined,
+        tier: tierName || undefined,
         category: product.category?.slug,
       },
       quantity
@@ -584,7 +574,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
               <Link href={isFlower ? "/flowers" : `/shop?category=${catSlug || "flowers"}`}>
                 {product.category?.name || "Flowers"}
               </Link>
-              {tierTag ? ` / ${tierTag}` : ""}
+              {tierName ? ` / ${tierName}` : ""}
             </span>
 
             {/* Title */}
@@ -758,7 +748,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                     : rel.name;
 
                 const relMeta = isFlower
-                  ? `${tierTag || "Topshelf"} · ${rel.strain ? rel.strain.charAt(0).toUpperCase() + rel.strain.slice(1).toLowerCase() : "Hybrid"}`
+                  ? `${tierName ? `${tierName} · ` : ""}${rel.strain ? rel.strain.charAt(0).toUpperCase() + rel.strain.slice(1).toLowerCase() : "Hybrid"}`
                   : rel.strain || "Curated";
 
                 return (
@@ -794,7 +784,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                               price: rel.price,
                               image: rel.image || "/assets/img/flower.webp",
                               weight: isFlower ? "3.5g" : "Standard",
-                              tier: isFlower ? tierTag : undefined,
+                              tier: tierName || undefined,
                               category: catSlug,
                             },
                             1

@@ -9,10 +9,13 @@ import {
   nextStep,
   nextStepOz,
   normalizeTier,
+  tierFromCategories,
+  tierWeightPrice,
   FlowerTier,
 } from "@/lib/deals";
 
 interface FlowerBase {
+  id?: string;
   name: string;
   slug: string;
   type: string;
@@ -67,26 +70,8 @@ const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
       image: "/assets/img/flower.webp",
     },
     {
-      name: "Gorilla Glue (Hybrid)",
-      slug: "gorilla-glue-hybrid",
-      type: "Hybrid",
-      image: "/assets/img/flower.webp",
-    },
-    {
-      name: "OG Kush (Indica)",
-      slug: "og-kush-indica",
-      type: "Indica",
-      image: "/assets/img/flower.webp",
-    },
-    {
       name: "Wedding Cake (Hybrid)",
       slug: "wedding-cake-hybrid",
-      type: "Hybrid",
-      image: "/assets/img/flower.webp",
-    },
-    {
-      name: "Gelato 41 (Hybrid)",
-      slug: "gelato-41-hybrid",
       type: "Hybrid",
       image: "/assets/img/flower.webp",
     },
@@ -105,12 +90,6 @@ const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
       image: "/assets/img/flower.webp",
     },
     {
-      name: "Ice Cream Cake (Indica)",
-      slug: "ice-cream-cake-indica",
-      type: "Indica",
-      image: "/assets/img/flower.webp",
-    },
-    {
       name: "Runtz (Hybrid)",
       slug: "runtz-hybrid",
       type: "Hybrid",
@@ -125,11 +104,6 @@ const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
   ],
 };
 
-const TIER_PRICES: Record<FlowerTier, { h: number; o: number }> = {
-  Midshelf: { h: 70, o: 100 },
-  Topshelf: { h: 100, o: 140 },
-  "Private Reserve": { h: 140, o: 220 },
-};
 
 const ADDONS = [
   {
@@ -256,18 +230,7 @@ export function StoreAddedToCartSheet() {
                 type = "Indica";
               }
 
-              let tier: FlowerTier = "Topshelf";
-              if (slugs.includes("midshelf") || nameLower.includes("midshelf")) {
-                tier = "Midshelf";
-              } else if (
-                slugs.includes("private-reserve") ||
-                nameLower.includes("private reserve") ||
-                nameLower.includes("exotic")
-              ) {
-                tier = "Private Reserve";
-              } else if (slugs.includes("topshelf") || nameLower.includes("topshelf")) {
-                tier = "Topshelf";
-              }
+              const tier = tierFromCategories(slugs, nameLower) || undefined;
 
               const resolvedImg =
                 p.images?.find((img: any) => img?.isPrimary && img?.url)?.url ||
@@ -275,6 +238,7 @@ export function StoreAddedToCartSheet() {
                 "/assets/img/flower.webp";
 
               return {
+                id: p._id ? String(p._id) : undefined,
                 name: p.name,
                 slug: p.slug,
                 type,
@@ -308,14 +272,8 @@ export function StoreAddedToCartSheet() {
         ))
   );
 
-  let effectiveTier: FlowerTier | null = normalizeTier(rawTier);
-  if (!effectiveTier && isFlower && lastAddedItem) {
-    const lower = lastAddedItem.name.toLowerCase();
-    if (lower.includes("midshelf")) effectiveTier = "Midshelf";
-    else if (lower.includes("private") || lower.includes("exotic"))
-      effectiveTier = "Private Reserve";
-    else effectiveTier = "Topshelf";
-  }
+  // Deals only apply to flowers with a known tier (same rule as the cart and checkout)
+  const effectiveTier: FlowerTier | null = normalizeTier(rawTier);
 
   // Dynamically select and shuffle 3 flower strains for recommendations
   const currentFirstWord =
@@ -392,11 +350,7 @@ export function StoreAddedToCartSheet() {
     });
   }
 
-  const pickPrice = effectiveTier
-    ? TIER_PRICES[effectiveTier][targetUnit]
-    : isOzDeal
-    ? 140
-    : 70;
+  const pickPrice = tierWeightPrice(effectiveTier, targetWeight) ?? 0;
 
   return (
     <div
@@ -464,7 +418,7 @@ export function StoreAddedToCartSheet() {
                   ? ozCount >= 8
                     ? "HALF-POUND HAUL"
                     : "STACK & SAVE"
-                  : "DOUBLE UP"}
+                  : "BUNDLE DEAL"}
               </span>
               <span className="muted">
                 {isOzDeal
@@ -509,7 +463,7 @@ export function StoreAddedToCartSheet() {
 
             {/* Recommended Strain Picks with Live + Add */}
             {availablePicks.map((base) => {
-              const pickId = `${base.slug}-${targetWeight.replace(/\s+/g, "")}`;
+              const pickId = base.id || base.slug;
               const baseKeyword = base.name.toLowerCase().split(/[\s(]+/)[0];
 
               const inCart = items.some(

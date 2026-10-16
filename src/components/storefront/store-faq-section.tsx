@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-interface FaqItem {
+export interface FaqItem {
   question: string;
   answer: string;
 }
@@ -95,11 +95,59 @@ const FAQS: FaqItem[] = [
   },
 ];
 
-export function StoreFaqSection() {
+/** Homepage FAQ, copied word for word from the client reference site (index.html). */
+export const HOME_FAQS: FaqItem[] = [
+  {
+    question: "What are your hours?",
+    answer: "Monday to Saturday 7AM to 11PM, Sunday 10AM to 9PM, for delivery and curbside pickup.",
+  },
+  {
+    question: "Where are you located?",
+    answer: "1000 G St NW, Washington, DC 20001, in Downtown DC. We deliver across the District.",
+  },
+  {
+    question: "How do I pay?",
+    answer: "Cash on delivery. Pay the driver in cash when your order arrives.",
+  },
+  {
+    question: "What products do you carry?",
+    answer: "Flower, pre-rolls, disposable vapes, concentrates, edibles and more. Browse the categories above to see the full menu.",
+  },
+  {
+    question: "Is there a first-order discount?",
+    answer: "Yes. Let us know it's your first order and we'll throw in something on the house.",
+  },
+  {
+    question: "Which neighborhoods do you deliver to?",
+    answer: "All of Washington, DC, including Downtown, Adams Morgan, Dupont Circle, Capitol Hill, Navy Yard, Shaw and Georgetown.",
+  },
+  {
+    question: "How old do I need to be?",
+    answer: "You must be 21 or older with a valid government-issued photo ID, checked at delivery or pickup.",
+  },
+  {
+    question: "Can visitors from out of state order?",
+    answer: "Yes. Adults 21+ with a valid government-issued photo ID from any state can order.",
+  },
+  {
+    question: "How much cannabis can I have in DC?",
+    answer: "Adults 21+ can possess up to 2 ounces in DC.",
+  },
+  {
+    question: "Do you have a loyalty program?",
+    answer: "[Describe how customers join and earn rewards]",
+  },
+  {
+    question: "What is your return policy?",
+    answer: "[Describe your return and exchange policy]",
+  },
+];
+
+export function StoreFaqSection({ faqs = FAQS }: { faqs?: FaqItem[] }) {
   return (
     <section className="faq" id="faq" aria-labelledby="faq-h">
       <h2 id="faq-h">Frequently Asked Questions</h2>
-      {FAQS.map((faq, index) => (
+      {faqs.map((faq, index) => (
         <details key={index}>
           <summary>{faq.question}</summary>
           <p>{faq.answer}</p>

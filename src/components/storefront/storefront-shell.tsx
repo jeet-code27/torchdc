@@ -39,15 +39,15 @@ export function StorefrontShell({ children }: StorefrontShellProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafbfa] text-neutral-900 selection:bg-[#5A805B]/20 selection:text-[#5A805B]">
+    <div className="storefront min-h-screen flex flex-col">
       {/* 1. Global Announcement Status Bar (Open Hours & Location) */}
       <StoreStatusBar />
 
       {/* 2. Persistent Global Navbar (Search, Cart Drawer, User Menu, Mobile Navigation) */}
       <StoreNavbar />
 
-      {/* 3. Page Content */}
-      <main className="flex-1">{children}</main>
+      {/* 3. Page Content (pages render their own <main class="shell__main">) */}
+      <div className="flex-1">{children}</div>
 
       {/* 4. Global Brand Footer */}
       <StoreFooter />

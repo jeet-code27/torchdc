@@ -97,3 +97,11 @@ body {
   color: var(--foreground-hex);
   font-feature-settings: "rlig" 1, "calt" 1;
 }
+
+/* Storefront: restore browser link underlines that Tailwind preflight removes
+   (the client reference site relies on them, e.g. "See all", breadcrumbs). */
+@layer base {
+  :where(.storefront) a {
+    text-decoration: underline;
+  }
+}

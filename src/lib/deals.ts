@@ -60,8 +60,35 @@ export function normalizeTier(tier?: string | null): FlowerTier | null {
   const t = tier.toLowerCase().replace(/[-_\s]+/g, '');
   if (t === 'midshelf') return 'Midshelf';
   if (t === 'topshelf') return 'Topshelf';
-  if (t === 'privatereserve') return 'Private Reserve';
+  // "exotic" is the legacy slug/label for Private Reserve
+  if (t === 'privatereserve' || t === 'exotic') return 'Private Reserve';
   return null;
+}
+
+/**
+ * Flower tier from a product's category slugs (WooCommerce tier categories),
+ * falling back to the product name.
+ */
+export function tierFromCategories(catSlugs: string[], name = ''): FlowerTier | null {
+  const lowerName = name.toLowerCase();
+  if (catSlugs.includes('private-reserve') || lowerName.includes('private reserve') || lowerName.includes('exotic')) {
+    return 'Private Reserve';
+  }
+  if (catSlugs.includes('topshelf') || lowerName.includes('topshelf')) return 'Topshelf';
+  if (catSlugs.includes('midshelf') || lowerName.includes('midshelf')) return 'Midshelf';
+  return null;
+}
+
+/**
+ * Price of a weight on the tier chart, or null when the weight is not sold for that tier.
+ */
+export function tierWeightPrice(tier: string | null | undefined, label: string | null | undefined): number | null {
+  const normalized = normalizeTier(tier);
+  if (!normalized || !label) return null;
+  const key = Object.keys(WEIGHTS[normalized]).find(
+    (k) => k.replace(/\s+/g, '').toLowerCase() === label.replace(/\s+/g, '').toLowerCase()
+  );
+  return key ? WEIGHTS[normalized][key] : null;
 }
 
 export function weightOptions(tier: string | FlowerTier): Array<{ label: string; price: number }> | null {
@@ -69,6 +96,24 @@ export function weightOptions(tier: string | FlowerTier): Array<{ label: string;
   if (!normalized) return null;
   const w = WEIGHTS[normalized];
   return w ? Object.keys(w).map((k) => ({ label: k, price: w[k] })) : null;
+}
+
+/**
+ * Flowers are sold by weight at the tier chart price (WooCommerce prices are ignored).
+ * Snaps a cart line to its canonical tier name, a weight the tier sells, and the chart price.
+ * Lines that are not tiered flowers are returned unchanged.
+ */
+export function applyTierPricing<T extends { tier?: string; weight?: string; price: number; category?: string }>(
+  item: T
+): T {
+  const tier = normalizeTier(item.tier);
+  if (!tier || (item.category && item.category !== 'flowers')) return item;
+  const chart = WEIGHTS[tier];
+  const labels = Object.keys(chart);
+  const weight =
+    labels.find((k) => k.replace(/\s+/g, '').toLowerCase() === String(item.weight || '').replace(/\s+/g, '').toLowerCase()) ||
+    labels[0];
+  return { ...item, tier, weight, price: chart[weight] };
 }
 
 // 9AM to 12PM, Washington DC time
@@ -175,7 +220,7 @@ export function computeDeals(lines: DealLineInput[], now?: Date): DealComputatio
 
   lines.forEach((l) => {
     const normalizedTier = normalizeTier(l.tier);
-    const unit = l.unit || unitOf(l.unit);
+    const unit = l.unit;
     if (!normalizedTier || !unit) return;
 
     for (let i = 0; i < l.qty; i++) {
