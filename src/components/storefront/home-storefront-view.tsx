@@ -3,7 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { ShopSidebar } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
@@ -143,7 +142,10 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
           <label htmlFor="mobile-q" className="sr-only">
             Search the menu
           </label>
-          <Search className="w-4 h-4 text-neutral-400 ml-4 shrink-0" />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5A50" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3.5-3.5" />
+          </svg>
           <input
             id="mobile-q"
             name="q"

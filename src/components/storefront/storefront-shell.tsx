@@ -6,6 +6,28 @@ import { StoreStatusBar } from "./store-statusbar";
 import { StoreNavbar } from "./store-navbar";
 import { StoreFooter } from "./store-footer";
 import { StoreAddedToCartSheet } from "./store-added-to-cart-sheet";
+import { AREAS_BY_SLUG } from "@/lib/areas-data";
+
+const STATIC_PAGES: Record<string, string> = {
+  "/": "home",
+  "/shop": "shop",
+  "/flowers": "flowers",
+  "/deals": "deals",
+  "/cart": "cart",
+  "/about": "about",
+  "/contact": "contact",
+  "/contact-us": "contact",
+  "/faq": "faq",
+  "/privacy-policy": "legal",
+  "/terms-conditions": "legal",
+};
+
+function pageKey(pathname: string): string | null {
+  if (STATIC_PAGES[pathname]) return STATIC_PAGES[pathname];
+  if (pathname.startsWith("/product/")) return "product";
+  if (AREAS_BY_SLUG[pathname.replace(/^\/|\/$/g, "")]) return "area";
+  return null;
+}
 
 interface StorefrontShellProps {
   children: React.ReactNode;
@@ -14,22 +36,11 @@ interface StorefrontShellProps {
 export function StorefrontShell({ children }: StorefrontShellProps) {
   const pathname = usePathname();
 
+  // body[data-page] values match the client site; its CSS has page-specific rules keyed on them
   React.useEffect(() => {
-    if (typeof document !== "undefined") {
-      if (pathname === "/") {
-        document.body.setAttribute("data-page", "home");
-      } else if (pathname === "/deals") {
-        document.body.setAttribute("data-page", "deals");
-      } else if (pathname === "/cart") {
-        document.body.setAttribute("data-page", "cart");
-      } else if (pathname === "/flowers") {
-        document.body.setAttribute("data-page", "flowers");
-      } else if (pathname?.startsWith("/product/")) {
-        document.body.setAttribute("data-page", "product");
-      } else {
-        document.body.removeAttribute("data-page");
-      }
-    }
+    const page = pageKey(pathname || "/");
+    if (page) document.body.setAttribute("data-page", page);
+    else document.body.removeAttribute("data-page");
   }, [pathname]);
 
   const isExcluded = pathname?.startsWith("/admin");
@@ -39,7 +50,8 @@ export function StorefrontShell({ children }: StorefrontShellProps) {
   }
 
   return (
-    <div className="storefront min-h-screen flex flex-col">
+    // Plain block layout like the client site (a flex column would stop margins collapsing into the footer gap)
+    <div className="storefront">
       {/* 1. Global Announcement Status Bar (Open Hours & Location) */}
       <StoreStatusBar />
 
@@ -47,7 +59,7 @@ export function StorefrontShell({ children }: StorefrontShellProps) {
       <StoreNavbar />
 
       {/* 3. Page Content (pages render their own <main class="shell__main">) */}
-      <div className="flex-1">{children}</div>
+      {children}
 
       {/* 4. Global Brand Footer */}
       <StoreFooter />

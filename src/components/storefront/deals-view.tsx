@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
 import { ShopSidebar } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
@@ -38,84 +37,77 @@ export function DealsView() {
   const dealConfig = DEALS[selectedTier];
   const weightsConfig = WEIGHTS[selectedTier];
 
-  React.useEffect(() => {
-    document.body.setAttribute("data-page", "deals");
-    return () => {
-      document.body.removeAttribute("data-page");
-    };
-  }, []);
-
-  // Base unit prices for calculating display savings
+  // Savings are shown against the tier chart price per unit (same as the client deals page)
   const halfUnitPrice = weightsConfig["14g"] || 0;
   const ozUnitPrice = weightsConfig["1 oz"] || 0;
+  const shopHref = `/flowers?tier=${encodeURIComponent(selectedTier)}`;
 
+  const cards = [
+    {
+      title: "Bundle Deal",
+      tag: "MOST POPULAR",
+      desc: `Mix any ${selectedTier} strains by the half ounce.`,
+      rows: [2, 3, 4].map((k) => ({ label: `${k} half ounces`, price: dealConfig.half[k], save: halfUnitPrice * k - dealConfig.half[k] })),
+    },
+    {
+      title: "Stack & Save",
+      tag: "BEST VALUE",
+      desc: "Stock up by the ounce and save more with every one.",
+      rows: [2, 3, 4].map((k) => ({ label: `${k} oz`, price: dealConfig.oz[k], save: ozUnitPrice * k - dealConfig.oz[k] })),
+    },
+    {
+      title: "The Half-Pound Haul",
+      tag: "BIGGEST SAVINGS",
+      desc: `Half a pound of ${selectedTier} at our lowest price.`,
+      rows: [{ label: "8 oz", price: dealConfig.haul, save: ozUnitPrice * 8 - dealConfig.haul }],
+    },
+  ];
+
+  // Markup mirrors client-reference/deals.html + dealsPage() in site.js
   return (
-    <div className="shell deals-page" data-page="deals">
-      {/* ================= 1. DESKTOP LEFT RAIL (Menu Navigation) ================= */}
+    <div className="shell">
       <ShopSidebar activeCategory="deals" />
 
-      {/* ================= 2. MAIN CENTER CONTENT (Deals Cards) ================= */}
-      <main className="shell__main deals-main">
-        {/* ================= TIER SWITCHER TABS ================= */}
-        <div className="seg seg--3 seg--green" role="tablist" aria-label="Select flower tier">
-          {(["Midshelf", "Topshelf", "Private Reserve"] as FlowerTier[]).map((tier) => {
-            const isActive = selectedTier === tier;
-            return (
-              <button
-                key={tier}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setSelectedTier(tier)}
-                className={`text-[12.5px] sm:text-sm px-1 font-bold ${isActive ? "is-on" : ""}`}
-                style={isActive ? { color: "#FFFFFF" } : undefined}
-              >
-                {tier}
-              </button>
-            );
-          })}
+      <main className="shell__main">
+        <div className="seg seg--green seg--3" role="tablist" aria-label="Flower tier">
+          {(["Midshelf", "Topshelf", "Private Reserve"] as FlowerTier[]).map((tier) => (
+            <button
+              key={tier}
+              type="button"
+              role="tab"
+              aria-selected={selectedTier === tier}
+              className={selectedTier === tier ? "is-on" : ""}
+              onClick={() => setSelectedTier(tier)}
+            >
+              {tier}
+            </button>
+          ))}
         </div>
 
-        {/* ================= PAGE TITLE & TAGLINE ================= */}
-        <div className="dealhead !px-4 lg:!px-0">
-          <span className="eyebrow" style={{ color: "var(--green)", fontWeight: 800, fontSize: "11px", letterSpacing: "0.8px" }}>
-            BULK SAVINGS
-          </span>
+        <section className="dealhead">
+          <span className="eyebrow">BULK SAVINGS</span>
           <h1>Deals</h1>
-          <span className="muted" style={{ fontSize: "14px", color: "var(--site-muted)" }}>
-            {meta.tagline}
-          </span>
-        </div>
+          <span className="muted">{meta.tagline}</span>
+        </section>
 
-        {/* ================= 1. WAKE & BAKE CARD ================= */}
         <div className="wake">
           <span className="wake__tag">9AM TO 12PM ONLY</span>
-          <div className="wake__t">Wake &amp; Bake</div>
-          <span className="muted" style={{ fontSize: "14px", color: "var(--site-muted)" }}>
-            Half ounce of {selectedTier} for just
-          </span>
-
+          <span className="wake__t">Wake &amp; Bake</span>
+          <span>Half ounce of {selectedTier} for just</span>
           <div className="wake__row">
             <span className="wake__p">${dealConfig.wake}</span>
-
-            <Link
-              href={`/flowers?tier=${encodeURIComponent(selectedTier)}`}
-              className="wake__go"
-              style={{ color: "#FFFFFF" }}
-            >
+            <Link className="wake__go" href={shopHref}>
               Pick a strain
             </Link>
           </div>
-
-          <span className="fine" style={{ fontSize: "12px", color: "var(--site-muted)", lineHeight: 1.5 }}>
-            Limit 1 per customer per day. Applied automatically in your cart during these hours.
-          </span>
+          <span className="fine">Limit 1 per customer per day. Applied automatically in your cart during these hours.</span>
         </div>
 
-        {/* ================= 2. NEW HERE? PROMO CALLOUT ================= */}
         <div className="newhere">
           <span className="newhere__ic">
-            <Check className="w-4 h-4 stroke-[3]" style={{ stroke: "#FFFFFF", color: "#FFFFFF" }} />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12l5 5L20 7" />
+            </svg>
           </span>
           <span>
             <strong>New Here?</strong>
@@ -123,142 +115,31 @@ export function DealsView() {
           </span>
         </div>
 
-        {/* ================= 3. BUNDLE DEAL, STACK & SAVE, HALF POUND HAUL ================= */}
         <div className="dealcards">
-          {/* Bundle Deal */}
-          <div className="dealcard">
-            <div className="dealcard__h">
-              <strong>Bundle Deal</strong>
-              <span className="dealtag">MOST POPULAR</span>
+          {cards.map((c) => (
+            <div key={c.title} className="dealcard">
+              <div className="dealcard__h">
+                <strong>{c.title}</strong>
+                <span className="dealtag">{c.tag}</span>
+              </div>
+              <span className="muted">{c.desc}</span>
+              {c.rows.map((r) => (
+                <div key={r.label} className="drow">
+                  <span>
+                    <strong>{r.label}</strong>
+                    {r.save > 0 && <span className="ok">Save ${r.save}</span>}
+                  </span>
+                  <b>${r.price}</b>
+                  <Link className="drow__go" href={shopHref} aria-label={`Pick ${selectedTier} strains`}>
+                    →
+                  </Link>
+                </div>
+              ))}
             </div>
-            <span className="muted" style={{ fontSize: "14px", color: "var(--site-muted)" }}>
-              Mix any {selectedTier} strains by the half ounce.
-            </span>
-
-            <div className="pt-1">
-              {[2, 3, 4].map((count) => {
-                const dealPrice = dealConfig.half[count];
-                const regularPrice = halfUnitPrice * count;
-                const save = regularPrice - dealPrice;
-
-                return (
-                  <div key={count} className="drow">
-                    <span>
-                      <strong>{count} half ounces</strong>
-                      {save > 0 && (
-                        <span className="ok" style={{ color: "var(--green-mid)", fontWeight: 700, fontSize: "13px" }}>
-                          Save ${save}
-                        </span>
-                      )}
-                    </span>
-
-                    <b>${dealPrice}</b>
-
-                    <Link
-                      href={`/flowers?tier=${encodeURIComponent(selectedTier)}`}
-                      className="drow__go"
-                      style={{ color: "#FFFFFF" }}
-                      aria-label={`Pick strain for ${count} half ounces`}
-                    >
-                      <ArrowRight className="w-4 h-4 stroke-[2.5]" style={{ stroke: "#FFFFFF", color: "#FFFFFF" }} />
-                    </Link>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Stack & Save */}
-          <div className="dealcard">
-            <div className="dealcard__h">
-              <strong>Stack &amp; Save</strong>
-              <span className="dealtag">BEST VALUE</span>
-            </div>
-            <span className="muted" style={{ fontSize: "14px", color: "var(--site-muted)" }}>
-              Stock up by the ounce and save more with every one.
-            </span>
-
-            <div className="pt-1">
-              {[2, 3, 4].map((count) => {
-                const dealPrice = dealConfig.oz[count];
-                const regularPrice = ozUnitPrice * count;
-                const save = regularPrice - dealPrice;
-
-                return (
-                  <div key={count} className="drow">
-                    <span>
-                      <strong>{count} oz</strong>
-                      {save > 0 && (
-                        <span className="ok" style={{ color: "var(--green-mid)", fontWeight: 700, fontSize: "13px" }}>
-                          Save ${save}
-                        </span>
-                      )}
-                    </span>
-
-                    <b>${dealPrice}</b>
-
-                    <Link
-                      href={`/flowers?tier=${encodeURIComponent(selectedTier)}`}
-                      className="drow__go"
-                      style={{ color: "#FFFFFF" }}
-                      aria-label={`Pick strain for ${count} oz`}
-                    >
-                      <ArrowRight className="w-4 h-4 stroke-[2.5]" style={{ stroke: "#FFFFFF", color: "#FFFFFF" }} />
-                    </Link>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* The Half-Pound Haul */}
-          <div className="dealcard">
-            <div className="dealcard__h">
-              <strong>The Half-Pound Haul</strong>
-              <span className="dealtag">BIGGEST SAVINGS</span>
-            </div>
-            <span className="muted" style={{ fontSize: "14px", color: "var(--site-muted)" }}>
-              Half a pound of {selectedTier} at our lowest price.
-            </span>
-
-            <div className="pt-1">
-              {(() => {
-                const dealPrice = dealConfig.haul;
-                const regularPrice = ozUnitPrice * 8;
-                const save = regularPrice - dealPrice;
-
-                return (
-                  <div className="drow">
-                    <span>
-                      <strong>8 oz</strong>
-                      {save > 0 && (
-                        <span className="ok" style={{ color: "var(--green-mid)", fontWeight: 700, fontSize: "13px" }}>
-                          Save ${save}
-                        </span>
-                      )}
-                    </span>
-
-                    <b>${dealPrice}</b>
-
-                    <Link
-                      href={`/flowers?tier=${encodeURIComponent(selectedTier)}`}
-                      className="drow__go"
-                      style={{ color: "#FFFFFF" }}
-                      aria-label="Pick strain for 8 oz"
-                    >
-                      <ArrowRight className="w-4 h-4 stroke-[2.5]" style={{ stroke: "#FFFFFF", color: "#FFFFFF" }} />
-                    </Link>
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* ================= FOOTER NOTE ================= */}
-        <p className="fine" style={{ textAlign: "center", padding: "18px 0 24px", color: "var(--site-muted)", fontSize: "13px" }}>
-          Deals apply automatically in your cart when you add the matching flower.
-        </p>
+        <p className="fine center">Deals apply automatically in your cart when you add the matching flower.</p>
       </main>
 
       {/* ================= 3. DESKTOP RIGHT RAIL (Order Sidebar) ================= */}

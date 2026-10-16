@@ -46,12 +46,10 @@ export default async function AreaPage({ params }: AreaPageProps) {
   }
 
   const allProducts = await getShopProducts();
-  const popularProducts = allProducts.filter((p) => p.isBestSeller || p.isNewArrival);
+  // Same as the client rail (data-rail="best" data-min="4"): best sellers, topped up to 4
+  const best = allProducts.filter((p) => p.isBestSeller);
+  const popularProducts =
+    best.length >= 4 ? best : [...best, ...allProducts.filter((p) => !p.isBestSeller).slice(0, 4 - best.length)];
 
-  return (
-    <AreaPageView
-      area={area}
-      popularProducts={popularProducts.length >= 4 ? popularProducts : allProducts}
-    />
-  );
+  return <AreaPageView area={area} popularProducts={popularProducts} />;
 }

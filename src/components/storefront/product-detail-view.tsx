@@ -6,18 +6,16 @@ import Link from "next/link";
 import {
   Plus,
   Minus,
-  ChevronRight,
-  ChevronLeft,
   Check,
   Truck,
   Store,
   Banknote,
   ArrowLeft,
 } from "lucide-react";
-import toast from "react-hot-toast";
 import { useCart } from "@/context/cart-context";
 import { ShopSidebar } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
+import { ShopProductCard, ShopProduct } from "./shop-product-card";
 import { normalizeTier } from "@/lib/deals";
 
 export interface ProductDetailVariant {
@@ -62,14 +60,6 @@ interface ProductDetailViewProps {
 
 export function ProductDetailView({ product }: ProductDetailViewProps) {
   const { addItem, items, finalTotal } = useCart();
-  const sliderRef = React.useRef<HTMLDivElement>(null);
-
-  const scrollSlider = (direction: "left" | "right") => {
-    if (sliderRef.current) {
-      const scrollAmount = direction === "left" ? -300 : 300;
-      sliderRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
-  };
 
   // Clean title (remove redundant (Sativa), (Hybrid), etc.)
   const cleanTitle = React.useMemo(() => {
@@ -486,9 +476,45 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
       : "Premium DC dispensary selection lab-tested for purity, potency, and smoothness.");
 
   // About this product description text
+  // Short description shown under the title, like the client site
+  const leadText = React.useMemo(
+    () =>
+      (product.shortDescription || "")
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\\n/g, " ")
+        .replace(/\s+/g, " ")
+        .trim(),
+    [product.shortDescription]
+  );
+
+  // Related cards in the shared card format (meta "Tier · Strain", "from $X" on tiered flowers)
+  const relatedCards: ShopProduct[] = React.useMemo(
+    () =>
+      (product.relatedProducts || []).map((r) => {
+        const strain = r.strain && r.strain !== "Flower" ? r.strain : "";
+        return {
+          id: r.id,
+          name: r.name,
+          slug: r.slug,
+          price: r.price,
+          image: r.image,
+          category: isFlower ? "flowers" : catSlug,
+          tier: tierName || undefined,
+          strain: strain.toLowerCase() || undefined,
+          subtitle: [tierName, strain].filter(Boolean).join(" · "),
+          hasOptions: Boolean(tierName),
+        };
+      }),
+    [product.relatedProducts, isFlower, catSlug, tierName]
+  );
+
   const cleanDescription = React.useMemo(() => {
     if (product.description && product.description.trim().length > 20) {
-      return product.description.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+      return product.description
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\\n/g, " ") // literal "\n" left over from the WooCommerce import
+        .replace(/\s+/g, " ")
+        .trim();
     }
     if (isEdible) {
       return `Premium lab-tested edibles formulated for clean, consistent absorption. Crafted with authentic fruit flavors and potent cannabinoids for a delightful, uplifting Washington DC cannabis experience.`;
@@ -579,6 +605,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
 
             {/* Title */}
             <h1>{displayTitle}</h1>
+            {leadText && <p className="lead">{leadText}</p>}
 
             {/* Price */}
             <span className="pdp__price">${currentPrice}</span>
@@ -701,125 +728,21 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
           </div>
         </div>
 
-        {/* Related Products Slider Section (Authentic Client Design) */}
-        {product.relatedProducts && product.relatedProducts.length > 0 && (
-          <div className="mt-14 pt-8 border-t border-neutral-200/80">
-            {/* Header: Title on Left, Controls & 'See all' on Right */}
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <h2 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">
-                {similarHeading}
-              </h2>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => scrollSlider("left")}
-                  className="w-8 h-8 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 flex items-center justify-center text-neutral-700 transition-colors shadow-2xs cursor-pointer active:scale-95"
-                  aria-label="Scroll left"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scrollSlider("right")}
-                  className="w-8 h-8 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 flex items-center justify-center text-neutral-700 transition-colors shadow-2xs cursor-pointer active:scale-95"
-                  aria-label="Scroll right"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-                <Link
-                  href={isFlower ? "/flowers" : `/shop?category=${catSlug || "flowers"}`}
-                  className="text-xs sm:text-sm font-bold text-[#4A6E4B] hover:text-[#2F4F30] ml-1 transition-colors whitespace-nowrap"
-                >
-                  See all
-                </Link>
+        {/* Related products: same markup as the client site (section.sec + .rail of cards) */}
+        {relatedCards.length > 0 && (
+          <>
+            <section className="sec">
+              <div className="sec__head">
+                <h2>{tierName ? `More ${tierName} strains` : "You might also like"}</h2>
+                <Link href={isFlower ? "/flowers" : `/shop?category=${catSlug || "flowers"}`}>See all</Link>
               </div>
+            </section>
+            <div className="rail">
+              {relatedCards.map((rel) => (
+                <ShopProductCard key={rel.id} product={rel} />
+              ))}
             </div>
-
-            {/* Slider Track with horizontal scroll */}
-            <div
-              ref={sliderRef}
-              className="flex gap-3 sm:gap-4 overflow-x-auto scroll-smooth pb-3 snap-x"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {product.relatedProducts.map((rel) => {
-                const relDisplayName =
-                  isFlower && rel.strain && !rel.name.includes("(")
-                    ? `${rel.name} (${rel.strain.charAt(0).toUpperCase() + rel.strain.slice(1).toLowerCase()})`
-                    : rel.name;
-
-                const relMeta = isFlower
-                  ? `${tierName ? `${tierName} · ` : ""}${rel.strain ? rel.strain.charAt(0).toUpperCase() + rel.strain.slice(1).toLowerCase() : "Hybrid"}`
-                  : rel.strain || "Curated";
-
-                return (
-                  <div
-                    key={rel.id}
-                    className="pcard w-[165px] sm:w-[185px] shrink-0 snap-start flex flex-col group relative"
-                  >
-                    {/* Card Image Box with Floating (+) Button */}
-                    <div className="pcard__img relative w-full h-[155px] sm:h-[175px] rounded-[22px] bg-[#F6F8F6] flex items-center justify-center p-3 overflow-hidden">
-                      <Link
-                        href={`/product/${rel.slug}`}
-                        className="w-full h-full flex items-center justify-center"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={rel.image || "/assets/img/flower.webp"}
-                          alt={rel.name}
-                          className="w-28 h-28 sm:w-32 sm:h-32 object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
-                        />
-                      </Link>
-
-                      {/* Quick Add (+) Button at bottom right */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          addItem(
-                            {
-                              id: rel.id,
-                              name: rel.name.replace(/\s*\((sativa|indica|hybrid)\)/i, "").trim(),
-                              slug: rel.slug,
-                              price: rel.price,
-                              image: rel.image || "/assets/img/flower.webp",
-                              weight: isFlower ? "3.5g" : "Standard",
-                              tier: tierName || undefined,
-                              category: catSlug,
-                            },
-                            1
-                          );
-                          toast.success(`Added ${rel.name} to cart`);
-                        }}
-                        className="add absolute right-2.5 bottom-2.5 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-neutral-900 shadow-md hover:bg-[#5A805B] hover:text-white flex items-center justify-center font-bold text-xl transition-all cursor-pointer z-10 active:scale-95"
-                        aria-label={`Add ${rel.name} to cart`}
-                      >
-                        +
-                      </button>
-                    </div>
-
-                    {/* Card Title */}
-                    <Link href={`/product/${rel.slug}`} className="mt-2 block">
-                      <h3 className="pcard__name font-bold text-sm sm:text-[15px] text-neutral-900 line-clamp-1 group-hover:text-[#5A805B] transition-colors">
-                        {relDisplayName}
-                      </h3>
-                    </Link>
-
-                    {/* Meta: Tier · Strain */}
-                    <span className="pcard__meta text-xs text-neutral-500 font-medium mt-0.5 truncate">
-                      {relMeta}
-                    </span>
-
-                    {/* Price: from $40 */}
-                    <div className="pcard__price text-sm sm:text-[15px] font-extrabold text-neutral-900 mt-1">
-                      <span className="text-xs font-normal text-neutral-500 mr-1">from</span>
-                      ${rel.price}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          </>
         )}
       </main>
 

@@ -27,13 +27,17 @@ export function CartAddToOrder({
     let isMounted = true;
     async function loadAddOns() {
       try {
-        // Fetch popular pre-rolls and impulse add-ons
-        const res = await fetch("/api/products?limit=16");
+        // Same rule as the client site: single-option items at $60 or less, in menu order
+        const res = await fetch("/api/products?limit=100");
         if (!res.ok) return;
         const data = await res.json();
         if (data.success && Array.isArray(data.products) && isMounted) {
           // Normalize to ShopProduct format
-          const formatted: ShopProduct[] = data.products.map((p: any) => {
+          const formatted: ShopProduct[] = data.products
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .filter((p: any) => (p.variants?.length || 0) <= 1)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .map((p: any) => {
             const resolvedImg =
               p.images?.find((img: any) => img?.isPrimary && img?.url)?.url ||
               p.images?.find((img: any) => typeof img?.url === "string" && img.url)?.url ||
@@ -45,12 +49,13 @@ export function CartAddToOrder({
               id: p._id || p.id,
               name: p.name,
               slug: p.slug,
-              price: p.salePrice || p.price || 0,
+              // The price checkout charges (variant or product price, not the sale price)
+              price: p.variants?.[0]?.price ?? p.price ?? 0,
               image: resolvedImg,
-              category: "pre-rolls",
-              weight: p.variants?.[0]?.weight || "1g",
+              weight: p.variants?.[0]?.name || "",
             };
-          });
+          })
+            .filter((p: ShopProduct) => p.price > 0 && p.price <= 60);
           setSuggestions(formatted);
         }
       } catch (err) {

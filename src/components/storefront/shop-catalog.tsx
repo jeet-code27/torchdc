@@ -1,28 +1,13 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
-import {
-  Search,
-  SlidersHorizontal,
-  Sparkles,
-  ChevronLeft,
-  ChevronRight,
-  Tag,
-  Filter,
-  Truck,
-  Store,
-} from "lucide-react";
 import { useCart } from "@/context/cart-context";
-import { ShopSidebar, STORE_CATEGORIES } from "./shop-sidebar";
+import { ShopSidebar } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
-import { ShopFlowerTiers } from "./shop-flower-tiers";
+import { ShopFlowerTiers, FLOWER_TIERS } from "./shop-flower-tiers";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { ShopProductCard, ShopProduct } from "./shop-product-card";
-import { StoreHeroCarousel } from "./store-hero-carousel";
-
-const ITEMS_PER_PAGE = 12;
 
 const CATEGORY_PILLS = [
   { slug: "all", label: "All" },
@@ -34,452 +19,194 @@ const CATEGORY_PILLS = [
   { slug: "mushrooms", label: "Mushrooms" },
 ];
 
-function getPageNumbers(currentPage: number, totalPages: number): (number | string)[] {
-  if (totalPages <= 7) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
-  }
-
-  if (currentPage <= 4) {
-    return [1, 2, 3, 4, 5, "...", totalPages];
-  }
-
-  if (currentPage >= totalPages - 3) {
-    return [
-      1,
-      "...",
-      totalPages - 4,
-      totalPages - 3,
-      totalPages - 2,
-      totalPages - 1,
-      totalPages,
-    ];
-  }
-
-  return [
-    1,
-    "...",
-    currentPage - 1,
-    currentPage,
-    currentPage + 1,
-    "...",
-    totalPages,
-  ];
-}
-
 interface ShopCatalogProps {
   initialProducts?: ShopProduct[];
   initialCategory?: string;
   initialQuery?: string;
 }
 
+/** Shop page, built on the client reference markup (shop.html + shopPage() in site.js). */
 export function ShopCatalog({
   initialProducts = [],
   initialCategory,
   initialQuery = "",
 }: ShopCatalogProps) {
-  const { fulfillment, setFulfillment, totalCount } = useCart();
-  const [products, setProducts] = React.useState<ShopProduct[]>(initialProducts);
+  const { fulfillment, setFulfillment } = useCart();
+  const products = initialProducts;
 
-  React.useEffect(() => {
-    if (initialProducts && initialProducts.length > 0) {
-      setProducts(initialProducts);
-    }
-  }, [initialProducts]);
-
-  // By default, Shop page shows ALL products unless an initialCategory is specified
-  const [activeCategory, setActiveCategory] = React.useState(initialCategory || "all");
-
-  React.useEffect(() => {
-    if (initialCategory) {
-      setActiveCategory(initialCategory);
-    }
-  }, [initialCategory]);
-
-  const [activeTier, setActiveTier] = React.useState("all");
-  const [activeStrain, setActiveStrain] = React.useState("all");
+  // "best" / "new" are sorts on the client site; categories are tabs.
+  // The page remounts this component (key) when the URL's category or search changes.
+  const initial = initialCategory || "all";
+  const [activeCategory, setActiveCategory] = React.useState(initial);
+  const [activeTier, setActiveTier] = React.useState("topshelf");
   const [searchQuery, setSearchQuery] = React.useState(initialQuery || "");
+  const [searchInput, setSearchInput] = React.useState(initialQuery || "");
 
-  React.useEffect(() => {
-    if (initialQuery !== undefined) {
-      setSearchQuery(initialQuery);
+  const isBest = activeCategory === "best" || activeCategory === "best-sellers";
+  const isNew = activeCategory === "new" || activeCategory === "new-arrivals";
+  const isFlowers = activeCategory === "flowers";
+  const tab = isBest || isNew ? "all" : activeCategory;
+
+  const tierCounts = React.useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const p of products) {
+      if (p.category === "flowers" && p.tier) counts[p.tier] = (counts[p.tier] || 0) + 1;
     }
-  }, [initialQuery]);
+    return counts;
+  }, [products]);
 
-  const [sortBy, setSortBy] = React.useState("popular");
-  const [showTierModal, setShowTierModal] = React.useState(false);
-  const [currentPage, setCurrentPage] = React.useState(1);
-
-  // Filter products
   const filteredProducts = React.useMemo(() => {
-    return products.filter((product) => {
-      // 1. Search Query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesName = product.name.toLowerCase().includes(q);
-        const matchesSubtitle = product.subtitle?.toLowerCase().includes(q);
-        if (!matchesName && !matchesSubtitle) return false;
+    const words = searchQuery.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    return products.filter((p) => {
+      if (tab !== "all" && (p.category || "").toLowerCase() !== tab) return false;
+      if (isFlowers && p.tier !== activeTier) return false;
+      if (words.length) {
+        const hay = `${p.name} ${p.subtitle || ""} ${p.strain || ""} ${p.tier || ""} ${p.category || ""}`.toLowerCase();
+        return words.every((w) => hay.includes(w));
       }
-
-      // 2. Category Filter
-      if (activeCategory === "best" || activeCategory === "best-sellers") {
-        if (!product.isBestSeller) return false;
-      } else if (activeCategory === "new" || activeCategory === "new-arrivals") {
-        if (!product.isNewArrival) return false;
-      } else if (activeCategory !== "all") {
-        const cat = (product.category || "").toLowerCase();
-        const target = activeCategory.toLowerCase();
-        if (cat !== target && !(target === "flowers" && (cat === "flower" || cat === "flowers"))) return false;
-      }
-
-      // 3. Flower Tier Filter
-      if (activeTier !== "all") {
-        if (product.tier !== activeTier) return false;
-      }
-
-      // 4. Strain Filter
-      if (activeStrain !== "all") {
-        if (product.strain !== activeStrain) return false;
-      }
-
+      if (isBest) return Boolean(p.isBestSeller);
+      if (isNew) return Boolean(p.isNewArrival);
       return true;
-    }).sort((a, b) => {
-      if (sortBy === "price-asc") return a.price - b.price;
-      if (sortBy === "price-desc") return b.price - a.price;
-      if (sortBy === "latest") return a.isNewArrival ? -1 : 1;
-      return 0; // default popular
     });
-  }, [products, activeCategory, activeTier, activeStrain, searchQuery, sortBy]);
+  }, [products, tab, isFlowers, activeTier, searchQuery, isBest, isNew]);
 
-  // Reset page when any filter changes
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [activeCategory, activeTier, activeStrain, searchQuery, sortBy]);
+  const title = searchQuery.trim()
+    ? `Results for "${searchQuery.trim()}"`
+    : isBest
+    ? "Best Sellers"
+    : isNew
+    ? "New Arrivals"
+    : tab === "all"
+    ? "Shop All"
+    : isFlowers
+    ? `${FLOWER_TIERS.find((t) => t.slug === activeTier)?.name || "Topshelf"} Flower`
+    : CATEGORY_PILLS.find((c) => c.slug === tab)?.label || "Products";
 
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
-  const paginatedProducts = React.useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredProducts, currentPage]);
+  // Client cards: flame on best sellers (except in New Arrivals), NEW badge only in New Arrivals
+  const cardProduct = (p: ShopProduct): ShopProduct =>
+    isNew
+      ? { ...p, badge: p.isNewArrival ? "New" : undefined }
+      : { ...p, isNewArrival: false, badge: p.isBestSeller ? p.badge : undefined };
 
-  const categoryTitle = React.useMemo(() => {
-    if (activeCategory === "best" || activeCategory === "best-sellers") return "Best Sellers";
-    if (activeCategory === "new" || activeCategory === "new-arrivals") return "New Arrivals";
-    if (activeCategory === "flowers") {
-      if (activeTier === "midshelf") return "Midshelf Flower";
-      if (activeTier === "topshelf") return "Topshelf Flower";
-      if (activeTier === "exotic") return "Private Reserve Flower";
-      return "Flower";
-    }
-    if (activeCategory === "all") return "Shop All";
-    const found = CATEGORY_PILLS.find((c) => c.slug === activeCategory);
-    return found ? found.label : "Products";
-  }, [activeCategory, activeTier]);
+  const selectTab = (slug: string) => {
+    setActiveCategory(slug);
+    setSearchQuery("");
+    setSearchInput("");
+    window.history.replaceState(null, "", slug === "all" ? "/shop" : `/shop?category=${slug}`);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchQuery(searchInput);
+  };
 
   return (
-    <div className="min-h-screen bg-[#fafbfa] text-neutral-900">
+    <div className="shell">
+      <ShopSidebar
+        activeCategory={tab === "all" ? (isBest ? "best" : isNew ? "new" : "") : tab}
+        onSelectCategory={selectTab}
+      />
 
+      <main className="shell__main">
+        <form className="search" role="search" onSubmit={handleSearch}>
+          <label htmlFor="q" className="sr-only">
+            Search the menu
+          </label>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5A50" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3.5-3.5" />
+          </svg>
+          <input
+            id="q"
+            name="q"
+            type="search"
+            placeholder="What are you looking for today?"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+        </form>
 
-      {/* ================= MAIN CONTAINER ================= */}
-      <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-5 lg:px-6 py-4 sm:py-6">
-        <div className="flex gap-4 lg:gap-5 xl:gap-6 items-start">
-          {/* ================= 1. DESKTOP LEFT RAIL (Sticky Categories & Nav) ================= */}
-          <div className="hidden lg:block shrink-0 sticky top-24 self-start">
-            <ShopSidebar
-              activeCategory={activeCategory}
-              onSelectCategory={(slug) => {
-                setActiveCategory(slug);
-                if (slug !== "flowers") setActiveTier("all");
-              }}
-            />
+        <div className="shopbar">
+          <div className="seg seg--green" role="tablist" aria-label="Delivery or pickup">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={fulfillment === "delivery"}
+              className={fulfillment === "delivery" ? "is-on" : ""}
+              onClick={() => setFulfillment("delivery")}
+            >
+              Delivery
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={fulfillment === "pickup"}
+              className={fulfillment === "pickup" ? "is-on" : ""}
+              onClick={() => setFulfillment("pickup")}
+            >
+              Pickup
+            </button>
           </div>
-
-          {/* ================= 2. CENTER PRODUCT FEED ================= */}
-          <main className="flex-1 min-w-0">
-            {/* Delivery/Pickup + Category Chips Bar (Client Reference Matching) */}
-            <div className="shopbar">
-              <div className="seg seg--green lg:!hidden" role="tablist" aria-label="Delivery or pickup">
+          <div className="shopbar__note">
+            {fulfillment === "delivery" ? "Free delivery across DC" : "Pickup at 1000 G St NW"}
+          </div>
+          <div className="chips rail-x" role="tablist" aria-label="Categories">
+            {CATEGORY_PILLS.map((cat) => {
+              const on = tab === cat.slug;
+              return (
                 <button
+                  key={cat.slug}
                   type="button"
                   role="tab"
-                  aria-selected={fulfillment === "delivery"}
-                  className={fulfillment === "delivery" ? "is-on" : ""}
-                  onClick={() => setFulfillment("delivery")}
+                  aria-selected={on}
+                  className={`chip ${on ? "is-on" : ""}`}
+                  onClick={() => selectTab(cat.slug)}
                 >
-                  Delivery
+                  {cat.label}
                 </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={fulfillment === "pickup"}
-                  className={fulfillment === "pickup" ? "is-on" : ""}
-                  onClick={() => setFulfillment("pickup")}
-                >
-                  Pickup
-                </button>
-              </div>
-              <div className="shopbar__note lg:!hidden">
-                {fulfillment === "delivery"
-                  ? "Free delivery across DC"
-                  : "Pickup at 1000 G St NW"}
-              </div>
-
-              {/* Category Filter Pills (Matching Client Reference) */}
-              <div className="chips rail-x items-center" role="tablist" aria-label="Categories">
-                {CATEGORY_PILLS.map((cat) => {
-                  if (cat.slug === "flowers") {
-                    return (
-                      <Link
-                        key={cat.slug}
-                        href="/flowers"
-                        className="chip inline-flex items-center justify-center"
-                      >
-                        {cat.label}
-                      </Link>
-                    );
-                  }
-
-                  const isActive = activeCategory === cat.slug;
-                  return (
-                    <button
-                      key={cat.slug}
-                      type="button"
-                      onClick={() => {
-                        setActiveCategory(cat.slug);
-                        setActiveTier("all");
-                      }}
-                      className={`chip inline-flex items-center justify-center ${isActive ? "is-on" : ""}`}
-                    >
-                      {cat.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Catalog Grid Section with Pagination */}
-            <div id="catalog-top" className="px-4 sm:px-0 pt-5 sm:pt-6">
-              {/* Header Bar: Title, Count & Sort */}
-              <div className="flex items-center justify-between gap-3 sm:gap-4 pb-2 mb-3">
-                {/* Left: Section Title & Count */}
-                <div className="min-w-0 flex-1">
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111111] leading-tight truncate">
-                    {categoryTitle}
-                  </h1>
-                  <span className="text-xs sm:text-sm text-[#4F5A50] font-medium mt-1 block truncate">
-                    {filteredProducts.length === 0
-                      ? "0 products"
-                      : `${filteredProducts.length} products`}
-                  </span>
-                </div>
-
-                {/* Right: Sort Button */}
-                <div className="relative shrink-0">
-                  <div className="flex items-center gap-1.5 sm:gap-2 bg-white border border-neutral-200/90 rounded-full px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs font-bold text-neutral-800 shadow-2xs hover:border-neutral-300 transition-colors pointer-events-none whitespace-nowrap">
-                    <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-600 shrink-0" />
-                    <span className="hidden sm:inline">
-                      {sortBy === "popular"
-                        ? "Popular"
-                        : sortBy === "price-asc"
-                        ? "Price: Low to High"
-                        : sortBy === "price-desc"
-                        ? "Price: High to Low"
-                        : "New Arrivals"}
-                    </span>
-                    <span className="sm:hidden">
-                      {sortBy === "popular"
-                        ? "Popular"
-                        : sortBy === "price-asc"
-                        ? "Price: Low"
-                        : sortBy === "price-desc"
-                        ? "Price: High"
-                        : "New"}
-                    </span>
-                    <ChevronRight className="w-3 h-3 text-neutral-400 rotate-90 shrink-0" />
-                  </div>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    aria-label="Sort products"
-                  >
-                    <option value="popular">Popular</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="latest">New Arrivals</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Flower Tier Shortcut or Stacked Tier Boxes (Matching Client Reference) */}
-              {activeCategory === "flowers" ? (
-                <ShopFlowerTiers
-                  activeTier={activeTier}
-                  onSelectTier={(tier) => setActiveTier(tier)}
-                />
-              ) : (
-                <Link href="/flowers" className="tierlink mb-4">
-                  <span>
-                    <strong>Shop flower by tier</strong>
-                    <span>Midshelf · Topshelf · Private Reserve</span>
-                  </span>
-                  <ChevronRight className="w-5 h-5 text-[#557754]" />
-                </Link>
-              )}
-
-              {/* Products Grid */}
-              {filteredProducts.length === 0 ? (
-                <div className="bg-white rounded-3xl p-12 text-center border border-neutral-200/80 my-6 shadow-2xs">
-                  <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400 mx-auto mb-3">
-                    <Search className="w-5 h-5" />
-                  </div>
-                  <h3 className="font-black text-lg text-neutral-900">
-                    No products found
-                  </h3>
-                  <p className="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
-                    Try adjusting your search query, flower tier, or strain filter to see available DC menu items.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveCategory("all");
-                      setActiveTier("all");
-                      setActiveStrain("all");
-                      setSearchQuery("");
-                    }}
-                    className="mt-4 bg-[#557754] text-white font-bold text-xs px-5 py-2.5 rounded-full hover:bg-[#466645] transition-all cursor-pointer shadow-xs"
-                  >
-                    Reset all filters
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="grid">
-                    {paginatedProducts.map((product) => (
-                      <ShopProductCard key={product.id} product={product} />
-                    ))}
-                  </div>
-
-                  {/* Modern Smart Pagination Bar */}
-                  {totalPages > 1 && (
-                    <div className="mt-12 pt-6 border-t border-neutral-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
-                      {/* Left: Product count stats */}
-                      <p className="text-xs text-neutral-500 font-medium">
-                        Showing{" "}
-                        <span className="font-bold text-neutral-900">
-                          {(currentPage - 1) * ITEMS_PER_PAGE + 1}
-                        </span>{" "}
-                        to{" "}
-                        <span className="font-bold text-neutral-900">
-                          {Math.min(
-                            currentPage * ITEMS_PER_PAGE,
-                            filteredProducts.length
-                          )}
-                        </span>{" "}
-                        of{" "}
-                        <span className="font-bold text-neutral-900">
-                          {filteredProducts.length}
-                        </span>{" "}
-                        products
-                      </p>
-
-                      {/* Right: Modern Compact Pagination Controls */}
-                      <div className="flex items-center gap-1.5 select-none">
-                        {/* Previous Button */}
-                        <button
-                          type="button"
-                          disabled={currentPage === 1}
-                          onClick={() => {
-                            setCurrentPage((prev) => Math.max(prev - 1, 1));
-                            document
-                              .getElementById("catalog-top")
-                              ?.scrollIntoView({ behavior: "smooth" });
-                          }}
-                          className="h-9 px-3.5 rounded-xl text-xs font-bold border border-neutral-200/90 bg-white text-neutral-700 hover:bg-[#557754]/5 hover:border-[#557754]/40 hover:text-[#557754] disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
-                          aria-label="Previous page"
-                        >
-                          <ChevronLeft className="w-3.5 h-3.5" />
-                          <span>Previous</span>
-                        </button>
-
-                        {/* Mobile indicator (Page X of Y) */}
-                        <div className="flex sm:hidden items-center px-3 text-xs font-bold text-neutral-700 bg-neutral-100 rounded-xl h-9">
-                          Page {currentPage} of {totalPages}
-                        </div>
-
-                        {/* Desktop / Tablet Number Pills with Smart Truncation */}
-                        <div className="hidden sm:flex items-center gap-1">
-                          {getPageNumbers(currentPage, totalPages).map((item, idx) => {
-                            if (typeof item === "string") {
-                              return (
-                                <span
-                                  key={`ellipsis-${idx}`}
-                                  className="w-8 h-9 flex items-center justify-center text-xs font-black text-neutral-400"
-                                >
-                                  …
-                                </span>
-                              );
-                            }
-
-                            const isActive = currentPage === item;
-                            return (
-                              <button
-                                key={item}
-                                type="button"
-                                onClick={() => {
-                                  setCurrentPage(item);
-                                  document
-                                    .getElementById("catalog-top")
-                                    ?.scrollIntoView({ behavior: "smooth" });
-                                }}
-                                className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
-                                  isActive
-                                    ? "bg-[#557754] text-white font-black shadow-xs ring-2 ring-[#557754]/25 scale-105"
-                                    : "bg-white text-neutral-700 border border-neutral-200/90 hover:border-neutral-300 hover:bg-neutral-50 shadow-2xs"
-                                }`}
-                                aria-label={`Page ${item}`}
-                                aria-current={isActive ? "page" : undefined}
-                              >
-                                {item}
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {/* Next Button */}
-                        <button
-                          type="button"
-                          disabled={currentPage === totalPages}
-                          onClick={() => {
-                            setCurrentPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            );
-                            document
-                              .getElementById("catalog-top")
-                              ?.scrollIntoView({ behavior: "smooth" });
-                          }}
-                          className="h-9 px-3.5 rounded-xl text-xs font-bold border border-neutral-200/90 bg-white text-neutral-700 hover:bg-[#557754]/5 hover:border-[#557754]/40 hover:text-[#557754] disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
-                          aria-label="Next page"
-                        >
-                          <span>Next</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </main>
-
-          {/* ================= 3. DESKTOP RIGHT RAIL (Sticky Cart Sidebar) ================= */}
-          <div className="hidden xl:block shrink-0 sticky top-24 self-start">
-            <ShopCartSidebar />
+              );
+            })}
           </div>
         </div>
-      </div>
 
-      {/* ================= MOBILE BOTTOM FLOATING CART PILL ================= */}
+        <div className="pagehead">
+          <div>
+            <h1>{title}</h1>
+            <span className="muted">
+              {filteredProducts.length} {filteredProducts.length === 1 ? "product" : "products"}
+            </span>
+          </div>
+        </div>
+
+        {tab === "all" && !searchQuery.trim() && (
+          <Link className="tierlink" href="/flowers">
+            <span>
+              <strong>Shop flower by tier</strong>
+              <span>Midshelf · Topshelf · Private Reserve</span>
+            </span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </Link>
+        )}
+
+        {isFlowers && (
+          <ShopFlowerTiers activeTier={activeTier} onSelectTier={setActiveTier} counts={tierCounts} />
+        )}
+
+        <div className="grid" aria-live="polite">
+          {filteredProducts.length ? (
+            filteredProducts.map((p) => <ShopProductCard key={p.id} product={cardProduct(p)} />)
+          ) : (
+            <div className="empty">
+              <strong>Nothing here yet</strong>
+              <span>Try another category or search.</span>
+            </div>
+          )}
+        </div>
+      </main>
+
+      <ShopCartSidebar />
       <ShopStickyCartBar />
     </div>
   );

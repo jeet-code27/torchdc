@@ -20,6 +20,7 @@ export default async function ShopPage({
 
   return (
     <ShopCatalog
+      key={`${resolvedParams.category || ""}|${resolvedParams.q || ""}`}
       initialProducts={products}
       initialCategory={resolvedParams.category}
       initialQuery={resolvedParams.q}

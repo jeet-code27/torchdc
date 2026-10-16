@@ -104,4 +104,14 @@ body {
   :where(.storefront) a {
     text-decoration: underline;
   }
+  /* Browser-default paragraph spacing inside the client page content */
+  :where(.storefront .shell__main) p {
+    margin-block: 1em;
+  }
+  /* Browser-default button metrics the client markup is built on (preflight sets inherit / 0) */
+  :where(.storefront) button {
+    font-size: 13.3333px;
+    line-height: normal;
+    padding: 1px 6px;
+  }
 }

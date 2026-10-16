@@ -798,33 +798,8 @@ button.chip.is-on {
   color: #FFFFFF !important;
 }
 
-/* Hybrid Strain Badge Styling */
-.type--hybrid,
-.chip--hybrid,
-.pcard__type.type--hybrid,
-.pdetail__type.type--hybrid,
-span.type--hybrid {
-  background: var(--mint) !important;
-  color: var(--green-dark) !important;
-  border: 1px solid rgba(46, 125, 50, 0.25) !important;
-}
 
 
-.deals-main {
-  max-width: 760px;
-}
-
-.deals-page .shell__main > .seg--3 {
-  max-width: 760px;
-  margin: 14px 16px 0;
-}
-
-@media (min-width: 1100px) {
-  .deals-page .shell__main > .seg--3 {
-    margin-left: 0;
-    margin-right: 0;
-  }
-}
 
 /* Added-to-cart Sheet Interactive controls */
 .sheet__topbar {
@@ -921,13 +896,6 @@ span.type--hybrid {
   box-shadow: 0 0 0 3px rgba(90,128,91,0.12);
 }
 
-.msg .fine {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 8px;
-  text-align: center;
-  display: block;
-}
 
 /* Additional link hover polish */
 .crumbs a:hover,

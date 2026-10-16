@@ -37,33 +37,29 @@ export const FLOWER_TIERS: TierInfo[] = [
 interface ShopFlowerTiersProps {
   activeTier: string;
   onSelectTier: (tierSlug: string) => void;
+  /** Live strain count per tier slug; falls back to the static label when missing. */
+  counts?: Record<string, number>;
 }
 
-export function ShopFlowerTiers({
-  activeTier,
-  onSelectTier,
-}: ShopFlowerTiersProps) {
+export function ShopFlowerTiers({ activeTier, onSelectTier, counts }: ShopFlowerTiersProps) {
   return (
-    <div
-      role="group"
-      aria-label="Flower quality tiers"
-      className="tiers"
-      style={{ margin: "14px 0 18px", padding: 0 }}
-    >
+    <div className="tiers">
       {FLOWER_TIERS.map((tier) => {
         const isActive = activeTier === tier.slug;
+        const n = counts?.[tier.slug];
         return (
           <button
             key={tier.slug}
             type="button"
-            onClick={() => onSelectTier(isActive ? "all" : tier.slug)}
+            onClick={() => onSelectTier(tier.slug)}
             className={`tier ${isActive ? "is-on" : ""}`}
+            aria-pressed={isActive}
           >
             <span className="tier__l">
               <span className="tier__n">{tier.name}</span>
               <span className="tier__d">{tier.subtitle}</span>
             </span>
-            <span className="tier__c">{tier.strainCount}</span>
+            <span className="tier__c">{n ? `${n} ${n === 1 ? "strain" : "strains"}` : tier.strainCount}</span>
           </button>
         );
       })}
