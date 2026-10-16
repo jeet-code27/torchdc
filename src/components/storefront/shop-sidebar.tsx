@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import * as React from "react";
+import { usePathname } from "next/navigation";
 
 export interface CategoryOption {
   slug: string;
@@ -32,6 +33,7 @@ export function ShopSidebar({
   onSelectCategory,
   scrollLinks = false,
 }: ShopSidebarProps) {
+  const pathname = usePathname();
   const [currentActive, setCurrentActive] = React.useState(activeCategory);
 
   React.useEffect(() => {
@@ -98,7 +100,9 @@ export function ShopSidebar({
           ? "/flowers"
           : `/shop?category=${cat.slug}`;
 
-        const isActive = !isDeals && currentActive === cat.slug;
+        const isActive = isDeals
+          ? pathname === "/deals"
+          : currentActive === cat.slug && pathname !== "/deals";
 
         return (
           <Link

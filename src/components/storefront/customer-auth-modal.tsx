@@ -218,18 +218,14 @@ export function CustomerAuthModal({
 
         {/* Tab Toggle: Sign In vs Sign Up */}
         <div className="px-6 pb-2">
-          <div className="grid grid-cols-2 p-1 rounded-xl bg-zinc-100 border border-zinc-200 text-xs font-semibold">
+          <div className="seg">
             <button
               type="button"
               onClick={() => {
                 setMode("signin");
                 setErrorMessage("");
               }}
-              className={`py-2 rounded-lg transition ${
-                mode === "signin"
-                  ? "bg-white text-zinc-900 shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-900"
-              }`}
+              className={mode === "signin" ? "is-on" : ""}
             >
               Sign In
             </button>
@@ -239,11 +235,7 @@ export function CustomerAuthModal({
                 setMode("signup");
                 setErrorMessage("");
               }}
-              className={`py-2 rounded-lg transition ${
-                mode === "signup"
-                  ? "bg-white text-zinc-900 shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-900"
-              }`}
+              className={mode === "signup" ? "is-on" : ""}
             >
               Create Account
             </button>

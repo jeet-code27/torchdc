@@ -175,12 +175,6 @@ main.shell__main,
   }
 }
 
-/* Desktop Deals Sidebar & Layout alignment */
-.dside__deals {
-  background: var(--mint);
-  color: var(--green-dark) !important;
-  font-weight: 700;
-}
 
 .deals-main {
   max-width: 760px;
