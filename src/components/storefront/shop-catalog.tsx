@@ -198,7 +198,7 @@ export function ShopCatalog({
           <main className="flex-1 min-w-0">
             {/* Delivery/Pickup + Category Chips Bar (Client Reference Matching) */}
             <div className="shopbar">
-              <div className="seg seg--green lg:hidden" role="tablist" aria-label="Delivery or pickup">
+              <div className="seg seg--green lg:!hidden" role="tablist" aria-label="Delivery or pickup">
                 <button
                   type="button"
                   role="tab"
@@ -218,7 +218,7 @@ export function ShopCatalog({
                   Pickup
                 </button>
               </div>
-              <div className="shopbar__note lg:hidden">
+              <div className="shopbar__note lg:!hidden">
                 {fulfillment === "delivery"
                   ? "Free delivery across DC"
                   : "Pickup at 1000 G St NW"}

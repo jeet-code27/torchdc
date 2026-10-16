@@ -40,15 +40,42 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
   const [showFullLegalText, setShowFullLegalText] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  // Group products by category
+  // Group products by category - Exactly 4 client Best Sellers
   const bestSellers = React.useMemo(() => {
-    const list = products.filter((p) => p.isBestSeller);
-    return list.length >= 6 ? list.slice(0, 6) : products.slice(0, 6);
+    const TARGET_SLUGS = [
+      "strawberry-cough-sativa",
+      "clarity-full-spectrum-cannabis-infused-gummies-strawberry-kiwi",
+      "2g-plume-ghost-drank-phantom-fuel-x-trop-pop",
+      "top-shelf-1g-pre-rolls",
+    ];
+    const ordered: ShopProduct[] = [];
+    for (const slug of TARGET_SLUGS) {
+      const found = products.find((p) => p.slug === slug);
+      if (found) {
+        ordered.push({ ...found, isBestSeller: true });
+      }
+    }
+    if (ordered.length > 0) return ordered;
+    return products.filter((p) => p.isBestSeller).slice(0, 4);
   }, [products]);
 
+  // Group products by category - Exactly 4 client New Arrivals
   const newArrivals = React.useMemo(() => {
-    const list = products.filter((p) => p.isNewArrival);
-    return list.length >= 6 ? list.slice(0, 6) : products.slice(4, 10);
+    const TARGET_SLUGS = [
+      "bubba-kush-indica",
+      "mixed-fruit-rocket-gummies-500mg-10ct",
+      "2g-plume-the-hills-blackwater-x-lushberry",
+      "jeeter-bananaconda-enhanced-1g-pre-roll-indica",
+    ];
+    const ordered: ShopProduct[] = [];
+    for (const slug of TARGET_SLUGS) {
+      const found = products.find((p) => p.slug === slug);
+      if (found) {
+        ordered.push({ ...found, isNewArrival: true, badge: "New" });
+      }
+    }
+    if (ordered.length > 0) return ordered;
+    return products.filter((p) => p.isNewArrival).slice(0, 4);
   }, [products]);
 
   const flowers = React.useMemo(() => {
@@ -271,6 +298,7 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
             title="Flowers"
             seeAllHref="/flowers"
             products={flowers}
+            desktopOnly={true}
           />
 
           <ProductSlider
@@ -278,6 +306,7 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
             title="Pre-rolls"
             seeAllHref="/shop?category=pre-rolls"
             products={preRolls}
+            desktopOnly={true}
           />
 
           <ProductSlider
@@ -285,6 +314,7 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
             title="Disposables"
             seeAllHref="/shop?category=disposables"
             products={disposables}
+            desktopOnly={true}
           />
 
           <ProductSlider
@@ -292,6 +322,7 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
             title="Concentrates"
             seeAllHref="/shop?category=concentrates"
             products={concentrates}
+            desktopOnly={true}
           />
 
           <ProductSlider
@@ -299,6 +330,7 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
             title="Edibles"
             seeAllHref="/shop?category=edibles"
             products={edibles}
+            desktopOnly={true}
           />
 
           <ProductSlider
@@ -306,6 +338,7 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
             title="Mushrooms"
             seeAllHref="/shop?category=mushrooms"
             products={mushrooms}
+            desktopOnly={true}
           />
         </div>
 
