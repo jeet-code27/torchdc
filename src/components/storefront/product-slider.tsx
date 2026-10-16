@@ -23,7 +23,7 @@ export function ProductSlider({
   if (!products || products.length === 0) return null;
 
   return (
-    <section id={id} className="sec">
+    <section id={id} className="sec dsec">
       <div className="sec__head">
         <h2>{title}</h2>
         <Link href={seeAllHref}>See all</Link>

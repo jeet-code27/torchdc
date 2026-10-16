@@ -14,7 +14,24 @@ interface StorefrontShellProps {
 export function StorefrontShell({ children }: StorefrontShellProps) {
   const pathname = usePathname();
 
-  // Exclude admin dashboard
+  React.useEffect(() => {
+    if (typeof document !== "undefined") {
+      if (pathname === "/") {
+        document.body.setAttribute("data-page", "home");
+      } else if (pathname === "/deals") {
+        document.body.setAttribute("data-page", "deals");
+      } else if (pathname === "/cart") {
+        document.body.setAttribute("data-page", "cart");
+      } else if (pathname === "/flowers") {
+        document.body.setAttribute("data-page", "flowers");
+      } else if (pathname?.startsWith("/product/")) {
+        document.body.setAttribute("data-page", "product");
+      } else {
+        document.body.removeAttribute("data-page");
+      }
+    }
+  }, [pathname]);
+
   const isExcluded = pathname?.startsWith("/admin");
 
   if (isExcluded) {

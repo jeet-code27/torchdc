@@ -116,14 +116,14 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
         {/* Hero Banner Carousel */}
         <StoreHeroCarousel />
 
-        {/* Mobile Order Mode Buttons */}
-        <div className="orderbtns">
+        {/* Mobile Order Mode Buttons (Delivery vs Pickup) */}
+        <div className="orderbtns lg:hidden">
           <button
             type="button"
             className={`pill ${fulfillment === "delivery" ? "pill--green" : "pill--black"}`}
             onClick={() => setFulfillment("delivery")}
           >
-            Free Delivery
+            Delivery
           </button>
           <button
             type="button"
@@ -133,60 +133,91 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
             Pickup
           </button>
         </div>
-        <p className="ordernote">
-          {fulfillment === "delivery"
-            ? "Fast delivery across DC · Pay cash at the door"
-            : "Pickup at 1000 G St NW · Pickup paused"}
+        <p className="ordernote lg:hidden">
+          Free delivery in DC · Pickup at 1000 G St NW
         </p>
 
         {/* Mobile Categories Grid */}
         <MobileCategoryGrid />
 
-        {/* How It Works Steps */}
-        <div className="steps">
-          <h2>How it works</h2>
+        {/* Delivery in 3 easy steps (Mobile only, with client SVG icons) */}
+        <section className="steps lg:hidden" aria-labelledby="steps-h">
+          <h2 id="steps-h">Delivery in 3 easy steps</h2>
           <div className="step">
-            <span className="step__rail">
+            <div className="step__rail">
+              <span className="step__icon" style={{ background: "#85AD85" }}>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="9" cy="20" r="1.5" />
+                  <circle cx="18" cy="20" r="1.5" />
+                  <path d="M2 3h3l2.6 12.2a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L22 7H6" />
+                </svg>
+              </span>
+              <span className="step__line" />
+            </div>
+            <div className="step__body">
+              <strong>Pick your products</strong>
+              <span>Order online in a few taps, or call us.</span>
+            </div>
+          </div>
+          <div className="step">
+            <div className="step__rail">
               <span className="step__icon" style={{ background: "#5A805B" }}>
-                1
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="5" width="18" height="14" rx="2" />
+                  <circle cx="9" cy="11" r="2.2" />
+                  <path d="M5.8 16.2c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14 10h4M14 13.5h3" />
+                </svg>
               </span>
               <span className="step__line" />
-            </span>
+            </div>
             <div className="step__body">
-              <strong>Pick your favorites</strong>
-              <span>
-                Add what you want to your cart. No medical card needed — 21+ with government ID.
-              </span>
+              <strong>Verify your ID</strong>
+              <span>Text us a photo of your ID and a quick selfie.</span>
             </div>
           </div>
           <div className="step">
-            <span className="step__rail">
+            <div className="step__rail">
               <span className="step__icon" style={{ background: "#2F4F30" }}>
-                2
-              </span>
-              <span className="step__line" />
-            </span>
-            <div className="step__body">
-              <strong>We text you updates</strong>
-              <span>
-                Your driver reaches out with an ETA as soon as your order is out for delivery.
-              </span>
-            </div>
-          </div>
-          <div className="step">
-            <span className="step__rail">
-              <span className="step__icon" style={{ background: "#E8561E" }}>
-                3
-              </span>
-            </span>
-            <div className="step__body">
-              <strong>Pay with cash</strong>
-              <span>
-                Show your 21+ ID and pay cash at the door. Free delivery across Washington, DC.
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M1 6h13v10H1zM14 9h4l4 4v3h-8z" />
+                  <circle cx="6" cy="18" r="2" />
+                  <circle cx="18" cy="18" r="2" />
+                </svg>
               </span>
             </div>
+            <div className="step__body">
+              <strong>Get your delivery</strong>
+              <span>We deliver it right to you.</span>
+            </div>
           </div>
-        </div>
+        </section>
 
         {/* Sections synced with menu IDs */}
         <div className="space-y-6 pt-4">
