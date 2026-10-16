@@ -381,9 +381,8 @@ export function StoreAddedToCartSheet() {
           aria-label="Close sheet"
         />
 
-        {/* Topbar with confirmation & X close button */}
-        <div className="sheet__topbar">
-          <div className="sheet__ok">
+        {/* Confirmation row (client sheet closes via grip, backdrop, swipe or Esc; no X) */}
+        <div className="sheet__ok">
             <span className="okdot">✓</span>
             <span>
               <strong>Added to cart</strong>
@@ -395,37 +394,14 @@ export function StoreAddedToCartSheet() {
                   : ""}
               </span>
             </span>
-          </div>
-
-          {/* Quick Close 'X' Button */}
-          <button
-            type="button"
-            className="sheet__close"
-            onClick={() => setIsAddedSheetOpen(false)}
-            title="Close"
-            aria-label="Close dialog"
-          >
-            ✕
-          </button>
         </div>
 
         {/* ================= FLOWER DEAL BOX (LIVE INTERACTIVE PROGRESS) ================= */}
         {hasDeal && effectiveTier && (
           <div className="dealbox">
-            <div className="dealbox__top">
-              <span className="dealbox__tag">
-                {isOzDeal
-                  ? ozCount >= 8
-                    ? "HALF-POUND HAUL"
-                    : "STACK & SAVE"
-                  : "BUNDLE DEAL"}
-              </span>
-              <span className="muted">
-                {isOzDeal
-                  ? `${effectiveTier} · ${Math.min(ozCount, 8)} oz`
-                  : `${effectiveTier} · ${Math.min(halfCount, 4)} of 4 half oz`}
-              </span>
-            </div>
+            <span className="dealbox__tag">
+              {isOzDeal ? (ozCount >= 8 ? "HALF-POUND HAUL" : "STACK & SAVE") : "BUNDLE DEAL"}
+            </span>
 
             <strong>
               {isOzDeal

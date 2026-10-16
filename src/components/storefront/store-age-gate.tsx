@@ -174,17 +174,6 @@ export function StoreAgeGate() {
               />{" "}
               Remember me for 30 days
             </label>
-            <small>
-              By entering you agree to our{" "}
-              <Link href="/terms-conditions" onClick={() => setIsOpen(false)}>
-                Terms
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy-policy" onClick={() => setIsOpen(false)}>
-                Privacy Policy
-              </Link>
-              .
-            </small>
           </div>
         ) : (
           <div
@@ -209,6 +198,18 @@ export function StoreAgeGate() {
             </button>
           </div>
         )}
+        {/* Shown under both steps, like the client site */}
+        <small>
+          By entering you agree to our{" "}
+          <Link href="/terms-conditions" onClick={() => setIsOpen(false)}>
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy-policy" onClick={() => setIsOpen(false)}>
+            Privacy Policy
+          </Link>
+          .
+        </small>
       </div>
     </div>
   );

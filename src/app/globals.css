@@ -101,15 +101,15 @@ body {
 /* Storefront: restore browser link underlines that Tailwind preflight removes
    (the client reference site relies on them, e.g. "See all", breadcrumbs). */
 @layer base {
-  :where(.storefront) a {
+  :where(.storefront, .agegate) a {
     text-decoration: underline;
   }
   /* Browser-default paragraph spacing inside the client page content */
-  :where(.storefront .shell__main) p {
+  :where(.storefront .shell__main, .storefront .narrow) p {
     margin-block: 1em;
   }
   /* Browser-default button metrics the client markup is built on (preflight sets inherit / 0) */
-  :where(.storefront) button {
+  :where(.storefront, .agegate) button {
     font-size: 13.3333px;
     line-height: normal;
     padding: 1px 6px;

@@ -20,6 +20,7 @@ const STATIC_PAGES: Record<string, string> = {
   "/faq": "faq",
   "/privacy-policy": "legal",
   "/terms-conditions": "legal",
+  "/blog": "blog",
 };
 
 function pageKey(pathname: string): string | null {

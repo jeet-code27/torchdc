@@ -129,7 +129,8 @@ export async function getShopProducts(): Promise<ShopProduct[]> {
             : tier.charAt(0).toUpperCase() + tier.slice(1)
         );
       }
-      if (strain) {
+      // Strain is only shown next to a flower tier; other products fall back to the short description
+      if (strain && category === "flowers") {
         parts.push(strain.charAt(0).toUpperCase() + strain.slice(1));
       }
       // Same as the client site card: "Tier · Strain", else the start of the short description
@@ -141,10 +142,8 @@ export async function getShopProducts(): Promise<ShopProduct[]> {
         .replace(/[—–]/g, "-")
         .trim()
         .slice(0, 40);
-      const subtitle =
-        parts.join(" · ") ||
-        shortText ||
-        (category ? category.charAt(0).toUpperCase() + category.slice(1) : "");
+      // Empty when there is nothing to say, like the client card
+      const subtitle = parts.join(" · ") || shortText;
 
       // Determine badge
       const badge = p.isBestSeller

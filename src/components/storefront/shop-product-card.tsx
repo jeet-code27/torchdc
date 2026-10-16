@@ -89,12 +89,13 @@ export function ShopProductCard({
   }
 
   // Display subtitle or strain
+  // A built subtitle (even an empty one) wins, matching the client card meta
   const metaText =
-    product.subtitle ||
-    [product.strain ? capitalize(product.strain) : "", product.tier ? capitalize(product.tier) : "", product.weight]
+    product.subtitle ??
+    ([product.strain ? capitalize(product.strain) : "", product.tier ? capitalize(product.tier) : "", product.weight]
       .filter(Boolean)
       .join(" · ") ||
-    "Washington, DC Local";
+      "Washington, DC Local");
 
   if (layout === "list") {
     return (

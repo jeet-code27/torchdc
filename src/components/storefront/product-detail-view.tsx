@@ -547,7 +547,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     addItem(
       {
         id: product._id,
-        name: cleanTitle,
+        name: displayTitle,
         slug: product.slug,
         price: currentPrice,
         image: primaryImage,

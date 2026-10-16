@@ -24,7 +24,7 @@ export function StoreFooter() {
     <footer className="footer">
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <span className="footer__lead">
-          Order online or by phone for free delivery or pickup.
+          Order online or by phone for free delivery or curbside pickup.
         </span>
 
         <a className="footer__line" href="tel:+12024681966">
@@ -122,6 +122,7 @@ export function StoreFooter() {
           <h3>Company</h3>
           <Link href="/about">About Us</Link>
           <Link href="/deals">Deals</Link>
+          <Link href="/blog">Blog</Link>
           <Link href="/contact">Contact Us</Link>
           <Link href="/faq">FAQ</Link>
           <Link href="/terms-conditions">Terms and Conditions</Link>
