@@ -117,9 +117,10 @@ button { font-family: inherit; cursor: pointer; }
 .faq { padding: 20px 16px 0; }
 .faq h2 { margin: 0 0 8px; font-weight: 700; font-size: 24px; letter-spacing: -0.3px; }
 .faq details { border-bottom: 1px solid #E3ECE3; }
-.faq summary { list-style: none; min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; font-size: 15px; font-weight: 600; cursor: pointer; }
+.faq details:first-of-type { border-top: 1px solid #E3ECE3; }
+.faq summary { list-style: none; min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; font-size: 15px; font-weight: 600; cursor: pointer; user-select: none; }
 .faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: '+'; flex: none; width: 28px; height: 28px; border-radius: 14px; background: var(--mint); color: var(--green-mid); font-size: 18px; display: flex; align-items: center; justify-content: center; }
+.faq summary::after { content: '+'; flex: none; width: 28px; height: 28px; border-radius: 14px; background: var(--mint); color: var(--green-mid); font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; }
 .faq details[open] summary::after { content: '\2212'; }
 .faq details p { margin: 0 0 14px; font-size: 14px; line-height: 1.55; color: var(--muted); }
 
@@ -510,6 +511,8 @@ body[data-page="deals"] .dealhead { padding-left: 16px; padding-right: 16px; }
   .grid .pcard__price { font-size: 18px; }
   .dinfo { margin-top: 48px; padding-top: 30px; border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
   .dinfo .about, .dinfo .faq { padding: 0; max-width: none; margin: 0; }
+  body[data-page="home"] .shell__main { padding-bottom: 16px; }
+  body[data-page="home"] .footer { margin-top: 24px; }
   /* Shop, flowers, product, deals inside the shell */
   .shell .shopbar { padding: 0; }
   .shell .shopbar .seg, .shell .shopbar__note { display: none; }

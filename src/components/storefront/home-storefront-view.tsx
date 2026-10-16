@@ -344,7 +344,7 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
 
         {/* About & FAQ Info */}
         <div className="dinfo">
-          <div className="about">
+          <section className="about">
             <h2>About Torch Cannabis Delivery</h2>
             <p>
               Torch delivers premium cannabis directly to your door across Washington, DC. We stock lab-tested flowers across three curated tiers, whole-flower pre-rolls, disposable vapes, concentrates, and artisan edibles.
@@ -363,11 +363,9 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
             >
               {showFullLegalText ? "Show less" : "Read more"}
             </button>
-          </div>
+          </section>
 
-          <div className="faq">
-            <StoreFaqSection />
-          </div>
+          <StoreFaqSection />
         </div>
       </main>
 
