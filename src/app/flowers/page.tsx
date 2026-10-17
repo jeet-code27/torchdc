@@ -3,9 +3,9 @@ import { getShopProducts } from "@/lib/get-shop-products";
 import { FlowersView } from "@/components/storefront/flowers-view";
 
 export const metadata: Metadata = {
-  title: "Cannabis Flower Delivery in DC | Midshelf, Topshelf, Private Reserve | Torch",
+  title: "Cannabis Flower Delivery in DC | Midshelf, Topshelf, Exotic | Torch",
   description:
-    "Hand-picked cannabis flower in three tiers: Midshelf, Topshelf and Private Reserve. Free same-day delivery across Washington, DC.",
+    "Hand-picked cannabis flower in three tiers: Midshelf, Topshelf and Exotic. Free same-day delivery across Washington, DC.",
 };
 
 export const revalidate = 60;

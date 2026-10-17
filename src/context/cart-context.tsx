@@ -19,10 +19,14 @@ import {
   computeDeals,
   unitOf,
   applyTierPricing,
+  MIN_ORDER,
   DealComputationResult,
 } from "@/lib/deals";
 
 export type FulfillmentType = "delivery" | "pickup";
+
+export { MIN_ORDER };
+
 
 export interface CartCustomerInfo {
   name?: string;
@@ -53,6 +57,10 @@ interface CartContextType {
   setFulfillment: (mode: FulfillmentType, force?: boolean) => void;
   setDeliveryZip: (zip: string) => void;
   isAddedSheetOpen: boolean;
+  /** Dollars still needed to reach MIN_ORDER (0 when the cart is empty or the minimum is met). */
+  minShortfall: number;
+  isMinSheetOpen: boolean;
+  setIsMinSheetOpen: (open: boolean) => void;
   setIsAddedSheetOpen: (open: boolean) => void;
   lastAddedItem: CartItem | null;
   openAddedSheet: (item: CartItem) => void;
@@ -101,6 +109,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [customerInfo, setCustomerInfo] = React.useState<CartCustomerInfo>({});
   const [isCartDrawerOpen, setIsCartDrawerOpen] = React.useState(false);
   const [isAddedSheetOpen, setIsAddedSheetOpen] = React.useState(false);
+  const [isMinSheetOpen, setIsMinSheetOpen] = React.useState(false);
   const [lastAddedItem, setLastAddedItem] = React.useState<CartItem | null>(null);
   const [isInitialized, setIsInitialized] = React.useState(false);
 
@@ -401,6 +410,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const discount = deals.total;
   const finalTotal = Math.max(0, subtotal - discount);
+  const minShortfall = items.length > 0 ? Math.max(0, MIN_ORDER - finalTotal) : 0;
 
   return (
     <CartContext.Provider
@@ -418,6 +428,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setHasPrerollBonus,
         isCartDrawerOpen,
         isAddedSheetOpen,
+        minShortfall,
+        isMinSheetOpen,
+        setIsMinSheetOpen,
         setIsAddedSheetOpen,
         lastAddedItem,
         openAddedSheet,

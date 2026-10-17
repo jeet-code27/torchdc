@@ -81,7 +81,7 @@ const FAQS: FaqItem[] = [
   {
     question: "What's the price of 7 grams of weed?",
     answer:
-      "Prices vary by dispensary and strain, but 7 grams (a quarter ounce) typically ranges from $40 to $90 across our Midshelf, Topshelf, and Private Reserve selections.",
+      "Prices vary by dispensary and strain, but 7 grams (a quarter ounce) typically ranges from $40 to $90 across our Midshelf, Topshelf, and Exotic selections.",
   },
   {
     question: "Can you buy weed online in DC?",

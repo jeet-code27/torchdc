@@ -6,6 +6,7 @@ import { ShopSidebar } from "./shop-sidebar";
 import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { ShopProduct } from "./shop-product-card";
+import { normalizeTier, FlowerTier } from "@/lib/deals";
 
 interface FlowersViewProps {
   initialProducts: ShopProduct[];
@@ -16,13 +17,8 @@ export function FlowersView({
   initialProducts,
   initialTier = "Topshelf",
 }: FlowersViewProps) {
-  const [selectedTier, setSelectedTier] = React.useState<
-    "Midshelf" | "Topshelf" | "Private Reserve"
-  >(
-    initialTier === "Midshelf" || initialTier === "Private Reserve"
-      ? initialTier
-      : "Topshelf"
-  );
+  // normalizeTier also maps old "?tier=Private Reserve" links to Exotic, like the client site
+  const [selectedTier, setSelectedTier] = React.useState<FlowerTier>(normalizeTier(initialTier) || "Topshelf");
   const [selectedType, setSelectedType] = React.useState<
     "All" | "Sativa" | "Indica" | "Hybrid"
   >("All");
@@ -50,7 +46,7 @@ export function FlowersView({
     switch (selectedTier) {
       case "Midshelf":
         return midshelfStrains;
-      case "Private Reserve":
+      case "Exotic":
         return privateReserveStrains;
       case "Topshelf":
       default:
@@ -142,16 +138,16 @@ export function FlowersView({
             <button
               type="button"
               role="tab"
-              aria-selected={selectedTier === "Private Reserve"}
-              className={`tier ${selectedTier === "Private Reserve" ? "is-on" : ""}`}
+              aria-selected={selectedTier === "Exotic"}
+              className={`tier ${selectedTier === "Exotic" ? "is-on" : ""}`}
               onClick={() => {
-                setSelectedTier("Private Reserve");
+                setSelectedTier("Exotic");
                 setSelectedType("All");
               }}
             >
               <span className="tier__l">
-                <span className="tier__n">Private Reserve</span>
-                <span className="tier__d">Small-batch exotics</span>
+                <span className="tier__n">Exotic</span>
+                <span className="tier__d">Small-batch, hard-to-find strains</span>
               </span>
               <span className="tier__c">
                 {privateReserveStrains.length} {privateReserveStrains.length === 1 ? "strain" : "strains"}

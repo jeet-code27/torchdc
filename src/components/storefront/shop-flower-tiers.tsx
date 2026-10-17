@@ -27,8 +27,8 @@ export const FLOWER_TIERS: TierInfo[] = [
   },
   {
     slug: "exotic",
-    name: "Private Reserve",
-    subtitle: "Small-batch exotics",
+    name: "Exotic",
+    subtitle: "Small-batch, hard-to-find strains",
     priceFrom: 60,
     strainCount: "8 strains",
   },

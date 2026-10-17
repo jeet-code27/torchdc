@@ -5,7 +5,7 @@ import { getShopProducts } from "@/lib/get-shop-products";
 export const metadata: Metadata = {
   title: "Shop All Cannabis Products | Torch Dispensary Washington DC",
   description:
-    "Explore Torch's curated dispensary menu: Midshelf, Topshelf, and Private Reserve flower, pre-rolls, disposables, concentrates, edibles, and mushrooms. Fast DC delivery.",
+    "Explore Torch's curated dispensary menu: Midshelf, Topshelf, and Exotic flower, pre-rolls, disposables, concentrates, edibles, and mushrooms. Fast DC delivery.",
 };
 
 export const revalidate = 60;

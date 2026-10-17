@@ -3,7 +3,8 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useCart } from "@/context/cart-context";
+import { useCart, MIN_ORDER } from "@/context/cart-context";
+import { MinNote } from "./order-minimum";
 
 export function ShopCartSidebar() {
   const {
@@ -16,6 +17,8 @@ export function ShopCartSidebar() {
     deals,
     finalTotal,
     hasPrerollBonus,
+    minShortfall,
+    setIsMinSheetOpen,
   } = useCart();
 
   return (
@@ -134,12 +137,19 @@ export function ShopCartSidebar() {
             </span>
           </div>
 
-          {/* Checkout CTA */}
-          <Link className="checkoutbtn" href="/cart">
-            CHECKOUT · ${finalTotal}
-          </Link>
+          {/* Checkout CTA ($60 minimum after deals, like the client site) */}
+          <MinNote />
+          {minShortfall > 0 ? (
+            <button type="button" className="checkoutbtn is-off" onClick={() => setIsMinSheetOpen(true)}>
+              ${MIN_ORDER} MINIMUM · ${finalTotal}
+            </button>
+          ) : (
+            <Link className="checkoutbtn" href="/cart">
+              CHECKOUT · ${finalTotal}
+            </Link>
+          )}
 
-          <span className="dcart__pay">Pay with cash at the door</span>
+          <span className="dcart__pay">Pay cash on delivery</span>
         </>
       )}
     </aside>

@@ -4,6 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart, CartItem } from "@/context/cart-context";
+import { MinNote } from "./order-minimum";
 import {
   unitOf,
   nextStep,
@@ -76,7 +77,7 @@ const TIER_BASE_FLOWERS: Record<FlowerTier, FlowerBase[]> = {
       image: "/assets/img/flower.webp",
     },
   ],
-  "Private Reserve": [
+  "Exotic": [
     {
       name: "Rainbow Belts (Hybrid)",
       slug: "rainbow-belts-hybrid",
@@ -559,6 +560,9 @@ export function StoreAddedToCartSheet() {
             );
           })}
         </div>
+
+        {/* $60 order minimum note (client add sheet) */}
+        <MinNote />
 
         {/* ================= BOTTOM ACTION BUTTONS ================= */}
         <div className="sheet__btns">

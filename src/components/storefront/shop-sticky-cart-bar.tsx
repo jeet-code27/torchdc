@@ -3,10 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCart } from "@/context/cart-context";
+import { useCart, MIN_ORDER } from "@/context/cart-context";
 
 export function ShopStickyCartBar() {
-  const { totalCount, finalTotal } = useCart();
+  const { totalCount, finalTotal, minShortfall } = useCart();
   const pathname = usePathname();
 
   // Hide on cart/checkout page or if empty
@@ -18,7 +18,8 @@ export function ShopStickyCartBar() {
         <span className="cartbar__l" style={{ color: "#FFFFFF" }}>
           <strong style={{ color: "#FFFFFF" }}>View cart</strong>
           <span style={{ color: "rgba(255,255,255,0.92)" }}>
-            {totalCount} {totalCount === 1 ? "item" : "items"} · free delivery
+            {totalCount} {totalCount === 1 ? "item" : "items"} ·{" "}
+            {minShortfall > 0 ? `$${minShortfall} to $${MIN_ORDER} minimum` : "free delivery"}
           </span>
         </span>
 

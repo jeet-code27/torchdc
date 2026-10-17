@@ -5,7 +5,7 @@ import { Order } from "@/models/Order";
 import { Cart } from "@/models/Cart";
 import { Coupon } from "@/models/Coupon";
 import { auth } from "@/auth";
-import { computeDeals, unitOf } from "@/lib/deals";
+import { computeDeals, unitOf, MIN_ORDER } from "@/lib/deals";
 import { verifyCartItems, CartItemError } from "@/lib/verify-cart-items";
 import {
   sendOrderConfirmationEmail,
@@ -99,6 +99,16 @@ export async function POST(request: Request) {
     const computedDeals = computeDeals(dealLines);
     const dealsDiscount = computedDeals.total;
     const dealsBreakdown = computedDeals.items;
+
+    // $60 order minimum after deal discounts (same rule as the client site's api/order.js)
+    const due = subtotal - dealsDiscount;
+    if (due < MIN_ORDER) {
+      const short = Number((MIN_ORDER - due).toFixed(2));
+      return NextResponse.json(
+        { success: false, error: `Orders have a $${MIN_ORDER} minimum. Add $${short} more to check out.` },
+        { status: 400 }
+      );
+    }
 
     // Apply Coupon Code if provided
     let couponDiscountAmount = 0;

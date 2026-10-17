@@ -5,7 +5,10 @@
  * Half-Pound Haul (8 oz), and Wake & Bake (9AM-12PM DC Time).
  */
 
-export type FlowerTier = 'Midshelf' | 'Topshelf' | 'Private Reserve';
+export type FlowerTier = 'Midshelf' | 'Topshelf' | 'Exotic';
+
+/** Order minimum after deal discounts (SETTINGS.minOrder / MIN_ORDER on the client site). */
+export const MIN_ORDER = 60;
 export type DealUnit = 'h' | 'o' | '';
 
 export interface TierDeals {
@@ -28,7 +31,7 @@ export const DEALS: Record<FlowerTier, TierDeals> = {
     haul: 840,
     wake: 80,
   },
-  'Private Reserve': {
+  'Exotic': {
     half: { 2: 250, 3: 360, 4: 480 },
     oz: { 2: 400, 3: 570, 4: 750 },
     haul: 1320,
@@ -47,7 +50,7 @@ export const WEIGHTS: Record<FlowerTier, Record<string, number>> = {
     '14g': 100,
     '1 oz': 140,
   },
-  'Private Reserve': {
+  'Exotic': {
     '3.5g': 60,
     '7g': 80,
     '14g': 140,
@@ -60,8 +63,8 @@ export function normalizeTier(tier?: string | null): FlowerTier | null {
   const t = tier.toLowerCase().replace(/[-_\s]+/g, '');
   if (t === 'midshelf') return 'Midshelf';
   if (t === 'topshelf') return 'Topshelf';
-  // "exotic" is the legacy slug/label for Private Reserve
-  if (t === 'privatereserve' || t === 'exotic') return 'Private Reserve';
+  // "private-reserve" is the old name of the Exotic tier (category slug and old carts/links)
+  if (t === 'privatereserve' || t === 'exotic') return 'Exotic';
   return null;
 }
 
@@ -72,7 +75,7 @@ export function normalizeTier(tier?: string | null): FlowerTier | null {
 export function tierFromCategories(catSlugs: string[], name = ''): FlowerTier | null {
   const lowerName = name.toLowerCase();
   if (catSlugs.includes('private-reserve') || lowerName.includes('private reserve') || lowerName.includes('exotic')) {
-    return 'Private Reserve';
+    return 'Exotic';
   }
   if (catSlugs.includes('topshelf') || lowerName.includes('topshelf')) return 'Topshelf';
   if (catSlugs.includes('midshelf') || lowerName.includes('midshelf')) return 'Midshelf';
@@ -215,7 +218,7 @@ export function computeDeals(lines: DealLineInput[], now?: Date): DealComputatio
   const byTier: Record<FlowerTier, { h: number[]; o: number[] }> = {
     Midshelf: { h: [], o: [] },
     Topshelf: { h: [], o: [] },
-    'Private Reserve': { h: [], o: [] },
+    'Exotic': { h: [], o: [] },
   };
 
   lines.forEach((l) => {

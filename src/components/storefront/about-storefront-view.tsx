@@ -129,8 +129,8 @@ export function AboutStorefrontView() {
             </Link>
             <Link className="tierrow" href="/flowers">
               <span>
-                <strong>Private Reserve</strong>
-                <span>Small-batch exotics</span>
+                <strong>Exotic</strong>
+                <span>Small-batch, hard-to-find strains</span>
               </span>
               <span className="tier__c">8 strains</span>
             </Link>

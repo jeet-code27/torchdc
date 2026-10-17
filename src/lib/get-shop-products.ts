@@ -91,10 +91,10 @@ export async function getShopProducts(): Promise<ShopProduct[]> {
       }
 
       // Determine flower tier
-      // Only flowers have a tier ("Exotic 1G Pre-Rolls" is a pre-roll, not Private Reserve)
+      // Only flowers have a tier ("Exotic 1G Pre-Rolls" is a pre-roll, not an Exotic-tier flower)
       const flowerTier = category === "flowers" ? tierFromCategories(catSlugs, p.name) : null;
       const tier: "midshelf" | "topshelf" | "exotic" | undefined =
-        flowerTier === "Private Reserve"
+        flowerTier === "Exotic"
           ? "exotic"
           : flowerTier === "Topshelf"
           ? "topshelf"
@@ -125,7 +125,7 @@ export async function getShopProducts(): Promise<ShopProduct[]> {
       if (tier) {
         parts.push(
           tier === "exotic"
-            ? "Private Reserve"
+            ? "Exotic"
             : tier.charAt(0).toUpperCase() + tier.slice(1)
         );
       }

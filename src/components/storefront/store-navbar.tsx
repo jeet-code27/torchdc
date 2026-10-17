@@ -5,22 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/context/cart-context";
+import { AREAS_LIST } from "@/lib/areas-data";
 
-const DC_NEIGHBORHOODS = [
-  { name: "Downtown", href: "/affordable-cannabis-in-downtown-dc-weed-deals" },
-  { name: "Adams Morgan", href: "/adams-morgan-weed-delivery-dc" },
-  { name: "Columbia Heights", href: "/affordable-cannabis-columbia-heights-dc" },
-  { name: "Brookland", href: "/brookland-dc-weed-delivery-catholic-university-area-torch-cannabis" },
-  { name: "Shaw", href: "/shaw-dc-cannabis-delivery-dispensary" },
-  { name: "Logan Circle", href: "/cannabis-delivery-in-logan-circle-dc-torch-dispensary" },
-  { name: "Capitol Hill", href: "/cannabis-delivery-in-capitol-hill-dc-torch-dispensary" },
-  { name: "Navy Yard", href: "/cannabis-delivery-in-navy-yard-dc-torch" },
-  { name: "Dupont Circle", href: "/cannabis-delivery-in-dupont-circle-dc-torch-dispensary" },
-  { name: "Petworth", href: "/cannabis-delivery-in-petworth-dc-torch" },
-  { name: "U Street", href: "/cannabis-delivery-on-u-street-dc-torch" },
-  { name: "Georgetown", href: "/cannabis-delivery-in-georgetown-dc-torch-dispensary" },
-  { name: "H Street", href: "/cannabis-delivery-on-h-street-ne-dc-torch" },
-];
+// Same list and order as the client site (AREAS in its build.py)
+const DC_NEIGHBORHOODS = AREAS_LIST.map((a) => ({ name: a.name, href: `/${a.slug}` }));
 
 export function StoreNavbar() {
   const router = useRouter();
@@ -339,7 +327,7 @@ export function StoreNavbar() {
 
             <details open className="mnav__acc">
               <summary>
-                Delivery Areas
+                Neighborhoods
                 <svg
                   width="16"
                   height="16"

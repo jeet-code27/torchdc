@@ -46,7 +46,7 @@ function getDCStatus(): { isOpen: boolean; text: string } {
     if (today && nowMins >= today[0] && nowMins < today[1]) {
       return {
         isOpen: true,
-        text: `Delivering until ${fmt(today[1])}`,
+        text: `Taking orders until ${fmt(today[1])}`,
       };
     } else {
       const next =
@@ -60,7 +60,7 @@ function getDCStatus(): { isOpen: boolean; text: string } {
   } catch {
     return {
       isOpen: true,
-      text: "Delivering until 11PM",
+      text: "Taking orders until 11PM",
     };
   }
 }

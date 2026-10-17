@@ -6,6 +6,7 @@ import { StoreStatusBar } from "./store-statusbar";
 import { StoreNavbar } from "./store-navbar";
 import { StoreFooter } from "./store-footer";
 import { StoreAddedToCartSheet } from "./store-added-to-cart-sheet";
+import { OrderMinimumSheet } from "./order-minimum";
 import { AREAS_BY_SLUG } from "@/lib/areas-data";
 
 const STATIC_PAGES: Record<string, string> = {
@@ -67,6 +68,9 @@ export function StorefrontShell({ children }: StorefrontShellProps) {
 
       {/* 5. Global Added-to-Cart Slide-Up Sheet */}
       <StoreAddedToCartSheet />
+
+      {/* 6. $60 order minimum popup */}
+      <OrderMinimumSheet />
     </div>
   );
 }

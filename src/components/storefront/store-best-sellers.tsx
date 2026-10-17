@@ -58,7 +58,7 @@ const BEST_SELLER_PRODUCTS: SliderProduct[] = [
     id: "bs-5",
     name: "Lemon Cherry Gelato (Hybrid)",
     slug: "lemon-cherry-gelato-hybrid",
-    subtitle: "Private Reserve · from",
+    subtitle: "Exotic · from",
     price: 60,
     image:
       "https://res.cloudinary.com/omtao1np/image/upload/v1791362261/torch/products/k3eyozayonkk2k8qisj3.jpg",

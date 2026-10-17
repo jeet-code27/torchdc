@@ -145,14 +145,14 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     strain = "hybrid";
   }
 
-  // Determine flower tier (Midshelf, Topshelf, Private Reserve). Only flowers have one.
+  // Determine flower tier (Midshelf, Topshelf, Exotic). Only flowers have one.
   const flowerTier =
     mainCat.slug === "flowers" ? tierFromCategories(productCatSlugs, productDoc.name) : null;
   const tier: string | undefined = flowerTier || undefined;
   // Tiered flowers are sold by weight at the tier chart price, not the WooCommerce price
   const tierWeights = flowerTier ? weightOptions(flowerTier) : null;
   const tierCategorySlug =
-    flowerTier === "Private Reserve" ? "private-reserve" : flowerTier ? flowerTier.toLowerCase() : null;
+    flowerTier === "Exotic" ? "private-reserve" : flowerTier ? flowerTier.toLowerCase() : null;
   const tierCategory = tierCategorySlug
     ? categories.find((c) => c.slug === tierCategorySlug)
     : undefined;
@@ -165,7 +165,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   };
 
   if (tierCategory) {
-    // "More Private Reserve strains" only shows the same tier
+    // "More Exotic strains" only shows the same tier
     relatedFilter.categoryIds = tierCategory._id;
   } else if (productDoc.categoryIds && productDoc.categoryIds.length > 0) {
     relatedFilter.categoryIds = { $in: productDoc.categoryIds };

@@ -46,7 +46,7 @@ export function FaqPageView() {
           <details>
             <summary>What products do you carry?</summary>
             <p>
-              Flower in three tiers (Midshelf, Topshelf and Private Reserve), pre-rolls, disposable vapes,
+              Flower in three tiers (Midshelf, Topshelf and Exotic), pre-rolls, disposable vapes,
               concentrates, edibles and mushrooms.
             </p>
           </details>

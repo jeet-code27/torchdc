@@ -26,8 +26,8 @@ export async function generateMetadata({
   const normalizedSlug = decodeURIComponent(slug).toLowerCase();
   if (normalizedSlug === "flowers" || normalizedSlug === "flower") {
     return {
-      title: "Cannabis Flower Delivery in DC | Midshelf, Topshelf, Private Reserve | Torch",
-      description: "Hand-picked cannabis flower in three tiers: Midshelf, Topshelf and Private Reserve. Free same-day delivery across Washington, DC.",
+      title: "Cannabis Flower Delivery in DC | Midshelf, Topshelf, Exotic | Torch",
+      description: "Hand-picked cannabis flower in three tiers: Midshelf, Topshelf and Exotic. Free same-day delivery across Washington, DC.",
     };
   }
   const displayName =

@@ -131,7 +131,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     return null;
   }, [product.strain, product.name]);
 
-  // Flower tier: "Midshelf" | "Topshelf" | "Private Reserve" (null when the flower has no tier)
+  // Flower tier: "Midshelf" | "Topshelf" | "Exotic" (null when the flower has no tier)
   const tierName = isFlower ? normalizeTier(product.tier) : null;
   const tierTag = tierName ? tierName.toUpperCase() : "";
 
@@ -693,7 +693,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
               </div>
               <div>
                 <strong>Pay cash</strong>
-                <span>At the door</span>
+                <span>On delivery</span>
               </div>
             </div>
 

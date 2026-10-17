@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useCart } from "@/context/cart-context";
 import { unitOf, nextStep, nextStepOz, normalizeTier } from "@/lib/deals";
 import { CartAddToOrder } from "@/components/storefront/cart-add-to-order";
+import { MinNote } from "@/components/storefront/order-minimum";
 
 export default function CartPage() {
   const { data: session } = useSession();
@@ -23,6 +24,8 @@ export default function CartPage() {
     finalTotal,
     hasPrerollBonus,
     sessionId,
+    minShortfall,
+    setIsMinSheetOpen,
   } = useCart();
 
   // Form states
@@ -82,6 +85,11 @@ export default function CartPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isPlacing) return;
+    // $60 minimum after deals: show the "Almost there" popup instead of placing the order
+    if (minShortfall > 0) {
+      setIsMinSheetOpen(true);
+      return;
+    }
 
     const problems: string[] = [];
     if (!name.trim()) problems.push("your name");
@@ -191,7 +199,7 @@ export default function CartPage() {
             <span className="okdot okdot--big">✓</span>
             <h2>Order placed</h2>
             <p>
-              Order #{placedOrder.orderNumber} · ${placedOrder.total}, paid in cash at the door.
+              Order #{placedOrder.orderNumber} · ${placedOrder.total}, paid in cash on delivery.
             </p>
             <p>
               We&apos;ll text <strong>{placedOrder.phone}</strong> when it&apos;s on the way. Have your 21+ ID ready.
@@ -382,10 +390,7 @@ export default function CartPage() {
               </div>
 
               <div className="paynote">
-                <strong>Pay with cash at the door</strong>
-                <span>
-                  Cash only. Your driver checks your 21+ ID before handing over your order.
-                </span>
+                <span>Cash on delivery. We&apos;ll text you when your driver is outside.</span>
               </div>
 
               <label htmlFor="c-name">Full name</label>
@@ -531,6 +536,7 @@ export default function CartPage() {
                   <span>Total, paid in cash</span>
                   <span>${finalTotal}</span>
                 </div>
+                <MinNote />
               </div>
 
               {formError && (
@@ -540,11 +546,15 @@ export default function CartPage() {
               )}
 
               <button
-                className="placebtn"
+                className={`placebtn ${minShortfall > 0 ? "is-off" : ""}`}
                 type="submit"
                 disabled={isPlacing}
               >
-                {isPlacing ? "Placing your order…" : `Place order · $${finalTotal}`}
+                {isPlacing
+                  ? "Placing your order…"
+                  : minShortfall > 0
+                  ? `Add $${minShortfall} more to order`
+                  : `Place order · $${finalTotal}`}
               </button>
 
               <span className="fine">
