@@ -1,0 +1,50 @@
+/*
+ * Admin panel: undo the storefront stylesheet (client-site.css) where it leaks into the admin.
+ *
+ * client-site.css is global and unlayered, so its element rules (a, img) and its .grid class beat
+ * Tailwind's layered utilities, and its :root --muted / --radius overwrite the admin theme tokens.
+ * Everything here is gated on html:has(.admin-root), so the storefront is untouched. Gating on
+ * <html> (not just .admin-root descendants) also covers dialogs and menus portaled into <body>.
+ */
+
+html:has(.admin-root) {
+  --muted: #f4f5f4;
+  --radius: 0.5rem;
+}
+html.dark:has(.admin-root) {
+  --muted: #1c1c1c;
+}
+
+/* Hand control back to the Tailwind utilities (text-primary-foreground, hidden, grid-cols-3 ...) */
+html:has(.admin-root) a,
+html:has(.admin-root) a:hover {
+  color: revert-layer;
+}
+html:has(.admin-root) img {
+  display: revert-layer;
+  max-width: revert-layer;
+}
+html:has(.admin-root) .grid {
+  padding: revert-layer;
+  grid-template-columns: revert-layer;
+  gap: revert-layer;
+}
+html:has(.admin-root) body {
+  font-size: revert-layer;
+  line-height: revert-layer;
+  background: var(--background-hex);
+  color: var(--foreground-hex);
+}
+
+/* Blog editor preview: readable article styles inside the admin theme */
+html:has(.admin-root) .blog-preview h2 { margin: 1.4em 0 0.5em; font-size: 1.25rem; font-weight: 700; }
+html:has(.admin-root) .blog-preview h3, html:has(.admin-root) .blog-preview h4 { margin: 1.2em 0 0.4em; font-size: 1.05rem; font-weight: 700; }
+html:has(.admin-root) .blog-preview p { margin: 0 0 0.9em; line-height: 1.65; }
+html:has(.admin-root) .blog-preview ul, html:has(.admin-root) .blog-preview ol { margin: 0 0 0.9em; padding-left: 1.4em; line-height: 1.65; }
+html:has(.admin-root) .blog-preview ul { list-style: disc; }
+html:has(.admin-root) .blog-preview ol { list-style: decimal; }
+html:has(.admin-root) .blog-preview a { color: var(--primary); text-decoration: underline; }
+html:has(.admin-root) .blog-preview img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 0.5em 0; }
+html:has(.admin-root) .blog-preview blockquote { margin: 1em 0; padding-left: 1em; border-left: 3px solid var(--primary); }
+html:has(.admin-root) .blog-preview table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+html:has(.admin-root) .blog-preview th, html:has(.admin-root) .blog-preview td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }

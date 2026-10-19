@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { Blog } from "@/models";
 import { requirePermission } from "@/lib/permissions";
@@ -67,6 +68,7 @@ export async function POST(req: NextRequest) {
       readTimeMinutes,
       isPublished,
       featured,
+      seo,
     } = body;
 
     if (!title || !slug || !content) {
@@ -98,7 +100,15 @@ export async function POST(req: NextRequest) {
       isPublished: Boolean(isPublished),
       publishedAt: isPublished ? new Date() : undefined,
       featured: Boolean(featured),
+      seo: {
+        metaTitle: seo?.metaTitle?.trim() || "",
+        metaDescription: seo?.metaDescription?.trim() || "",
+        focusKeyword: seo?.focusKeyword?.trim() || "",
+      },
     });
+    revalidatePath(`/${blog.slug}`);
+    revalidatePath("/blog");
+    revalidatePath("/sitemap.xml");
 
     return NextResponse.json({ success: true, blog }, { status: 201 });
   } catch (error: unknown) {

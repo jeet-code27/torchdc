@@ -31,12 +31,11 @@ export default function AdminLoginPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "admin@torch.com",
+      email: "",
       password: "",
     },
   });
@@ -72,12 +71,6 @@ export default function AdminLoginPage() {
       });
       setIsLoading(false);
     }
-  };
-
-  const fillSuperAdmin = () => {
-    setValue("email", "admin@torch.com");
-    setValue("password", "TorchAdminPassword123!");
-    toast("Default super admin credentials filled", { icon: "🔑" });
   };
 
   return (
@@ -134,7 +127,7 @@ export default function AdminLoginPage() {
                   id="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="admin@torch.com"
+                  placeholder="you@torchdc.co"
                   disabled={isLoading}
                   {...register("email")}
                   className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border bg-background text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors ${
@@ -214,26 +207,6 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          {/* Seed hint helper button */}
-          <div className="pt-2 border-t border-border">
-            <div className="p-3 rounded-lg bg-muted/50 border border-border/80 flex items-center justify-between text-xs">
-              <div>
-                <span className="font-semibold text-foreground block">
-                  Demo Super Admin
-                </span>
-                <span className="text-[11px] text-muted-foreground">
-                  admin@torch.com
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={fillSuperAdmin}
-                className="text-xs text-primary font-medium hover:underline px-2 py-1 rounded hover:bg-primary/10 transition-colors"
-              >
-                Auto-fill
-              </button>
-            </div>
-          </div>
         </div>
 
         <p className="text-center text-[11px] text-muted-foreground">

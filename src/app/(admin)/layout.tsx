@@ -3,6 +3,7 @@ import { AdminToaster } from "@/components/admin/admin-toaster";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { SessionProvider } from "@/components/auth/session-provider";
 import { auth } from "@/auth";
+import "./admin.css";
 
 export const metadata: Metadata = {
   title: "TORCH Admin",

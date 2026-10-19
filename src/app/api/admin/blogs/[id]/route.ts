@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { Blog } from "@/models";
 import { requirePermission } from "@/lib/permissions";
@@ -55,6 +56,14 @@ export async function PUT(
     if (body.category !== undefined) blog.category = body.category;
     if (body.readTimeMinutes !== undefined) blog.readTimeMinutes = Number(body.readTimeMinutes) || 3;
     if (body.featured !== undefined) blog.featured = Boolean(body.featured);
+    if (body.seo !== undefined) {
+      blog.seo = {
+        metaTitle: body.seo?.metaTitle?.trim() || "",
+        metaDescription: body.seo?.metaDescription?.trim() || "",
+        focusKeyword: body.seo?.focusKeyword?.trim() || "",
+        canonicalUrl: blog.seo?.canonicalUrl || "",
+      };
+    }
 
     if (body.tags !== undefined) {
       blog.tags = Array.isArray(body.tags)
@@ -72,7 +81,10 @@ export async function PUT(
       blog.isPublished = willPublish;
     }
 
+    const oldSlug = (await Blog.findById(id).select("slug").lean())?.slug;
     await blog.save();
+    // Posts are cached pages at the site root (/<slug>); refresh them and the list right away
+    revalidateBlog(blog.slug, oldSlug);
     return NextResponse.json({ success: true, blog });
   } catch (error: unknown) {
     return NextResponse.json(
@@ -96,6 +108,7 @@ export async function DELETE(
     if (!blog) {
       return NextResponse.json({ success: false, error: "Blog not found" }, { status: 404 });
     }
+    revalidateBlog(blog.slug);
 
     return NextResponse.json({ success: true, message: "Blog deleted successfully" });
   } catch (error: unknown) {
@@ -104,4 +117,10 @@ export async function DELETE(
       { status: 500 }
     );
   }
+}
+
+function revalidateBlog(...slugs: (string | undefined)[]) {
+  for (const slug of new Set(slugs.filter(Boolean))) revalidatePath(`/${slug}`);
+  revalidatePath("/blog");
+  revalidatePath("/sitemap.xml");
 }

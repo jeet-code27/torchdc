@@ -11,11 +11,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   // Do not render admin chrome on login page
   if (pathname === "/admin/login") {
-    return <main className="min-h-screen bg-background text-foreground">{children}</main>;
+    return <main className="admin-root min-h-screen bg-background text-foreground">{children}</main>;
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="admin-root min-h-screen bg-background text-foreground flex">
       {/* Sidebar (Desktop sticky + Mobile slideover) */}
       <AdminSidebar
         isOpenMobile={mobileSidebarOpen}
