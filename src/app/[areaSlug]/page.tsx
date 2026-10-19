@@ -3,13 +3,18 @@ import { notFound } from "next/navigation";
 import { AREAS_LIST, AREAS_BY_SLUG } from "@/lib/areas-data";
 import { AreaPageView } from "@/components/storefront/area-page-view";
 import { getShopProducts } from "@/lib/get-shop-products";
+import { getPublishedPost } from "@/lib/blog";
+import { BlogPostView } from "@/components/storefront/blog-post-view";
 
 interface AreaPageProps {
   params: Promise<{ areaSlug: string }>;
 }
 
-export const revalidate = 86400;
+// Neighborhood pages and blog posts (old WordPress posts live at the root, e.g. /gifting-vs-legal-weed-shops-dc)
+export const revalidate = 3600;
 
+// Only neighborhoods are prerendered; blog posts render on first request and are then cached
+// (keeps the build independent of the database, and new posts work without a redeploy)
 export async function generateStaticParams() {
   return AREAS_LIST.map((area) => ({
     areaSlug: area.slug,
@@ -23,7 +28,23 @@ export async function generateMetadata({
   const area = AREAS_BY_SLUG[areaSlug];
 
   if (!area) {
-    return {};
+    const post = await getPublishedPost(areaSlug).catch(() => null);
+    if (!post) return {};
+    const description = post.seo.metaDescription || post.excerpt;
+    return {
+      title: { absolute: post.seo.metaTitle || `${post.title} | Torch Cannabis Delivery` },
+      description,
+      alternates: { canonical: post.seo.canonicalUrl || `/${post.slug}` },
+      openGraph: {
+        type: "article",
+        title: post.seo.metaTitle || post.title,
+        description,
+        url: `/${post.slug}`,
+        publishedTime: post.publishedAt || undefined,
+        modifiedTime: post.updatedAt || undefined,
+        images: post.coverImage ? [{ url: post.coverImage }] : [],
+      },
+    };
   }
 
   const at = area.name.endsWith("Street") ? "on" : "in";
@@ -42,7 +63,9 @@ export default async function AreaPage({ params }: AreaPageProps) {
   const area = AREAS_BY_SLUG[areaSlug];
 
   if (!area) {
-    notFound();
+    const post = await getPublishedPost(areaSlug);
+    if (!post) notFound();
+    return <BlogPostView post={post} />;
   }
 
   const allProducts = await getShopProducts();

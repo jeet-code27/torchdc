@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { connectToDatabase } from "@/lib/db";
 import { Product } from "@/models/Product";
+import { Blog } from "@/models/Blog";
 import { AREAS_LIST } from "@/lib/areas-data";
 
 const SITE = "https://torchdc.co";
@@ -29,7 +30,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     await connectToDatabase();
-    const products = await Product.find({ isActive: true }).select("slug updatedAt").lean();
+    const [products, posts] = await Promise.all([
+      Product.find({ isActive: true }).select("slug updatedAt").lean(),
+      Blog.find({ isPublished: true }).select("slug updatedAt").lean(),
+    ]);
     return [
       ...pages,
       ...products.map((p) => ({
@@ -37,6 +41,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: p.updatedAt,
         changeFrequency: "weekly" as const,
         priority: 0.6,
+      })),
+      // Blog posts keep their WordPress URLs at the site root
+      ...posts.map((p) => ({
+        url: `${SITE}/${p.slug}`,
+        lastModified: p.updatedAt,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
       })),
     ];
   } catch {
