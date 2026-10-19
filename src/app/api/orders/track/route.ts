@@ -4,52 +4,34 @@ import { Order } from "@/models/Order";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/orders/track?q=TORCH-123456 or ?q=2025550143
+// GET /api/orders/track?order=TORCH-123456&phone=2025550143
+// Both must match: an order number or a phone number alone must not reveal someone's order.
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const q = searchParams.get("q")?.trim();
+    const orderParam = (searchParams.get("order") || "").trim().toUpperCase();
+    const phoneDigits = (searchParams.get("phone") || "").replace(/\D/g, "").slice(-10);
 
-    if (!q || q.length < 3) {
+    if (!orderParam || phoneDigits.length < 10) {
       return NextResponse.json(
-        { success: false, error: "Please enter an order number or phone number" },
+        { success: false, error: "Please enter your order number and the mobile number used for the order." },
         { status: 400 }
       );
     }
 
     await connectToDatabase();
 
-    const digitsOnly = q.replace(/\D/g, "");
-
+    const orderNumber = orderParam.startsWith("TORCH-") ? orderParam : `TORCH-${orderParam}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const filter: Record<string, any> = {};
-
-    if (q.toUpperCase().startsWith("TORCH-") || /^\d{6}$/.test(q)) {
-      // Order number search
-      const formattedOrderNo = q.toUpperCase().startsWith("TORCH-")
-        ? q.toUpperCase()
-        : `TORCH-${q}`;
-      filter.orderNumber = formattedOrderNo;
-    } else if (digitsOnly.length >= 7) {
-      // Phone number search
-      filter.$or = [
-        { "customer.phone": q },
-        { "customer.phone": digitsOnly },
-        { "customer.phone": new RegExp(digitsOnly.slice(-10)) },
-      ];
-    } else {
-      filter.$or = [
-        { orderNumber: q.toUpperCase() },
-        { "customer.email": q.toLowerCase() },
-      ];
-    }
+    const filter: Record<string, any> = { orderNumber };
 
     const order = await Order.findOne(filter)
       .sort({ createdAt: -1 })
       .select("-__v")
       .lean();
 
-    if (!order) {
+    const storedDigits = String(order?.customer?.phone || "").replace(/\D/g, "").slice(-10);
+    if (!order || storedDigits !== phoneDigits) {
       return NextResponse.json(
         {
           success: false,

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { Cart } from "@/models/Cart";
-import { auth } from "@/auth";
+import { getCurrentUser } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -9,11 +9,20 @@ export const dynamic = "force-dynamic";
 // Retrieves all abandoned carts (untouched for > 30 minutes with items and no order)
 export async function GET() {
   try {
-    const session = await auth();
-    // Verify admin access
-    const roleKey = (session?.user as { roleKey?: string })?.roleKey;
-    if (!session || (roleKey !== "SUPER_ADMIN" && roleKey !== "ADMIN" && roleKey !== "STORE_MANAGER")) {
+    // Same access rule as the orders list (abandoned carts are shown on the Orders page)
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+    const hasAccess =
+      user.role === "super_admin" ||
+      user.role === "admin" ||
+      user.role === "store_manager" ||
+      user.permissions.includes("*") ||
+      user.permissions.includes("orders.view") ||
+      user.permissions.includes("orders.manage");
+    if (!hasAccess) {
+      return NextResponse.json({ success: false, error: "Forbidden: Missing orders permission" }, { status: 403 });
     }
 
     await connectToDatabase();

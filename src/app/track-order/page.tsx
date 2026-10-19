@@ -60,18 +60,22 @@ function TrackOrderContent() {
   const initialQuery = searchParams.get("order") || "";
 
   const [query, setQuery] = React.useState(initialQuery);
+  const [phone, setPhone] = React.useState("");
   const [order, setOrder] = React.useState<TrackedOrder | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState("");
 
-  const handleSearch = React.useCallback(async (searchKey: string) => {
-    if (!searchKey.trim()) return;
+  const handleSearch = React.useCallback(async (searchKey: string, phoneNumber: string) => {
+    if (!searchKey.trim() || phoneNumber.replace(/\D/g, "").length < 10) return;
     setIsLoading(true);
     setErrorMsg("");
     setOrder(null);
 
     try {
-      const res = await fetch(`/api/orders/track?q=${encodeURIComponent(searchKey.trim())}`);
+      // Order number and phone must both match (an order number alone does not reveal an order)
+      const res = await fetch(
+        `/api/orders/track?order=${encodeURIComponent(searchKey.trim())}&phone=${encodeURIComponent(phoneNumber)}`
+      );
       const data = await res.json();
       if (data.success && data.order) {
         setOrder(data.order);
@@ -85,15 +89,9 @@ function TrackOrderContent() {
     }
   }, []);
 
-  React.useEffect(() => {
-    if (initialQuery) {
-      handleSearch(initialQuery);
-    }
-  }, [initialQuery, handleSearch]);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSearch(query);
+    handleSearch(query, phone);
   };
 
   // Status timeline steps
@@ -143,7 +141,7 @@ function TrackOrderContent() {
               Track Your Order
             </h1>
             <p className="text-sm text-zinc-500 max-w-md mx-auto">
-              Enter your Order Number (e.g. <span className="font-mono font-semibold text-zinc-700">TORCH-750480</span>) or your 10-digit mobile phone number.
+              Enter your Order Number (e.g. <span className="font-mono font-semibold text-zinc-700">TORCH-750480</span>) and the mobile number you ordered with.
             </p>
           </div>
 
@@ -158,13 +156,26 @@ function TrackOrderContent() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Order # (TORCH-...) or Phone Number"
+                placeholder="Order # (TORCH-...)"
+                aria-label="Order number"
                 className="w-full pl-11 pr-4 py-3 rounded-xl border border-transparent bg-zinc-50 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:bg-white focus:border-[#5A805B] transition font-medium"
+              />
+            </div>
+            <div className="relative flex-1">
+              <input
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Mobile number"
+                aria-label="Mobile number used for the order"
+                className="w-full px-4 py-3 rounded-xl border border-transparent bg-zinc-50 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:bg-white focus:border-[#5A805B] transition font-medium"
               />
             </div>
             <button
               type="submit"
-              disabled={isLoading || !query.trim()}
+              disabled={isLoading || !query.trim() || phone.replace(/\D/g, "").length < 10}
               className="py-3 px-8 rounded-xl bg-[#5A805B] hover:bg-[#4d704e] active:scale-95 text-white font-bold text-sm shadow transition flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? (

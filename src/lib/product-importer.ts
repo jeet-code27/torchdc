@@ -228,7 +228,7 @@ export async function importProductsFromCsv(): Promise<{
         yoastDesc ||
         `Shop ${name} in Washington DC at Torch Dispensary. Fast local cannabis delivery.`,
       focusKeyword: yoastKw || `${name} DC`,
-      canonicalUrl: `https://torchdc.com/product/${slug}`,
+      canonicalUrl: `https://torchdc.co/product/${slug}`,
       metaRobotsIndex: true,
     };
 

@@ -17,6 +17,8 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
+  // Production domain: canonical and Open Graph URLs resolve against it
+  metadataBase: new URL("https://torchdc.co"),
   title: "TORCH | Premium Dispensary & Delivery in Washington DC",
   description: "Torch - Washington DC Premium Weed Dispensary & Same-Day Delivery. 21+ only.",
   icons: {

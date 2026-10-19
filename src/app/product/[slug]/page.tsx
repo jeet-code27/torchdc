@@ -49,6 +49,8 @@ export async function generateMetadata({
       description:
         product.shortDescription ||
         `Order ${cleanTitle} online from Torch. Fast cannabis delivery across Washington D.C. 21+ only.`,
+      // Old WordPress slugs (e.g. /product/jack-herer) also resolve here; point search engines at the real URL
+      alternates: { canonical: `/product/${product.slug}` },
       openGraph: {
         title: `${cleanTitle} | Torch Dispensary`,
         description:

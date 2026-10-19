@@ -32,7 +32,7 @@ export async function generateMetadata({
     title: `Weed Delivery ${at} ${area.name}, DC | Torch Cannabis Delivery`,
     description: `Free same-day cannabis delivery ${at} ${area.name}, Washington, DC. Flower, pre-rolls, vapes and edibles. Cash on delivery, 21+ only.`,
     alternates: {
-      canonical: `https://torchdc.co/${area.slug}/`,
+      canonical: `/${area.slug}`,
     },
   };
 }
