@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/models/Order";
@@ -229,13 +229,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Trigger emails in background (do not block user response if SMTP is slow)
-    sendOrderConfirmationEmail(newOrder).catch((e) =>
-      console.warn("Async customer email error:", e)
-    );
-    sendAdminNewOrderNotification(newOrder).catch((e) =>
-      console.warn("Async admin email error:", e)
-    );
+    // Send emails right after the response. after() keeps the serverless function alive
+    // until they finish (a plain fire-and-forget promise can be cut off on Vercel).
+    after(async () => {
+      await Promise.allSettled([sendOrderConfirmationEmail(newOrder), sendAdminNewOrderNotification(newOrder)]);
+    });
 
     return NextResponse.json({
       success: true,

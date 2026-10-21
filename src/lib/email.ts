@@ -26,8 +26,33 @@ const FROM_EMAIL =
 // Official Customer-Facing Reply-To Email
 const PUBLIC_REPLY_TO = process.env.EMAIL_REPLY_TO || "info@torchdc.co";
 
-// Admin notification recipient
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "torchdc0@gmail.com";
+// Store owner's inbox: every admin notification (new orders) always goes here
+const STORE_NOTIFY_EMAIL = "torchdc@icloud.com";
+
+// Admin notification recipients: the store inbox plus any extra addresses in ADMIN_EMAIL (comma separated)
+const ADMIN_RECIPIENTS = Array.from(
+  new Set(
+    [STORE_NOTIFY_EMAIL, ...(process.env.ADMIN_EMAIL || "").split(",")]
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean)
+  )
+);
+
+// Public site URL for links inside emails (Vercel sets VERCEL_PROJECT_PRODUCTION_URL to the production domain)
+const SITE_URL = (
+  process.env.SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "https://torchdc.co")
+).replace(/\/$/, "");
+
+/** Escape customer-entered text before putting it into email HTML. */
+function esc(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 // Official Torch Black Logo Hosted URL
 const TORCH_LOGO_URL =
@@ -41,6 +66,10 @@ const BRAND_GREEN = "#5A805B";
  */
 export async function sendOrderConfirmationEmail(order: IOrder) {
   try {
+    // Email is optional at checkout; nothing to send without one
+    if (!order.customer.email) {
+      return { success: true, skipped: true };
+    }
     const transporter = getTransporter();
     if (!transporter) {
       console.log(
@@ -171,7 +200,7 @@ export async function sendAdminNewOrderNotification(order: IOrder) {
     }
 
     const itemsSummary = order.items
-      .map((it) => `${it.quantity}x ${it.name} ($${it.price * it.quantity})`)
+      .map((it) => `${it.quantity}x ${esc(it.name)}${it.weight ? ` · ${esc(it.weight)}` : ""} ($${it.price * it.quantity})`)
       .join("<br/>");
 
     const html = `
@@ -186,15 +215,15 @@ export async function sendAdminNewOrderNotification(order: IOrder) {
         </p>
 
         <div style="background: #f7f9f7; border: 1px solid #e2ebe3; border-radius: 8px; padding: 14px; margin: 16px 0; font-size: 13px; line-height: 1.5;">
-          <strong>Customer:</strong> ${order.customer.name}<br/>
-          <strong>Phone:</strong> <a href="tel:${order.customer.phone}">${order.customer.phone}</a><br/>
-          <strong>Email:</strong> <a href="mailto:${order.customer.email}">${order.customer.email}</a><br/>
+          <strong>Customer:</strong> ${esc(order.customer.name)}<br/>
+          <strong>Phone:</strong> <a href="tel:${esc(order.customer.phone)}">${esc(order.customer.phone)}</a><br/>
+          ${order.customer.email ? `<strong>Email:</strong> <a href="mailto:${esc(order.customer.email)}">${esc(order.customer.email)}</a><br/>` : ""}
           ${
             order.fulfillment === "delivery"
-              ? `<strong>Delivery Address:</strong> ${order.deliveryAddress?.street || ""}${order.deliveryAddress?.apartment ? `, Apt ${order.deliveryAddress.apartment}` : ""}, ${order.deliveryAddress?.city || "Washington"}, DC ${order.deliveryAddress?.zip || ""}<br/>`
+              ? `<strong>Delivery Address:</strong> ${esc(order.deliveryAddress?.street)}${order.deliveryAddress?.apartment ? `, Apt ${esc(order.deliveryAddress.apartment)}` : ""}, ${esc(order.deliveryAddress?.city || "Washington")}, DC ${esc(order.deliveryAddress?.zip)}<br/>`
               : `<strong>Fulfillment:</strong> Store Pickup at 1000 G St NW<br/>`
           }
-          ${order.deliveryNotes ? `<strong>Customer Notes:</strong> "${order.deliveryNotes}"<br/>` : ""}
+          ${order.deliveryNotes ? `<strong>Customer Notes:</strong> "${esc(order.deliveryNotes).replace(/\n/g, "<br/>")}"<br/>` : ""}
         </div>
 
         <div style="margin: 16px 0; font-size: 13px;">
@@ -205,7 +234,7 @@ export async function sendAdminNewOrderNotification(order: IOrder) {
         </div>
 
         <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f3f4f6;">
-          <a href="http://localhost:3000/admin/orders/${order._id}" style="display: inline-block; background: ${BRAND_GREEN}; color: #ffffff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
+          <a href="${SITE_URL}/admin/orders/${order._id}" style="display: inline-block; background: ${BRAND_GREEN}; color: #ffffff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
             Open Order in Admin Panel →
           </a>
         </div>
@@ -214,8 +243,8 @@ export async function sendAdminNewOrderNotification(order: IOrder) {
 
     const info = await transporter.sendMail({
       from: FROM_EMAIL,
-      to: ADMIN_EMAIL,
-      replyTo: order.customer.email,
+      to: ADMIN_RECIPIENTS.join(", "),
+      replyTo: order.customer.email || undefined,
       subject: `🚨 NEW ORDER #${order.orderNumber} - $${order.total.toFixed(2)} (${order.fulfillment})`,
       html,
     });
