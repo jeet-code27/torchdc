@@ -23,6 +23,22 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+/**
+ * Admin page to open after login, from ?callbackUrl= (e.g. an order link in an email).
+ * Only admin paths are allowed; a full URL (older links carried http://localhost:3009/...) keeps just its path.
+ */
+function adminReturnPath(): string {
+  try {
+    const raw = new URLSearchParams(window.location.search).get("callbackUrl");
+    if (!raw) return "/admin";
+    const url = new URL(raw, window.location.origin);
+    const path = url.pathname + url.search;
+    return path.startsWith("/admin") && !path.startsWith("/admin/login") ? path : "/admin";
+  } catch {
+    return "/admin";
+  }
+}
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = React.useState(false);
@@ -64,7 +80,7 @@ export default function AdminLoginPage() {
       toast.success("Welcome back! Redirecting to dashboard...", {
         id: toastId,
       });
-      window.location.href = "/admin";
+      window.location.href = adminReturnPath();
     } catch {
       toast.error("An unexpected error occurred during login", {
         id: toastId,

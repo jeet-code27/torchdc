@@ -1,5 +1,25 @@
 import type { NextAuthConfig } from "next-auth";
 
+/**
+ * Public origin of the site. Behind a reverse proxy (Nginx on the VPS) the request URL is the app's
+ * internal address (e.g. https://localhost:3009), so prefer SITE_URL, then the proxy's forwarded headers.
+ */
+function publicOrigin(request: Request, fallback: URL): string {
+  // SITE_URL only in production, so local `npm run dev` keeps redirecting to localhost
+  const site = process.env.NODE_ENV === "production" ? process.env.SITE_URL?.trim().replace(/\/$/, "") : "";
+  if (site) return site;
+  const host = request.headers.get("x-forwarded-host")?.split(",")[0].trim();
+  if (host) {
+    const proto = request.headers.get("x-forwarded-proto")?.split(",")[0].trim() || "https";
+    return `${proto}://${host}`;
+  }
+  return fallback.origin;
+}
+
+function publicRedirect(request: Request, fallback: URL, path: string): Response {
+  return Response.redirect(new URL(path, publicOrigin(request, fallback)), 307);
+}
+
 export const authConfig: NextAuthConfig = {
   trustHost: true,
   secret: process.env.AUTH_SECRET,
@@ -12,7 +32,8 @@ export const authConfig: NextAuthConfig = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
+    authorized({ auth, request }) {
+      const { nextUrl } = request;
       const userRole = (auth?.user?.role || "").toLowerCase();
       const isAdminStaff = [
         "superadmin",
@@ -27,14 +48,19 @@ export const authConfig: NextAuthConfig = {
 
       if (isOnLogin) {
         if (isLoggedIn && isAdminStaff) {
-          return Response.redirect(new URL("/admin", nextUrl));
+          return publicRedirect(request, nextUrl, "/admin");
         }
         return true;
       }
 
       if (isOnAdmin) {
         if (isLoggedIn && isAdminStaff) return true;
-        return false;
+        // Send to login and come back to this exact admin page afterwards (e.g. an order link from an email)
+        return publicRedirect(
+          request,
+          nextUrl,
+          `/admin/login?callbackUrl=${encodeURIComponent(nextUrl.pathname + nextUrl.search)}`
+        );
       }
 
       return true;
