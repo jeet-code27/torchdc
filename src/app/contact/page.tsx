@@ -4,7 +4,7 @@ import { ContactView } from "@/components/storefront/contact-view";
 export const metadata: Metadata = {
   title: "Contact Torch | Cannabis Delivery in Washington, DC",
   description:
-    "Call, text or email Torch. 1000 G St NW, Washington, DC 20001. Open Monday to Saturday 7AM to 11PM, Sunday 10AM to 9PM.",
+    "Call, text or email Torch. 1000 G St NW, Washington, DC 20001. Open 7 days a week, 7AM to 11PM.",
   alternates: {
     canonical: "/contact-us",
   },

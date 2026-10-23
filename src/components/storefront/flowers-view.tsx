@@ -88,7 +88,7 @@ export function FlowersView({
           <section className="phero">
             <div>
               <span className="eyebrow">HAND-PICKED · SAME-DAY DELIVERY</span>
-              <h1>Flowers</h1>
+              <h1>Cannabis Flower</h1>
               <span className="muted">Three tiers, one standard of quality.</span>
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}

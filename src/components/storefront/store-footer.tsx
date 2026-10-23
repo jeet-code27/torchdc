@@ -91,26 +91,24 @@ export function StoreFooter() {
               <path d="M12 7v5l3 2" />
             </svg>
           </span>
-          Mon to Sat 7AM to 11PM · Sun 10AM to 9PM
+          Open 7 days a week · 7AM to 11PM
         </span>
       </div>
 
       <div className="footer__cols">
         <div>
           <h3>Shop</h3>
-          <Link href="/flowers">Flowers</Link>
-          <Link href="/shop?category=pre-rolls">Pre-rolls</Link>
-          <Link href="/shop?category=disposables">Disposables</Link>
-          <Link href="/shop?category=concentrates">Concentrates</Link>
-          <Link href="/shop?category=edibles">Edibles</Link>
-          <Link href="/shop?category=mushrooms">Mushrooms</Link>
+          <Link href="/flowers">Flower</Link>
+          <Link href="/product-category/pre-rolls">Pre-rolls</Link>
+          <Link href="/product-category/disposables">Disposables</Link>
+          <Link href="/product-category/concentrates">Concentrates</Link>
+          <Link href="/product-category/edibles">Edibles</Link>
         </div>
 
         <div>
           <h3>Company</h3>
           <Link href="/about">About Us</Link>
           <Link href="/deals">Deals</Link>
-          <Link href="/blog">Blog</Link>
           <Link href="/contact">Contact Us</Link>
           <Link href="/faq">FAQ</Link>
           <Link href="/terms-conditions">Terms and Conditions</Link>

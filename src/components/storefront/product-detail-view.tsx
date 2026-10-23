@@ -598,7 +598,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
             <span className="crumbs">
               <Link href="/shop">Shop</Link> /{" "}
               <Link href={isFlower ? "/flowers" : `/shop?category=${catSlug || "flowers"}`}>
-                {product.category?.name || "Flowers"}
+                {isFlower ? "Flower" : product.category?.name || "Flower"}
               </Link>
               {tierName ? ` / ${tierName}` : ""}
             </span>

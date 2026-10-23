@@ -128,7 +128,7 @@ export function StoreAgeGate() {
             }}
           >
             <span className="tag">21+ ONLY</span>
-            <h1 id="age-title">Are you 21 or older?</h1>
+            <p className="agegate__h" id="age-title">Are you 21 or older?</p>
             <p>
               You must be 21+ to shop Torch. A valid government ID is checked at
               delivery or pickup.
@@ -186,7 +186,7 @@ export function StoreAgeGate() {
               width: "100%",
             }}
           >
-            <h1>Sorry, you must be 21 or older</h1>
+            <p className="agegate__h">Sorry, you must be 21 or older</p>
             <p>Come back when you&apos;re 21. Thanks for understanding.</p>
             <button
               className="btn-wide btn-wide--ghost"

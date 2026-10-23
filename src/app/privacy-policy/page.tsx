@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Torch",
-  description: "Privacy Policy for Torch Cannabis Delivery, Washington, DC.",
+  description:
+    "How Torch collects and uses your name, phone and address to fill orders in Washington, DC. We never sell your information.",
 };
 
 export const revalidate = 86400;
 
-/** Generated from client-reference/privacy-policy.html (markup kept 1:1 with the client site). */
+/** Generated from client-reference-new/torch-site-2026-10-22/torch-site/privacy-policy.html (markup kept 1:1 with the client site). */
 export default function PrivacyPolicyPage() {
   return (
     <main>
@@ -34,7 +35,6 @@ export default function PrivacyPolicyPage() {
           </p>
           <h2>Your choices</h2>
           <p>Ask us to see, correct or delete your information at info@torchdc.co.</p>
-          <p className="fine">[Have your lawyer review this policy before launch.]</p>
         </section>
       </div>
     </main>

@@ -95,21 +95,16 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
     return list.length > 0 ? list.slice(0, 6) : products.slice(3, 9);
   }, [products]);
 
-  const mushrooms = React.useMemo(() => {
-    const list = products.filter((p) => p.category === "mushrooms");
-    return list.length > 0 ? list.slice(0, 6) : products.slice(0, 6);
-  }, [products]);
 
   // Desktop sections, same order as the client site: Best Sellers, New Arrivals, then each category
   const desktopSections = [
     { id: "best", title: "Best Sellers", list: bestSellers, badge: "Best Seller", href: "/shop?category=best-sellers" },
     { id: "new", title: "New Arrivals", list: newArrivals, badge: "New", href: "/shop?category=new-arrivals" },
-    { id: "flowers", title: "Flowers", list: flowers, badge: "", href: "/flowers" },
-    { id: "pre-rolls", title: "Pre-rolls", list: preRolls, badge: "", href: "/shop?category=pre-rolls" },
-    { id: "disposables", title: "Disposables", list: disposables, badge: "", href: "/shop?category=disposables" },
-    { id: "concentrates", title: "Concentrates", list: concentrates, badge: "", href: "/shop?category=concentrates" },
-    { id: "edibles", title: "Edibles", list: edibles, badge: "", href: "/shop?category=edibles" },
-    { id: "mushrooms", title: "Mushrooms", list: mushrooms, badge: "", href: "/shop?category=mushrooms" },
+    { id: "flowers", title: "Flower", list: flowers, badge: "", href: "/flowers" },
+    { id: "pre-rolls", title: "Pre-rolls", list: preRolls, badge: "", href: "/product-category/pre-rolls" },
+    { id: "disposables", title: "Disposables", list: disposables, badge: "", href: "/product-category/disposables" },
+    { id: "concentrates", title: "Concentrates", list: concentrates, badge: "", href: "/product-category/concentrates" },
+    { id: "edibles", title: "Edibles", list: edibles, badge: "", href: "/product-category/edibles" },
   ];
 
   const handleMobileSearch = (e: React.FormEvent) => {
@@ -248,12 +243,13 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
         {/* About & FAQ */}
         <div className="dinfo">
           <section className="about">
-            <h2>Washington DC&apos;s Trusted Cannabis Delivery</h2>
+            {/* The homepage H1 (client site: About section heading, nothing visible above the banner) */}
+            <h1>Washington DC&apos;s Trusted Cannabis Delivery</h1>
             <p>
               Torch delivers top-shelf <Link href="/flowers">cannabis flower</Link>,{" "}
-              <Link href="/shop?category=pre-rolls">pre-rolls</Link>,{" "}
-              <Link href="/shop?category=disposables">disposable vapes</Link>, concentrates and{" "}
-              <Link href="/shop?category=edibles">edibles</Link> anywhere in Washington, DC, usually the
+              <Link href="/product-category/pre-rolls">pre-rolls</Link>,{" "}
+              <Link href="/product-category/disposables">disposable vapes</Link>, concentrates and{" "}
+              <Link href="/product-category/edibles">edibles</Link> anywhere in Washington, DC, usually the
               same day. Order online or by phone, or choose curbside pickup at our Downtown location on G St
               NW.
             </p>

@@ -10,6 +10,37 @@ import { AREAS_LIST } from "@/lib/areas-data";
 // Same list and order as the client site (AREAS in its build.py)
 const DC_NEIGHBORHOODS = AREAS_LIST.map((a) => ({ name: a.name, href: `/${a.slug}` }));
 
+// Mobile menu, same order as the client site (Oct 22)
+const MOBILE_LINKS = [
+  { href: "/flowers", label: "Flower" },
+  { href: "/product-category/pre-rolls", label: "Pre-rolls" },
+  { href: "/product-category/disposables", label: "Disposables" },
+  { href: "/product-category/concentrates", label: "Concentrates" },
+  { href: "/product-category/edibles", label: "Edibles" },
+  { href: "/deals", label: "Deals" },
+  { href: "/about", label: "About Us" },
+  { href: "/contact", label: "Contact Us" },
+  { href: "/faq", label: "FAQ" },
+];
+
+function Chevron() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 6l6 6-6 6" />
+    </svg>
+  );
+}
+
 export function StoreNavbar() {
   const router = useRouter();
   const { data: session } = useSession();
@@ -102,8 +133,8 @@ export function StoreNavbar() {
           <nav className="dnav" aria-label="Main">
             <Link href="/shop">Shop</Link>
             <Link href="/deals">Deals</Link>
-            <Link href="/about">About</Link>
-            <Link href="/contact">Contact</Link>
+            <Link href="/about">About Us</Link>
+            <Link href="/contact">Contact Us</Link>
             {session?.user && (
               <Link href="/account" title="My Account">
                 Account
@@ -111,8 +142,8 @@ export function StoreNavbar() {
             )}
           </nav>
 
-          {/* Desktop Phone Pill */}
-          <a className="dphone" href="tel:+12024681966">
+          {/* Desktop call icon (client site shows no written number in the header) */}
+          <a className="dphone" href="tel:+12024681966" aria-label="Call Torch">
             <span className="dphone__ic">
               <svg
                 width="18"
@@ -128,7 +159,6 @@ export function StoreNavbar() {
                 <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
               </svg>
             </span>
-            (202) 468-1966
           </a>
 
           {/* Header Right (Call & Cart buttons on Mobile) */}
@@ -208,124 +238,27 @@ export function StoreNavbar() {
           </div>
 
           <nav className="mnav__links">
-            <Link href="/shop" onClick={() => setMenuOpen(false)}>
-              Shop all
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M9 6l6 6-6 6" />
-              </svg>
-            </Link>
-            <Link href="/deals" onClick={() => setMenuOpen(false)}>
-              Deals
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M9 6l6 6-6 6" />
-              </svg>
-            </Link>
-            <Link href="/about" onClick={() => setMenuOpen(false)}>
-              About
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M9 6l6 6-6 6" />
-              </svg>
-            </Link>
-            <Link href="/contact" onClick={() => setMenuOpen(false)}>
-              Contact
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M9 6l6 6-6 6" />
-              </svg>
-            </Link>
-            <Link href="/faq" onClick={() => setMenuOpen(false)}>
-              FAQ
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M9 6l6 6-6 6" />
-              </svg>
-            </Link>
+            {/* Client site order: every category, then Deals, About Us, Contact Us, FAQ */}
+            {MOBILE_LINKS.map((l) => (
+              <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}>
+                {l.label}
+                <Chevron />
+              </Link>
+            ))}
 
             {session?.user ? (
               <Link href="/account" onClick={() => setMenuOpen(false)}>
                 My Account
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M9 6l6 6-6 6" />
-                </svg>
+                <Chevron />
               </Link>
             ) : (
               <Link href="/login" onClick={() => setMenuOpen(false)}>
                 Sign in / Account
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M9 6l6 6-6 6" />
-                </svg>
+                <Chevron />
               </Link>
             )}
 
-            <details open className="mnav__acc">
+            <details className="mnav__acc">
               <summary>
                 Neighborhoods
                 <svg
@@ -370,8 +303,21 @@ export function StoreNavbar() {
             </details>
           </nav>
 
-          <a className="mnav__call" href="tel:+12024681966">
-            Call (202) 468-1966
+          <a className="mnav__call" href="tel:+12024681966" aria-label="Call Torch">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
+            </svg>
+            Call us
           </a>
         </aside>
       </div>

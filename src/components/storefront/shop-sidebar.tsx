@@ -13,12 +13,11 @@ export interface CategoryOption {
 export const STORE_CATEGORIES: CategoryOption[] = [
   { slug: "best", name: "Best Sellers" },
   { slug: "new", name: "New Arrivals" },
-  { slug: "flowers", name: "Flowers" },
+  { slug: "flowers", name: "Flower" },
   { slug: "pre-rolls", name: "Pre-rolls" },
   { slug: "disposables", name: "Disposables" },
   { slug: "concentrates", name: "Concentrates" },
   { slug: "edibles", name: "Edibles" },
-  { slug: "mushrooms", name: "Mushrooms" },
   { slug: "deals", name: "Deals", isDeals: true },
 ];
 
@@ -68,9 +67,9 @@ export function ShopSidebar({
 
   const handleClick = (e: React.MouseEvent, cat: CategoryOption) => {
     if (cat.isDeals) return; // follow regular link to /deals
-    if (cat.slug === "flowers") return; // always navigate directly to /flowers page!
 
-    if (onSelectCategory) {
+    // Shop page: Best Sellers / New Arrivals filter in place; categories open their own pages
+    if (onSelectCategory && !scrollLinks && (cat.slug === "best" || cat.slug === "new")) {
       e.preventDefault();
       setCurrentActive(cat.slug);
       onSelectCategory(cat.slug);
@@ -92,13 +91,16 @@ export function ShopSidebar({
       <span className="dside__h">MENU</span>
       {STORE_CATEGORIES.map((cat) => {
         const isDeals = cat.isDeals;
+        // Real links search engines can follow (client site: href plus data-sec); the homepage scrolls instead
         const href = isDeals
           ? "/deals"
-          : scrollLinks
-          ? `#${cat.slug}`
+          : cat.slug === "best"
+          ? "/shop?category=best-sellers"
+          : cat.slug === "new"
+          ? "/shop?category=new-arrivals"
           : cat.slug === "flowers"
           ? "/flowers"
-          : `/shop?category=${cat.slug}`;
+          : `/product-category/${cat.slug}`;
 
         const isActive = isDeals
           ? pathname === "/deals"

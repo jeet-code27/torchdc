@@ -68,15 +68,42 @@ export default function AdminDashboardPage() {
   const [storeSettings, setStoreSettings] = React.useState<{
     pickupEnabled: boolean;
     deliveryEnabled: boolean;
+    offerPopupEnabled: boolean;
     pickupPausedTitle: string;
     pickupPausedMessage: string;
   }>({
     pickupEnabled: false,
     deliveryEnabled: true,
+    offerPopupEnabled: true,
     pickupPausedTitle: "Pickup is paused right now",
     pickupPausedMessage: "We'll deliver it free, with a pre-roll on us.",
   });
   const [isUpdatingPickup, setIsUpdatingPickup] = React.useState(false);
+  const [isUpdatingOffer, setIsUpdatingOffer] = React.useState(false);
+
+  // "Want $10 Off Your Order?" pop-up on the cart page (on/off switch from the client site)
+  const handleToggleOffer = async () => {
+    setIsUpdatingOffer(true);
+    const nextState = !storeSettings.offerPopupEnabled;
+    try {
+      const res = await fetch("/api/admin/settings/store", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ offerPopupEnabled: nextState }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setStoreSettings((prev) => ({ ...prev, offerPopupEnabled: nextState }));
+        toast.success(nextState ? "Checkout offer pop-up is ON." : "Checkout offer pop-up is OFF.");
+      } else {
+        toast.error(json.error || "Failed to update the offer pop-up");
+      }
+    } catch {
+      toast.error("Network error while updating the offer pop-up");
+    } finally {
+      setIsUpdatingOffer(false);
+    }
+  };
 
   React.useEffect(() => {
     async function loadStats() {
@@ -387,6 +414,26 @@ export default function AdminDashboardPage() {
               <div className="text-xs text-muted-foreground flex justify-between pt-1 border-t border-border/60">
                 <span>Pending Prep: {stats?.queues.pickup.pending || 0}</span>
                 <span>Ready for Pickup: {stats?.queues.pickup.ready || 0}</span>
+              </div>
+
+              {/* Checkout offer pop-up switch */}
+              <div className="pt-2 border-t border-border/60 flex items-center justify-between gap-3">
+                <span className="text-xs text-muted-foreground">
+                  &ldquo;Want $10 Off Your Order?&rdquo; pop-up on the cart (orders $60+):{" "}
+                  <strong className="text-foreground">{storeSettings.offerPopupEnabled ? "ON" : "OFF"}</strong>
+                </span>
+                <button
+                  type="button"
+                  onClick={handleToggleOffer}
+                  disabled={isUpdatingOffer}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer shadow-xs disabled:opacity-50 whitespace-nowrap ${
+                    storeSettings.offerPopupEnabled
+                      ? "bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200"
+                      : "bg-[#5A805B] text-white hover:bg-[#466645]"
+                  }`}
+                >
+                  {isUpdatingOffer ? "Updating..." : storeSettings.offerPopupEnabled ? "Turn off" : "Turn on"}
+                </button>
               </div>
             </div>
           </div>

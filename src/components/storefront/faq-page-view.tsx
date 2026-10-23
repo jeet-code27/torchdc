@@ -1,4 +1,4 @@
-/** FAQ page, generated from client-reference/cannabis-faq-dc.html (markup kept 1:1 with the client site). */
+/** FAQ page, generated from client-reference-new/torch-site-2026-10-22/torch-site/cannabis-faq-dc.html (markup kept 1:1 with the client site). */
 export function FaqPageView() {
   return (
     <main>
@@ -12,7 +12,7 @@ export function FaqPageView() {
           <h2 id="faq-h">Questions and answers</h2>
           <details>
             <summary>What are your hours?</summary>
-            <p>Monday to Saturday 7AM to 11PM, Sunday 10AM to 9PM, for delivery and curbside pickup.</p>
+            <p>We&apos;re open 7 days a week, 7AM to 11PM, for delivery and curbside pickup.</p>
           </details>
           <details>
             <summary>Where are you located?</summary>
@@ -46,15 +46,15 @@ export function FaqPageView() {
           <details>
             <summary>What products do you carry?</summary>
             <p>
-              Flower in three tiers (Midshelf, Topshelf and Exotic), pre-rolls, disposable vapes,
-              concentrates, edibles and mushrooms.
+              Flower in three tiers (Midshelf, Topshelf and Exotic), pre-rolls, disposable vapes, concentrates
+              and edibles.
             </p>
           </details>
           <details>
             <summary>How do the flower tiers work?</summary>
             <p>
-              Midshelf is quality flower priced for value, Topshelf is our core lineup of classics and Private
-              Reserve is our small-batch exotics.
+              Midshelf is quality flower priced for value, Topshelf is our core lineup of classics and Exotic
+              is our small-batch, hard-to-find strains.
             </p>
           </details>
           <details>
@@ -75,14 +75,6 @@ export function FaqPageView() {
           <details>
             <summary>Is my order discreet?</summary>
             <p>Yes. Orders are packed in unmarked bags.</p>
-          </details>
-          <details>
-            <summary>Do you have a loyalty program?</summary>
-            <p>[Describe how customers join and earn rewards]</p>
-          </details>
-          <details>
-            <summary>What is your return policy?</summary>
-            <p>[Describe your return and exchange policy]</p>
           </details>
         </section>
       </div>

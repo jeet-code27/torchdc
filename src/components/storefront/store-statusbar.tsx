@@ -3,7 +3,7 @@
 import * as React from "react";
 
 const HOURS: [number, number][] = [
-  [600, 1260], // Sun: 10:00 AM - 9:00 PM (600 - 1260 mins)
+  [420, 1380], // Sun: 7:00 AM - 11:00 PM (open 7 days a week, same as every day)
   [420, 1380], // Mon: 7:00 AM - 11:00 PM (420 - 1380 mins)
   [420, 1380], // Tue: 7:00 AM - 11:00 PM
   [420, 1380], // Wed: 7:00 AM - 11:00 PM

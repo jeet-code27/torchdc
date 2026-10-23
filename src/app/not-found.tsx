@@ -3,6 +3,8 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Page not found | Torch",
+  description: "Page not found.",
+  robots: { index: false, follow: true },
 };
 
 /** Generated from client-reference/404.html (markup kept 1:1 with the client site). */

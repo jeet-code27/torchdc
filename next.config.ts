@@ -35,8 +35,11 @@ const nextConfig: NextConfig = {
       ["/product-category/premium-flower", "/flowers"],
       ["/product-category/premium-flower/:sub", "/flowers"],
       ["/product-category/flowers", "/flowers"],
-      ["/product-category/disposables/:sub", "/shop?category=disposables"],
-      ["/product-category/:cat", "/shop?category=:cat"],
+      ["/product-category/flower", "/flowers"],
+      ["/product-category/disposables/:sub", "/product-category/disposables"],
+      // pre-rolls, disposables, concentrates and edibles have their own pages (src/app/product-category/[cat])
+      ["/product-category/mushrooms", "/shop"],
+      ["/product-category/cartridges", "/shop?category=cartridges"],
       // Blog categories
       ["/category/:slug", "/blog"],
       // Products whose WordPress slug no longer matches

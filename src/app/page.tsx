@@ -3,15 +3,44 @@ import { HomeStorefrontView } from "@/components/storefront/home-storefront-view
 import { getShopProducts } from "@/lib/get-shop-products";
 
 export const metadata: Metadata = {
-  title: "Torch | Premium Cannabis Delivery & Pickup in Washington D.C.",
+  title: "Weed Delivery in Washington, DC | Torch Cannabis Delivery",
   description:
-    "Order premium flowers, pre-rolls, cartridges, edibles, and concentrates in Washington DC. Fast DC delivery. 21+ only.",
+    "Torch delivers flower, pre-rolls, vapes, concentrates and edibles across Washington, DC. Free delivery, pay cash on delivery. 21+ only.",
 };
 
 export const revalidate = 60;
 
+// Store schema from the client site (hours: open 7 days a week, 7AM to 11PM)
+const STORE_LD = {
+  "@context": "https://schema.org",
+  "@type": "Store",
+  name: "Torch",
+  url: "https://torchdc.co/",
+  telephone: "+1-202-468-1966",
+  email: "info@torchdc.co",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "1000 G St NW",
+    addressLocality: "Washington",
+    addressRegion: "DC",
+    postalCode: "20001",
+    addressCountry: "US",
+  },
+  openingHours: ["Mo-Su 07:00-23:00"],
+  paymentAccepted: "Cash",
+  areaServed: "Washington, DC",
+};
+
 export default async function HomePage() {
   const products = await getShopProducts();
 
-  return <HomeStorefrontView products={products} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(STORE_LD) }}
+      />
+      <HomeStorefrontView products={products} />
+    </>
+  );
 }

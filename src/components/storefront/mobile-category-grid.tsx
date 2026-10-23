@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const CATEGORIES = [
   {
-    name: "Flowers",
+    name: "Flower",
     slug: "flowers",
     href: "/flowers",
     image: "/assets/img/flower.webp",
@@ -13,32 +13,32 @@ const CATEGORIES = [
   {
     name: "Pre-rolls",
     slug: "pre-rolls",
-    href: "/shop?category=pre-rolls",
+    href: "/product-category/pre-rolls",
     image: "/assets/img/preroll.webp",
   },
   {
     name: "Disposables",
     slug: "disposables",
-    href: "/shop?category=disposables",
+    href: "/product-category/disposables",
     image: "/assets/img/disposable.webp",
   },
   {
     name: "Concentrates",
     slug: "concentrates",
-    href: "/shop?category=concentrates",
+    href: "/product-category/concentrates",
     image: "/assets/img/concentrate.webp",
   },
   {
     name: "Edibles",
     slug: "edibles",
-    href: "/shop?category=edibles",
+    href: "/product-category/edibles",
     image: "/assets/img/edible.webp",
   },
   {
-    name: "Mushrooms",
-    slug: "mushrooms",
-    href: "/shop?category=mushrooms",
-    image: "/assets/img/mushroom.webp",
+    name: "Deals",
+    slug: "deals",
+    href: "/deals",
+    image: "/assets/img/deals-tile.webp",
   },
 ];
 
@@ -56,7 +56,7 @@ export function MobileCategoryGrid() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={cat.image}
-              alt={cat.name}
+              alt=""
               width={76}
               height={76}
               loading="lazy"

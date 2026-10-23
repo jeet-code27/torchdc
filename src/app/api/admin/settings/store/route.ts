@@ -62,6 +62,9 @@ export async function PATCH(req: NextRequest) {
     if (typeof body.deliveryEnabled === "boolean") {
       updates.deliveryEnabled = body.deliveryEnabled;
     }
+    if (typeof body.offerPopupEnabled === "boolean") {
+      updates.offerPopupEnabled = body.offerPopupEnabled;
+    }
     if (typeof body.pickupPausedTitle === "string") {
       updates.pickupPausedTitle = body.pickupPausedTitle.trim();
     }
@@ -79,7 +82,7 @@ export async function PATCH(req: NextRequest) {
     try {
       await ActivityLog.create({
         action: "store_settings.update",
-        description: `Updated store fulfillment settings. Pickup enabled: ${updated.pickupEnabled}`,
+        description: `Updated store settings. Pickup enabled: ${updated.pickupEnabled}. Checkout offer pop-up: ${updated.offerPopupEnabled !== false ? "on" : "off"}`,
         actor: {
           userId: user.userId,
           name: user.name || "Admin",

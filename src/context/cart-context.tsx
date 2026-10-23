@@ -52,6 +52,8 @@ interface CartContextType {
   isCartDrawerOpen: boolean;
   setIsCartDrawerOpen: (open: boolean) => void;
   isPickupEnabled: boolean;
+  /** Admin switch for the "Want $10 Off Your Order?" cart pop-up */
+  isOfferPopupEnabled: boolean;
   isPickupPausedModalOpen: boolean;
   setIsPickupPausedModalOpen: (open: boolean) => void;
   setFulfillment: (mode: FulfillmentType, force?: boolean) => void;
@@ -117,6 +119,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Store fulfillment settings (Admin can pause or enable store pickup)
   const [isPickupEnabled, setIsPickupEnabled] = React.useState<boolean>(false);
+  const [isOfferPopupEnabled, setIsOfferPopupEnabled] = React.useState<boolean>(false);
   const [isPickupPausedModalOpen, setIsPickupPausedModalOpen] = React.useState<boolean>(false);
   const [pickupNotice, setPickupNotice] = React.useState<{
     title: string;
@@ -148,6 +151,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (data.success && data.settings && mounted) {
           const enabled = Boolean(data.settings.pickupEnabled);
           setIsPickupEnabled(enabled);
+          setIsOfferPopupEnabled(data.settings.offerPopupEnabled !== false);
           if (data.settings.pickupPausedTitle) {
             setPickupNotice({
               title: data.settings.pickupPausedTitle,
@@ -435,6 +439,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         lastAddedItem,
         openAddedSheet,
         isPickupEnabled,
+        isOfferPopupEnabled,
         isPickupPausedModalOpen,
         setIsPickupPausedModalOpen,
         setFulfillment,

@@ -24,6 +24,8 @@ export async function GET() {
       settings: {
         pickupEnabled: Boolean(settings.pickupEnabled),
         deliveryEnabled: Boolean(settings.deliveryEnabled),
+        // On unless an admin turned it off (older settings documents have no value yet)
+        offerPopupEnabled: settings.offerPopupEnabled !== false,
         pickupPausedTitle:
           settings.pickupPausedTitle || "Pickup is paused right now",
         pickupPausedMessage:
@@ -39,6 +41,7 @@ export async function GET() {
         settings: {
           pickupEnabled: false,
           deliveryEnabled: true,
+          offerPopupEnabled: false,
           pickupPausedTitle: "Pickup is paused right now",
           pickupPausedMessage: "We'll deliver it free, with a pre-roll on us.",
         },

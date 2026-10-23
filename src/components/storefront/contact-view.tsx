@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 
-/** Contact page, generated from client-reference/contact-us.html (markup kept 1:1 with the client site). */
+/** Contact page, generated from client-reference-new/torch-site-2026-10-22/torch-site/contact-us.html (markup kept 1:1 with the client site). */
 export function ContactView() {
   // Same as the client site: the form opens the email app with the message filled in
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -73,12 +73,8 @@ export function ContactView() {
         <div className="hours">
           <strong>Hours</strong>
           <div>
-            <span>Monday to Saturday</span>
+            <span>Open 7 days a week</span>
             <span>7AM to 11PM</span>
-          </div>
-          <div>
-            <span>Sunday</span>
-            <span>10AM to 9PM</span>
           </div>
         </div>
         <section className="msg">

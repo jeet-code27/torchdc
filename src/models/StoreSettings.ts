@@ -4,6 +4,8 @@ export interface IStoreSettings extends Document {
   key: string;
   pickupEnabled: boolean;
   deliveryEnabled: boolean;
+  /** "Want $10 Off Your Order?" pop-up on the cart page (client SETTINGS.offerPopup) */
+  offerPopupEnabled: boolean;
   pickupPausedTitle: string;
   pickupPausedMessage: string;
   updatedAt: Date;
@@ -15,6 +17,7 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     key: { type: String, default: "default", unique: true },
     pickupEnabled: { type: Boolean, default: false },
     deliveryEnabled: { type: Boolean, default: true },
+    offerPopupEnabled: { type: Boolean, default: true },
     pickupPausedTitle: {
       type: String,
       default: "Pickup is paused right now",

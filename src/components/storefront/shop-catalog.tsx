@@ -11,12 +11,11 @@ import { ShopProductCard, ShopProduct } from "./shop-product-card";
 
 const CATEGORY_PILLS = [
   { slug: "all", label: "All" },
-  { slug: "flowers", label: "Flowers" },
+  { slug: "flowers", label: "Flower" },
   { slug: "pre-rolls", label: "Pre-rolls" },
   { slug: "disposables", label: "Disposables" },
   { slug: "concentrates", label: "Concentrates" },
   { slug: "edibles", label: "Edibles" },
-  { slug: "mushrooms", label: "Mushrooms" },
 ];
 
 interface ShopCatalogProps {
@@ -92,7 +91,14 @@ export function ShopCatalog({
     setActiveCategory(slug);
     setSearchQuery("");
     setSearchInput("");
-    window.history.replaceState(null, "", slug === "all" ? "/shop" : `/shop?category=${slug}`);
+    // Same URLs as the client site: categories have their own pages under /product-category/
+    const url =
+      slug === "all"
+        ? "/shop"
+        : ["pre-rolls", "disposables", "concentrates", "edibles"].includes(slug)
+        ? `/product-category/${slug}`
+        : `/shop?category=${slug}`;
+    window.history.replaceState(null, "", url);
   };
 
   const handleSearch = (e: React.FormEvent) => {

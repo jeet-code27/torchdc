@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Jost } from "next/font/google";
 import "./globals.css";
 import "./client-site.css";
@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/context/cart-context";
 import { StoreAgeGate } from "@/components/storefront/store-age-gate";
 import { StorefrontShell } from "@/components/storefront/storefront-shell";
+import { pageKeyInlineScript } from "@/lib/page-key";
 
 import { SessionProvider } from "@/components/auth/session-provider";
 
@@ -19,13 +20,34 @@ const jost = Jost({
 export const metadata: Metadata = {
   // Production domain: canonical and Open Graph URLs resolve against it
   metadataBase: new URL("https://torchdc.co"),
-  title: "TORCH | Premium Dispensary & Delivery in Washington DC",
-  description: "Torch - Washington DC Premium Weed Dispensary & Same-Day Delivery. 21+ only.",
+  // Defaults = homepage (client site index.html); other pages set their own
+  title: "Weed Delivery in Washington, DC | Torch Cannabis Delivery",
+  description:
+    "Torch delivers flower, pre-rolls, vapes, concentrates and edibles across Washington, DC. Free delivery, pay cash on delivery. 21+ only.",
+  // Tab, home screen and app icons from the client site (Oct 22)
   icons: {
-    icon: "/images/torch-logo.svg",
-    shortcut: "/images/torch-logo.svg",
-    apple: "/images/torch-logo.svg",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/assets/img/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/assets/img/favicon-16.png", type: "image/png", sizes: "16x16" },
+    ],
+    apple: "/assets/img/apple-touch-icon.png",
   },
+  manifest: "/site.webmanifest",
+  openGraph: {
+    siteName: "Torch Cannabis Delivery",
+    type: "website",
+    locale: "en_US",
+    images: [{ url: "/assets/img/og.jpg", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/assets/img/og.jpg"],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#5A805B",
 };
 
 export default function RootLayout({
@@ -43,7 +65,12 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`${jost.className} min-h-screen bg-background text-foreground antialiased font-sans`}>
+      <body
+        className={`${jost.className} min-h-screen bg-background text-foreground antialiased font-sans`}
+        suppressHydrationWarning
+      >
+        {/* Sets body[data-page] before first paint (page-specific CSS from the client site) */}
+        <script dangerouslySetInnerHTML={{ __html: pageKeyInlineScript() }} />
         <SessionProvider>
           <ThemeProvider
             attribute="class"

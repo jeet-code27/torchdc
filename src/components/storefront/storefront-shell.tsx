@@ -7,29 +7,8 @@ import { StoreNavbar } from "./store-navbar";
 import { StoreFooter } from "./store-footer";
 import { StoreAddedToCartSheet } from "./store-added-to-cart-sheet";
 import { OrderMinimumSheet } from "./order-minimum";
-import { AREAS_BY_SLUG } from "@/lib/areas-data";
-
-const STATIC_PAGES: Record<string, string> = {
-  "/": "home",
-  "/shop": "shop",
-  "/flowers": "flowers",
-  "/deals": "deals",
-  "/cart": "cart",
-  "/about": "about",
-  "/contact": "contact",
-  "/contact-us": "contact",
-  "/faq": "faq",
-  "/privacy-policy": "legal",
-  "/terms-conditions": "legal",
-  "/blog": "blog",
-};
-
-function pageKey(pathname: string): string | null {
-  if (STATIC_PAGES[pathname]) return STATIC_PAGES[pathname];
-  if (pathname.startsWith("/product/")) return "product";
-  if (AREAS_BY_SLUG[pathname.replace(/^\/|\/$/g, "")]) return "area";
-  return null;
-}
+import { CheckoutOffer } from "./checkout-offer";
+import { pageKey } from "@/lib/page-key";
 
 interface StorefrontShellProps {
   children: React.ReactNode;
@@ -71,6 +50,9 @@ export function StorefrontShell({ children }: StorefrontShellProps) {
 
       {/* 6. $60 order minimum popup */}
       <OrderMinimumSheet />
+
+      {/* 7. "Want $10 Off Your Order?" cart pop-up */}
+      <CheckoutOffer />
     </div>
   );
 }

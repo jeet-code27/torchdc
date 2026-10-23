@@ -95,11 +95,11 @@ const FAQS: FaqItem[] = [
   },
 ];
 
-/** Homepage FAQ, copied word for word from the client reference site (index.html). */
+/** Homepage FAQ, copied word for word from the client site (src/home_about_faq.html, Oct 22). */
 export const HOME_FAQS: FaqItem[] = [
   {
     question: "What are your hours?",
-    answer: "Monday to Saturday 7AM to 11PM, Sunday 10AM to 9PM, for delivery and curbside pickup.",
+    answer: "We're open 7 days a week, 7AM to 11PM, for delivery and curbside pickup.",
   },
   {
     question: "Where are you located?",
@@ -132,14 +132,6 @@ export const HOME_FAQS: FaqItem[] = [
   {
     question: "How much cannabis can I have in DC?",
     answer: "Adults 21+ can possess up to 2 ounces in DC.",
-  },
-  {
-    question: "Do you have a loyalty program?",
-    answer: "[Describe how customers join and earn rewards]",
-  },
-  {
-    question: "What is your return policy?",
-    answer: "[Describe your return and exchange policy]",
   },
 ];
 

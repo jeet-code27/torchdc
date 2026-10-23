@@ -3,9 +3,9 @@ import { ShopCatalog } from "@/components/storefront/shop-catalog";
 import { getShopProducts } from "@/lib/get-shop-products";
 
 export const metadata: Metadata = {
-  title: "Shop All Cannabis Products | Torch Dispensary Washington DC",
+  title: "Shop Cannabis Online in DC | Torch Cannabis Delivery",
   description:
-    "Explore Torch's curated dispensary menu: Midshelf, Topshelf, and Exotic flower, pre-rolls, disposables, concentrates, edibles, and mushrooms. Fast DC delivery.",
+    "Shop flower, pre-rolls, disposables, concentrates and edibles for free delivery across Washington, DC. Pay cash on delivery.",
 };
 
 export const revalidate = 60;

@@ -15,6 +15,17 @@ interface ProductPageProps {
 
 export const revalidate = 60;
 
+// Lowercase category label used in product descriptions ("...: flower delivered free across Washington, DC")
+const CATEGORY_LABEL: Record<string, string> = {
+  flowers: "flower",
+  "pre-rolls": "pre-rolls",
+  disposables: "disposables",
+  cartridges: "cartridges",
+  concentrates: "concentrates",
+  edibles: "edibles",
+  mushrooms: "mushrooms",
+};
+
 export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
@@ -40,22 +51,29 @@ export async function generateMetadata({
       };
     }
 
-    const cleanTitle = product.name
-      .replace(/\s*\((sativa|indica|hybrid|sativa hybrid|indica hybrid)\)/i, "")
-      .trim();
+    // Title and description follow build_products() in the client build.py (Oct 22)
+    const cats = await Category.find({ _id: { $in: product.categoryIds || [] } }).select("slug").lean();
+    const catSlugs = cats.map((c) => c.slug);
+    const mainCat = ["flowers", "pre-rolls", "disposables", "cartridges", "concentrates", "edibles", "mushrooms"].find(
+      (c) => catSlugs.includes(c)
+    );
+    const tierName = mainCat === "flowers" || !mainCat ? tierFromCategories(catSlugs, product.name) : null;
+    const tier = tierName ? ` (${tierName})` : "";
+    const label = CATEGORY_LABEL[mainCat || "flowers"] || "cannabis";
+    let title = `${product.name}${tier} | Torch Cannabis Delivery`;
+    if (title.length > 60) title = `${product.name}${tier} | Torch`;
+    const description = `${product.name}${tier}: ${label} delivered free across Washington, DC. Order online, pay cash on delivery. 21+ only.`;
 
     return {
-      title: `${cleanTitle} | Order Cannabis Delivery & Pickup in Washington DC`,
-      description:
-        product.shortDescription ||
-        `Order ${cleanTitle} online from Torch. Fast cannabis delivery across Washington D.C. 21+ only.`,
+      // Absolute so the root "%s" template (if any) doesn't append a second brand
+      title: { absolute: title },
+      description,
       // Old WordPress slugs (e.g. /product/jack-herer) also resolve here; point search engines at the real URL
       alternates: { canonical: `/product/${product.slug}` },
       openGraph: {
-        title: `${cleanTitle} | Torch Dispensary`,
-        description:
-          product.shortDescription || `Order ${cleanTitle} online from Torch.`,
-        images: product.images?.[0]?.url ? [{ url: product.images[0].url }] : [],
+        title,
+        description,
+        images: product.images?.[0]?.url ? [{ url: product.images[0].url }] : ["/assets/img/og.jpg"],
       },
     };
   } catch {
@@ -287,5 +305,28 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     relatedProducts,
   };
 
-  return <ProductDetailView product={productData} />;
+  // Product schema, like the client site's product pages
+  const prices = variants.length ? variants.map((v: { price: number }) => v.price) : [startingPrice];
+  const productLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: productDoc.name,
+    image: productData.images?.[0]?.url || "https://torchdc.co/assets/img/og.jpg",
+    description: productDoc.shortDescription || productDoc.name,
+    brand: { "@type": "Brand", name: "Torch" },
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "USD",
+      lowPrice: Math.min(...prices),
+      highPrice: Math.max(...prices),
+      availability: productDoc.inStock === false ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+    },
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
+      <ProductDetailView product={productData} />
+    </>
+  );
 }

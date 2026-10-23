@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms and Conditions | Torch",
-  description: "Terms and Conditions for Torch Cannabis Delivery, Washington, DC.",
+  description:
+    "Terms for ordering from Torch: 21+ only, cash on delivery, delivery within Washington, DC, deals and responsible use.",
 };
 
 export const revalidate = 86400;
 
-/** Generated from client-reference/terms-conditions.html (markup kept 1:1 with the client site). */
+/** Generated from client-reference-new/torch-site-2026-10-22/torch-site/terms-conditions.html (markup kept 1:1 with the client site). */
 export default function TermsConditionsPage() {
   return (
     <main>
@@ -44,7 +45,6 @@ export default function TermsConditionsPage() {
           </p>
           <h2>Contact</h2>
           <p>Questions about these terms: info@torchdc.co or (202) 468-1966.</p>
-          <p className="fine">[Have your lawyer review these terms before launch.]</p>
         </section>
       </div>
     </main>

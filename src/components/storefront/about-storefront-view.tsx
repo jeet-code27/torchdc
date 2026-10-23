@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCart } from "@/context/cart-context";
 
-/** About page, generated from client-reference/about-us.html (markup kept 1:1 with the client site). */
+/** About page, generated from client-reference-new/torch-site-2026-10-22/torch-site/about-us.html (markup kept 1:1 with the client site). */
 export function AboutStorefrontView() {
   const { setFulfillment } = useCart();
 
