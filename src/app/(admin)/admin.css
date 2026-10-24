@@ -48,3 +48,25 @@ html:has(.admin-root) .blog-preview img { max-width: 100%; height: auto; border-
 html:has(.admin-root) .blog-preview blockquote { margin: 1em 0; padding-left: 1em; border-left: 3px solid var(--primary); }
 html:has(.admin-root) .blog-preview table { width: 100%; border-collapse: collapse; margin: 1em 0; }
 html:has(.admin-root) .blog-preview th, html:has(.admin-root) .blog-preview td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }
+
+/* The mobile-first screens from the Oct 2026 admin update (Today, Orders, Order details, phone
+   Products list) are designed light-only: keep them light even when the admin is in dark mode. */
+html:has(.admin-root) .admin-light {
+  --background-hex: #ffffff;
+  --foreground-hex: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --secondary: #f4f5f4;
+  --secondary-foreground: #141414;
+  --muted: #f4f5f4;
+  --muted-foreground: #71717a;
+  --accent: #eff3ef;
+  --accent-foreground: #2d452e;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  color-scheme: light;
+  background: #ffffff;
+  color: #0a0a0a;
+}

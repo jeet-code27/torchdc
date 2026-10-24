@@ -13,7 +13,8 @@ export async function GET(_req: NextRequest) {
     await connectDB();
 
     // 1. Order Metrics
-    const allOrders = await Order.find().sort({ createdAt: -1 }).lean();
+    // Test orders are left out of every total
+    const allOrders = await Order.find({ isTest: { $ne: true } }).sort({ createdAt: -1 }).lean();
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);

@@ -8,6 +8,7 @@ import { useCart } from "@/context/cart-context";
 import { unitOf, nextStep, nextStepOz, normalizeTier } from "@/lib/deals";
 import { CartAddToOrder } from "@/components/storefront/cart-add-to-order";
 import { MinNote } from "@/components/storefront/order-minimum";
+import { orderLabel } from "@/lib/orders/display";
 
 export default function CartPage() {
   const { data: session } = useSession();
@@ -199,7 +200,7 @@ export default function CartPage() {
             <span className="okdot okdot--big">✓</span>
             <h2>Order placed</h2>
             <p>
-              Order #{placedOrder.orderNumber} · ${placedOrder.total}, paid in cash on delivery.
+              Order {orderLabel(placedOrder.orderNumber)} · ${placedOrder.total}, paid in cash on delivery.
             </p>
             <p>
               We&apos;ll text <strong>{placedOrder.phone}</strong> when it&apos;s on the way. Have your 21+ ID ready.

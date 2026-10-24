@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/models/Order";
+import { orderNumberCandidates } from "@/lib/orders/order-number";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/orders/track?order=TORCH-123456&phone=2025550143
+// GET /api/orders/track?order=1042&phone=2025550143  ("#1042", "TORCH-123456" and "123456" work too)
 // Both must match: an order number or a phone number alone must not reveal someone's order.
 export async function GET(req: NextRequest) {
   try {
@@ -21,9 +22,8 @@ export async function GET(req: NextRequest) {
 
     await connectToDatabase();
 
-    const orderNumber = orderParam.startsWith("TORCH-") ? orderParam : `TORCH-${orderParam}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const filter: Record<string, any> = { orderNumber };
+    const filter: Record<string, any> = { orderNumber: { $in: orderNumberCandidates(orderParam) } };
 
     const order = await Order.findOne(filter)
       .sort({ createdAt: -1 })

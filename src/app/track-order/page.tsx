@@ -141,7 +141,7 @@ function TrackOrderContent() {
               Track Your Order
             </h1>
             <p className="text-sm text-zinc-500 max-w-md mx-auto">
-              Enter your Order Number (e.g. <span className="font-mono font-semibold text-zinc-700">TORCH-750480</span>) and the mobile number you ordered with.
+              Enter your Order Number (e.g. <span className="font-mono font-semibold text-zinc-700">1042</span>) and the mobile number you ordered with.
             </p>
           </div>
 
@@ -156,7 +156,7 @@ function TrackOrderContent() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Order # (TORCH-...)"
+                placeholder="Order # (e.g. 1042)"
                 aria-label="Order number"
                 className="w-full pl-11 pr-4 py-3 rounded-xl border border-transparent bg-zinc-50 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:bg-white focus:border-[#5A805B] transition font-medium"
               />

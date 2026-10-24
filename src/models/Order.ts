@@ -26,6 +26,12 @@ export interface IOrderDeliveryAddress {
   zip?: string;
 }
 
+export interface IOrderHistoryEntry {
+  at: Date;
+  label: string;
+  status?: string;
+}
+
 export interface IOrder extends Document {
   orderNumber: string;
   customer: IOrderCustomer;
@@ -56,6 +62,15 @@ export interface IOrder extends Document {
   idPhotoUrl?: string;
   sessionId?: string;
   userId?: mongoose.Types.ObjectId | null;
+  /** Internal note from staff (never shown to the customer) */
+  staffNotes?: string;
+  /** Status changes, newest last: "Confirmed by Torch Admin" */
+  history?: IOrderHistoryEntry[];
+  /** Test orders are left out of the admin lists and every total */
+  isTest?: boolean;
+  completedAt?: Date | null;
+  /** Set once the "still waiting" push reminder went out */
+  alertReminderSentAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -195,6 +210,30 @@ const OrderSchema = new Schema<IOrder>(
       ref: "User",
       default: null,
       index: true,
+    },
+    staffNotes: {
+      type: String,
+      default: "",
+    },
+    history: [
+      {
+        _id: false,
+        at: { type: Date, default: Date.now },
+        label: { type: String, required: true },
+        status: { type: String },
+      },
+    ],
+    isTest: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    completedAt: {
+      type: Date,
+      default: null,
+    },
+    alertReminderSentAt: {
+      type: Date,
     },
   },
   {

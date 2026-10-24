@@ -318,7 +318,7 @@ export default function CustomerAccountPage() {
                             </div>
 
                             <Link
-                              href={`/track-order?order=${ord.orderNumber}`}
+                              href={`/track-order?order=${encodeURIComponent(ord.orderNumber.replace(/^#/, ""))}`}
                               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#5A805B]/10 hover:bg-[#5A805B]/20 text-[#5A805B] text-xs font-bold transition"
                             >
                               <span>Track</span>

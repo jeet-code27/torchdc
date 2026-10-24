@@ -12,6 +12,17 @@ export const metadata: Metadata = {
     index: false,
     follow: false,
   },
+  // "Torch Admin" home-screen app: needed for order alerts on iPhone
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "Torch Admin", statusBarStyle: "default" },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/assets/img/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/assets/img/favicon-16.png", type: "image/png", sizes: "16x16" },
+    ],
+    apple: "/admin-icons/icon-192.png",
+  },
 };
 
 export default async function AdminRootLayout({

@@ -36,6 +36,25 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import ProductsMobileList, { type AdminProductRow } from "@/components/admin/products/ProductsMobileList";
+
+// Category chips on the phone list, in menu order
+const MAIN_CATEGORIES = ["flowers", "pre-rolls", "disposables", "cartridges", "concentrates", "edibles", "mushrooms"];
+
+function mainCategory(p: ProductItem) {
+  const cats = p.categoryIds || [];
+  return (
+    MAIN_CATEGORIES.map((slug) => cats.find((c) => c.slug === slug)).find(Boolean) ||
+    cats[0] || { name: "Other", slug: "other" }
+  );
+}
+
+function priceLabel(p: ProductItem) {
+  if (p.type === "variable" && p.variants?.length) {
+    return p.variants.length === 1 ? `$${p.variants[0].salePrice || p.variants[0].price}` : `${p.variants.length} sizes`;
+  }
+  return `$${p.salePrice || p.price}`;
+}
 
 export interface ProductItem {
   _id: string;
@@ -105,6 +124,41 @@ export default function ProductsPage() {
   React.useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  // Phone list (client admin update): one switch per product for in stock / out of stock
+  const mobileRows: AdminProductRow[] = React.useMemo(
+    () =>
+      products.map((p) => ({
+        _id: p._id,
+        name: p.name,
+        category: mainCategory(p).name,
+        priceLabel: priceLabel(p),
+        inStock: p.inStock !== false,
+        isBestSeller: p.isBestSeller,
+        imageUrl: p.images?.find((img) => img.isPrimary)?.url || p.images?.[0]?.url,
+      })),
+    [products]
+  );
+  const mobileCategories = React.useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const p of products) {
+      const c = mainCategory(p);
+      if (!seen.has(c.slug)) seen.set(c.slug, c.name);
+    }
+    const rank = (slug: string) => (MAIN_CATEGORIES.indexOf(slug) + 1 || 99);
+    return [...seen.entries()].sort((a, b) => rank(a[0]) - rank(b[0])).map(([, name]) => name);
+  }, [products]);
+
+  const setInStock = React.useCallback(async (id: string, inStock: boolean) => {
+    const res = await fetch(`/api/admin/products/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inStock }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) throw new Error(json.error || "Could not save");
+    setProducts((prev) => prev.map((p) => (p._id === id ? { ...p, inStock } : p)));
+  }, []);
 
 
   // Delete product
@@ -444,7 +498,19 @@ export default function ProductsPage() {
 
   return (
     <PermissionGuard permission="products.view">
-      <div className="space-y-6 animate-in fade-in-50 duration-300">
+      {/* Phones: quick list with stock switches */}
+      <div className="md:hidden">
+        <div className="admin-light -m-4 min-h-[calc(100vh-4rem)]">
+          {isLoading ? (
+            <p className="px-4 py-16 text-center text-sm text-[#52525b]">Loading products…</p>
+          ) : (
+            <ProductsMobileList products={mobileRows} categories={mobileCategories} setInStock={setInStock} />
+          )}
+        </div>
+      </div>
+
+      {/* Tablets and computers: full table */}
+      <div className="hidden md:block space-y-6 animate-in fade-in-50 duration-300">
         {/* Header */}
         <PageHeader
           title="Products"

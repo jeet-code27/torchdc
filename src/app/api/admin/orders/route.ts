@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/permissions";
-import { Order } from "@/models/Order";
+import { Order, type IOrder } from "@/models/Order";
+import { escapeRegex, orderNumberCandidates } from "@/lib/orders/order-number";
+import { logStatusChange, manualStatusUpdate } from "@/lib/orders/order-status";
 
 export const dynamic = "force-dynamic";
 
@@ -38,12 +40,18 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get("status");
     const fulfillment = searchParams.get("fulfillment");
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-    const limit = Math.max(1, Math.min(50, parseInt(searchParams.get("limit") || "20", 10)));
+    // The mobile Orders screen loads a whole working set at once (up to 500)
+    const limit = Math.max(1, Math.min(500, parseInt(searchParams.get("limit") || "20", 10)));
     const skip = (page - 1) * limit;
 
     // Build filter query
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: Record<string, any> = {};
+
+    // Test orders stay out of the lists unless asked for
+    if (searchParams.get("includeTests") !== "1") {
+      filter.isTest = { $ne: true };
+    }
 
     if (status && status !== "all") {
       filter.orderStatus = status;
@@ -54,8 +62,9 @@ export async function GET(req: NextRequest) {
     }
 
     if (q) {
-      const regex = new RegExp(q, "i");
+      const regex = new RegExp(escapeRegex(q.replace(/^#/, "")), "i");
       filter.$or = [
+        { orderNumber: { $in: orderNumberCandidates(q) } },
         { orderNumber: regex },
         { "customer.name": regex },
         { "customer.email": regex },
@@ -71,6 +80,7 @@ export async function GET(req: NextRequest) {
         .lean(),
       Order.countDocuments(filter),
       Order.aggregate([
+        { $match: { isTest: { $ne: true } } },
         {
           $group: {
             _id: "$orderStatus",
@@ -132,7 +142,7 @@ export async function PATCH(req: NextRequest) {
 
     await connectToDatabase();
     const body = await req.json();
-    const { orderId, orderStatus, paymentStatus, deliveryNotes } = body;
+    const { orderId, orderStatus, paymentStatus, deliveryNotes, staffNotes } = body;
 
     if (!orderId) {
       return NextResponse.json(
@@ -146,12 +156,32 @@ export async function PATCH(req: NextRequest) {
     if (orderStatus) updates.orderStatus = orderStatus;
     if (paymentStatus) updates.paymentStatus = paymentStatus;
     if (deliveryNotes !== undefined) updates.deliveryNotes = deliveryNotes;
+    if (typeof staffNotes === "string") updates.staffNotes = staffNotes.slice(0, 2000);
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
-      { $set: updates },
-      { returnDocument: "after" }
-    );
+    // Status changes are kept in the order history and the Activity Log
+    const current = await Order.findById(orderId).select("orderNumber orderStatus").lean();
+    if (!current) {
+      return NextResponse.json(
+        { success: false, error: "Order not found" },
+        { status: 404 }
+      );
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ops: Record<string, any> = { $set: updates };
+    const statusChanged = Boolean(orderStatus) && orderStatus !== current.orderStatus;
+    if (statusChanged) {
+      const extra = manualStatusUpdate(current.orderStatus, orderStatus as IOrder["orderStatus"], user);
+      Object.assign(updates, extra.set);
+      ops.$push = extra.push;
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, ops, {
+      returnDocument: "after",
+      runValidators: true,
+    });
+    if (updatedOrder && statusChanged) {
+      await logStatusChange(user, current, current.orderStatus, orderStatus);
+    }
 
     if (!updatedOrder) {
       return NextResponse.json(

@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   ShoppingBag,
 } from "lucide-react";
+import { orderLabel } from "@/lib/orders/display";
 
 interface OrderSuccessPageProps {
   params: Promise<{ id: string }>;
@@ -74,7 +75,7 @@ export default async function OrderSuccessPage({
               Thank You, {order.customer.name}!
             </h1>
             <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-1">
-              Order #{order.orderNumber} has been received and is being packed.
+              Order {orderLabel(order.orderNumber)} has been received and is being packed.
             </p>
           </div>
 
@@ -123,7 +124,7 @@ export default async function OrderSuccessPage({
               Order Summary
             </h2>
             <span className="text-xs font-bold text-neutral-500">
-              #{order.orderNumber}
+              {orderLabel(order.orderNumber)}
             </span>
           </div>
 

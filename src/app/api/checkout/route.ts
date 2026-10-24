@@ -4,6 +4,7 @@ import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/models/Order";
 import { Cart } from "@/models/Cart";
 import { Coupon } from "@/models/Coupon";
+import { StoreSettings } from "@/models/StoreSettings";
 import { auth } from "@/auth";
 import { computeDeals, unitOf, MIN_ORDER } from "@/lib/deals";
 import { verifyCartItems, CartItemError } from "@/lib/verify-cart-items";
@@ -11,6 +12,8 @@ import {
   sendOrderConfirmationEmail,
   sendAdminNewOrderNotification,
 } from "@/lib/email";
+import { nextOrderNumber } from "@/lib/orders/order-number";
+import { alertNewOrder } from "@/lib/push/order-alerts";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +72,22 @@ export async function POST(request: Request) {
     }
 
     await connectToDatabase();
+
+    // Admin dashboard switches: "Accepting delivery orders" and "Store pickup"
+    const storeSettings = await StoreSettings.findOne({ key: "default" }).select("deliveryEnabled pickupEnabled").lean();
+    if (fulfillment === "pickup" && !storeSettings?.pickupEnabled) {
+      return NextResponse.json(
+        { success: false, error: "Store pickup is paused right now. Switch to delivery to place your order." },
+        { status: 400 }
+      );
+    }
+    if (fulfillment !== "pickup" && storeSettings?.deliveryEnabled === false) {
+      return NextResponse.json(
+        { success: false, error: "We're not taking delivery orders right now. Please call or text (202) 468-1966." },
+        { status: 400 }
+      );
+    }
+
     const session = await auth();
     const userId = session?.user?.id || null;
 
@@ -149,9 +168,8 @@ export async function POST(request: Request) {
     const deliveryFee = 0; // Free delivery across DC
     const total = Math.max(0, Number((subtotal - discountAmount + deliveryFee).toFixed(2)));
 
-    // Generate unique sequential / timestamp order number (e.g. TORCH-849201)
-    const randomDigits = Math.floor(100000 + Math.random() * 900000);
-    const orderNumber = `TORCH-${randomDigits}`;
+    // Short sequential order number (#1001, #1002, ...); older orders keep their TORCH-xxxxxx numbers
+    const orderNumber = await nextOrderNumber();
 
     const formattedNotes = [
       deliveryNotes?.trim() || "",
@@ -195,7 +213,9 @@ export async function POST(request: Request) {
       paymentMethod:
         fulfillment === "pickup" ? "cash_on_pickup" : "cash_on_delivery",
       paymentStatus: "pending",
-      orderStatus: "confirmed",
+      // New orders wait for staff to confirm them with one tap in the admin
+      orderStatus: "pending",
+      history: [{ at: new Date(), label: "Order placed by customer", status: "pending" }],
       isAgeVerified: true,
       sessionId: sessionId || "",
       userId: userId ? new mongoose.Types.ObjectId(userId) : null,
@@ -232,7 +252,11 @@ export async function POST(request: Request) {
     // Send emails right after the response. after() keeps the serverless function alive
     // until they finish (a plain fire-and-forget promise can be cut off on Vercel).
     after(async () => {
-      await Promise.allSettled([sendOrderConfirmationEmail(newOrder), sendAdminNewOrderNotification(newOrder)]);
+      await Promise.allSettled([
+        sendOrderConfirmationEmail(newOrder),
+        sendAdminNewOrderNotification(newOrder),
+        alertNewOrder(newOrder),
+      ]);
     });
 
     return NextResponse.json({

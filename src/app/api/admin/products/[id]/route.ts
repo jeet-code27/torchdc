@@ -220,6 +220,45 @@ export async function PUT(
 }
 
 // DELETE /api/admin/products/[id] - Delete product and its Cloudinary media
+// PATCH /api/admin/products/[id] - Quick stock switch from the phone Products list { inStock: boolean }
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+  const canEdit =
+    user.role === "super_admin" || user.permissions.includes("*") || user.permissions.includes("products.edit");
+  if (!canEdit) {
+    return NextResponse.json({ success: false, error: "Forbidden: Missing product edit permissions" }, { status: 403 });
+  }
+
+  try {
+    const { id } = await params;
+    const body = await req.json().catch(() => ({}));
+    if (typeof body.inStock !== "boolean") {
+      return NextResponse.json({ success: false, error: "inStock (true/false) is required" }, { status: 400 });
+    }
+    await connectToDatabase();
+    const updated = await Product.findByIdAndUpdate(
+      id,
+      { $set: { inStock: body.inStock } },
+      { returnDocument: "after" }
+    )
+      .select("_id name inStock")
+      .lean();
+    if (!updated) {
+      return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+    }
+    return NextResponse.json({ success: true, data: updated });
+  } catch (error) {
+    console.error("PATCH /api/admin/products/[id] error:", error);
+    return NextResponse.json({ success: false, error: "Failed to update stock" }, { status: 500 });
+  }
+}
+
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

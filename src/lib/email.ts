@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { IOrder } from "@/models/Order";
+import { orderLabel } from "@/lib/orders/display";
 
 function getTransporter() {
   const host = process.env.SMTP_HOST;
@@ -108,7 +109,7 @@ export async function sendOrderConfirmationEmail(order: IOrder) {
         <div style="background: #ffffff; border-bottom: 3px solid ${BRAND_GREEN}; padding: 28px 24px; text-align: center;">
           <img src="${TORCH_LOGO_URL}" alt="TORCH" style="height: 44px; max-width: 190px; margin: 0 auto 10px; display: block; border: 0;" />
           <h1 style="margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; color: #111827;">ORDER CONFIRMED</h1>
-          <p style="margin: 4px 0 0; font-size: 13px; font-weight: 600; color: ${BRAND_GREEN};">#${order.orderNumber}</p>
+          <p style="margin: 4px 0 0; font-size: 13px; font-weight: 600; color: ${BRAND_GREEN};">${orderLabel(order.orderNumber)}</p>
         </div>
 
         <div style="padding: 28px 24px;">
@@ -175,7 +176,7 @@ export async function sendOrderConfirmationEmail(order: IOrder) {
       from: FROM_EMAIL,
       to: order.customer.email,
       replyTo: PUBLIC_REPLY_TO,
-      subject: `Order #${order.orderNumber} Confirmed | Torch`,
+      subject: `Order ${orderLabel(order.orderNumber)} Confirmed | Torch`,
       html,
     });
 
@@ -194,7 +195,7 @@ export async function sendAdminNewOrderNotification(order: IOrder) {
     const transporter = getTransporter();
     if (!transporter) {
       console.log(
-        `[Email Simulation] Admin new order alert for #${order.orderNumber} ($${order.total})`
+        `[Email Simulation] Admin new order alert for ${orderLabel(order.orderNumber)} ($${order.total})`
       );
       return { success: true, simulated: true };
     }
@@ -207,7 +208,7 @@ export async function sendAdminNewOrderNotification(order: IOrder) {
       <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 580px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">
         <div style="margin-bottom: 16px; border-bottom: 2px solid ${BRAND_GREEN}; padding-bottom: 12px;">
           <img src="${TORCH_LOGO_URL}" alt="TORCH" style="height: 36px; display: block; margin-bottom: 8px;" />
-          <h2 style="color: #111827; margin: 0; font-size: 18px;">🚨 NEW ORDER ALERT: #${order.orderNumber}</h2>
+          <h2 style="color: #111827; margin: 0; font-size: 18px;">🚨 NEW ORDER ALERT: ${orderLabel(order.orderNumber)}</h2>
         </div>
         
         <p style="font-size: 16px; font-weight: bold; color: #111827; margin: 8px 0;">
@@ -245,7 +246,7 @@ export async function sendAdminNewOrderNotification(order: IOrder) {
       from: FROM_EMAIL,
       to: ADMIN_RECIPIENTS.join(", "),
       replyTo: order.customer.email || undefined,
-      subject: `🚨 NEW ORDER #${order.orderNumber} - $${order.total.toFixed(2)} (${order.fulfillment})`,
+      subject: `🚨 NEW ORDER ${orderLabel(order.orderNumber)} - $${order.total.toFixed(2)} (${order.fulfillment})`,
       html,
     });
 

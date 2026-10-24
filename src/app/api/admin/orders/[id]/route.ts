@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/permissions";
-import { Order } from "@/models/Order";
+import { Order, type IOrder } from "@/models/Order";
+import { orderNumberCandidates } from "@/lib/orders/order-number";
+import { logStatusChange, manualStatusUpdate } from "@/lib/orders/order-status";
 import mongoose from "mongoose";
 
 export const dynamic = "force-dynamic";
@@ -44,7 +46,7 @@ export async function GET(
       order = await Order.findById(id).lean();
     }
     if (!order) {
-      order = await Order.findOne({ orderNumber: id }).lean();
+      order = await Order.findOne({ orderNumber: { $in: orderNumberCandidates(decodeURIComponent(id)) } }).lean();
     }
 
     if (!order) {
@@ -99,35 +101,54 @@ export async function PATCH(
     await connectToDatabase();
     const { id } = await params;
     const body = await req.json();
-    const { orderStatus, paymentStatus, deliveryNotes } = body;
+    const { orderStatus, paymentStatus, deliveryNotes, staffNotes, isTest } = body;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: Record<string, any> = {};
     if (orderStatus) updates.orderStatus = orderStatus;
     if (paymentStatus) updates.paymentStatus = paymentStatus;
     if (deliveryNotes !== undefined) updates.deliveryNotes = deliveryNotes;
+    if (typeof staffNotes === "string") updates.staffNotes = staffNotes.slice(0, 2000);
+    if (typeof isTest === "boolean") updates.isTest = isTest;
 
-    let updatedOrder = null;
+    let current = null;
     if (mongoose.Types.ObjectId.isValid(id)) {
-      updatedOrder = await Order.findByIdAndUpdate(
-        id,
-        { $set: updates },
-        { returnDocument: "after" }
-      );
+      current = await Order.findById(id).select("orderNumber orderStatus").lean();
     }
-    if (!updatedOrder) {
-      updatedOrder = await Order.findOneAndUpdate(
-        { orderNumber: id },
-        { $set: updates },
-        { returnDocument: "after" }
+    if (!current) {
+      current = await Order.findOne({ orderNumber: { $in: orderNumberCandidates(decodeURIComponent(id)) } })
+        .select("orderNumber orderStatus")
+        .lean();
+    }
+    if (!current) {
+      return NextResponse.json(
+        { success: false, error: "Order not found" },
+        { status: 404 }
       );
     }
 
+    // Status changes are kept in the order history and the Activity Log
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ops: Record<string, any> = { $set: updates };
+    const statusChanged = Boolean(orderStatus) && orderStatus !== current.orderStatus;
+    if (statusChanged) {
+      const extra = manualStatusUpdate(current.orderStatus, orderStatus as IOrder["orderStatus"], user);
+      Object.assign(updates, extra.set);
+      ops.$push = extra.push;
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(current._id, ops, {
+      returnDocument: "after",
+      runValidators: true,
+    });
     if (!updatedOrder) {
       return NextResponse.json(
         { success: false, error: "Order not found" },
         { status: 404 }
       );
+    }
+    if (statusChanged) {
+      await logStatusChange(user, current, current.orderStatus, orderStatus);
     }
 
     return NextResponse.json({
