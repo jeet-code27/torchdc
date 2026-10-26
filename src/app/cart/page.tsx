@@ -12,6 +12,7 @@ import { FEE_NEAR } from "@/lib/delivery-fees";
 import { OrderConfirmation, type PlacedOrder } from "@/components/storefront/order-confirmation";
 
 type Zone = "DC" | "MD" | "VA";
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const money = (n: number) => `$${(Math.round(n * 100) / 100).toLocaleString("en-US")}`;
 const PIN = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A805B" strokeWidth="2" aria-hidden="true">
@@ -43,7 +44,7 @@ export default function CartPage() {
   // Form states (Oct 24: no email, apartment, change, first-order or 21+ fields)
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
-  // Optional: kept so customers who want one get the order receipt email
+  // Required (client request): order confirmation email and later offers
   const [email, setEmail] = React.useState("");
   const [address, setAddress] = React.useState("");
   const [notes, setNotes] = React.useState("");
@@ -121,6 +122,7 @@ export default function CartPage() {
     if (!name.trim()) problems.push("your name");
     const cleanPhone = phone.replace(/\D/g, "");
     if (cleanPhone.length < 10) problems.push("a valid mobile number");
+    if (!EMAIL_RE.test(email.trim())) problems.push("a valid email");
     if (isDelivery && !address.trim()) problems.push("your delivery address");
 
     if (problems.length > 0) {
@@ -423,7 +425,7 @@ export default function CartPage() {
               />
 
               <label htmlFor="c-email">
-                Email <span className="opt">(optional, for your receipt)</span>
+                Email
               </label>
               <input
                 id="c-email"
@@ -431,6 +433,8 @@ export default function CartPage() {
                 type="email"
                 autoComplete="email"
                 inputMode="email"
+                required
+                placeholder="For your order confirmation"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />

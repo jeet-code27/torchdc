@@ -52,6 +52,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Email is required: order confirmation email (and later offers)
+    const email = String(customer?.email || "").trim().toLowerCase().slice(0, 120);
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return NextResponse.json(
+        { success: false, error: "Please add a valid email so we can send your order confirmation." },
+        { status: 400 }
+      );
+    }
+
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { success: false, error: "Your cart is empty. Please add items to order." },
@@ -191,10 +200,7 @@ export async function POST(request: Request) {
       orderNumber,
       customer: {
         name: customer.name.trim(),
-        // Optional; a mistyped address is dropped so the receipt never bounces
-        email: /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(customer.email || "").trim())
-          ? String(customer.email).trim().toLowerCase().slice(0, 120)
-          : "",
+        email,
         phone: customer.phone.trim(),
       },
       fulfillment: fulfillment === "pickup" ? "pickup" : "delivery",
