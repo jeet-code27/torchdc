@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import DashboardToday, { type AttentionItem, type StoreSettingKey } from "@/components/admin/dashboard/DashboardToday";
 import OrderAlertsCard from "@/components/admin/OrderAlertsCard";
+import PullToRefresh from "@/components/admin/PullToRefresh";
+import { postOrderStatus } from "@/components/admin/orders/map";
+import type { OrderStatus } from "@/components/admin/orders/types";
 import { LightSurface } from "@/components/admin/light-surface";
 import { usePermissions } from "@/hooks/use-permissions";
 
@@ -62,12 +65,44 @@ export default function AdminDashboardPage() {
     }
   }, []);
 
+  const loadStats = React.useCallback(async () => {
+    try {
+      const json = await (await fetch("/api/admin/dashboard/stats")).json();
+      if (json.success) setStats(json);
+    } catch {}
+  }, []);
+
+  // Pull to refresh / auto-refresh every 30 s (PullToRefresh) reloads both
+  const refreshAll = React.useCallback(async () => {
+    await Promise.all([loadToday(), loadStats()]);
+  }, [loadToday, loadStats]);
+
+  // One-tap actions on the Needs attention cards
+  const setStatus = React.useCallback(
+    async (ids: string[], status: OrderStatus) => {
+      await postOrderStatus(ids, status);
+      loadToday();
+    },
+    [loadToday]
+  );
+  const setTestFlag = React.useCallback(
+    async (orderIds: string[], isTest: boolean) => {
+      const res = await fetch("/api/admin/orders/test-flag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderIds, isTest }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.success) throw new Error(json.error || "Could not save");
+      loadToday();
+      loadStats();
+    },
+    [loadToday, loadStats]
+  );
+
   React.useEffect(() => {
     loadToday();
-    fetch("/api/admin/dashboard/stats")
-      .then((r) => r.json())
-      .then((json) => json.success && setStats(json))
-      .catch(() => {});
+    loadStats();
     fetch("/api/admin/settings/store")
       .then((r) => r.json())
       .then((json) => {
@@ -80,12 +115,7 @@ export default function AdminDashboardPage() {
         }
       })
       .catch(() => {});
-    // Keep "New orders" fresh while the dashboard is open
-    const timer = window.setInterval(() => {
-      if (document.visibilityState === "visible") loadToday();
-    }, 60_000);
-    return () => window.clearInterval(timer);
-  }, [loadToday]);
+  }, [loadToday, loadStats]);
 
   const setStoreSetting = React.useCallback(async (key: StoreSettingKey, value: boolean) => {
     const res = await fetch("/api/admin/settings/store", {
@@ -122,12 +152,15 @@ export default function AdminDashboardPage() {
 
   return (
     <LightSurface className="pb-10">
+      <PullToRefresh onRefresh={refreshAll}>
       {today && settings ? (
         <DashboardToday
           newOrders={today.newOrders}
           today={today.today}
           week={today.week}
           attention={today.attention}
+          setStatus={setStatus}
+          setTestFlag={setTestFlag}
           store={{ ...settings, hoursLabel: "7AM to 11PM" }}
           setStoreSetting={setStoreSetting}
           alertsSlot={hasPermission("orders.view") ? <OrderAlertsCard /> : null}
@@ -194,6 +227,7 @@ export default function AdminDashboardPage() {
           </div>
         </section>
       )}
+      </PullToRefresh>
     </LightSurface>
   );
 }

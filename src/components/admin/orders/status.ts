@@ -48,6 +48,15 @@ export function timelineIndex(status: OrderStatus) {
 
 export const money = (n: number) => `$${Number(n || 0).toFixed(2)}`;
 
+/** "#1042" stays "#1042"; legacy "TORCH-806546" stays as is (never "#TORCH-..."). */
+export function displayOrderNumber(n: string) {
+  const v = String(n || '').trim();
+  if (/^#/.test(v) || /^[A-Za-z]/.test(v)) return v;
+  return `#${v}`;
+}
+
+export const isFinal = (s: OrderStatus) => s === 'completed' || s === 'cancelled';
+
 export function itemCount(order: AdminOrder) {
   return order.items.reduce((sum, i) => sum + (i.quantity || 1), 0);
 }
@@ -93,17 +102,11 @@ export function buildCopyText(order: AdminOrder) {
     order.customer.phone || '',
     addressLine(order),
     ...order.items.map((i) => `${i.quantity}x ${i.name}${i.weight ? ` (${i.weight})` : ''}`),
-    `Collect: ${money(order.total)} cash`,
+    money(order.total),
   ];
   if (order.changeFor) lines.push(`Needs change for $${order.changeFor}`);
   if (order.deliveryNotes) lines.push(`Note: ${order.deliveryNotes}`);
-  return lines.filter(Boolean).join('\n');
-}
-
-/** Message for a failed save: the server's reason when it gave one (e.g. "changed by someone else"). */
-export function saveErrorText(err: unknown) {
-  const msg = err instanceof Error ? err.message : '';
-  return msg && !/fetch|network|load failed/i.test(msg) ? msg : "Couldn't save. Check your connection and try again.";
+  return lines.filter(Boolean).join('\n\n'); // blank line between each line, per owner
 }
 
 export async function copyToClipboard(text: string) {
@@ -113,4 +116,10 @@ export async function copyToClipboard(text: string) {
   } catch {
     return false;
   }
+}
+
+/** Message for a failed save: the server's reason when it gave one (e.g. "changed by someone else"). */
+export function saveErrorText(err: unknown) {
+  const msg = err instanceof Error ? err.message : '';
+  return msg && !/fetch|network|load failed/i.test(msg) ? msg : "Couldn't save. Check your connection and try again.";
 }

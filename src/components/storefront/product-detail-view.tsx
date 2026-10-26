@@ -685,18 +685,6 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
               </>
             )}
 
-            {/* Perks */}
-            <div className="perks">
-              <div>
-                <strong>Free delivery</strong>
-                <span>Across DC</span>
-              </div>
-              <div>
-                <strong>Pay cash</strong>
-                <span>On delivery</span>
-              </div>
-            </div>
-
             {/* Desktop buy bar (inside pdp__info, hidden on mobile by CSS) */}
             <div className="pdp__buy">
               <div className="stepper">

@@ -19,24 +19,24 @@ export const STATUS_LABEL: Record<OrderStatus, string> = {
 /** Older pickup orders can sit at "ready_for_pickup"; it is the same step as "out". */
 const flowStep = (s: OrderStatus): OrderStatus => (s === "ready_for_pickup" ? "out_for_delivery" : s);
 
+const isFinal = (s: OrderStatus) => s === "completed" || s === "cancelled";
+
 /**
- * Moves the admin buttons can make: one step forward, Decline (pending → cancelled),
- * and one step back for Undo (including cancelled → pending).
+ * Moves the admin buttons can make (admin update v3): an open order can move forward, be completed
+ * (Delivered & paid) or cancelled from any step; Undo can bring any order back to an open step.
+ * A finished order can't jump straight to the other finished state (Completed ↔ Cancelled).
  */
 export function canMoveStatus(from: OrderStatus, to: OrderStatus) {
   const f = flowStep(from);
   if (f === to) return false;
-  if (f === "pending" && to === "cancelled") return true;
-  if (f === "cancelled" && to === "pending") return true;
-  const i = FLOW.indexOf(f);
-  const j = FLOW.indexOf(to);
-  if (i < 0 || j < 0) return false;
-  return j === i + 1 || j === i - 1;
+  if (!FLOW.includes(to) && to !== "cancelled") return false;
+  return !(isFinal(f) && isFinal(to));
 }
 
 function historyLabel(from: OrderStatus, to: OrderStatus, by: string) {
-  const back = FLOW.indexOf(to) >= 0 && FLOW.indexOf(to) < FLOW.indexOf(flowStep(from));
-  if (back || (from === "cancelled" && to === "pending")) return `Moved back to ${STATUS_LABEL[to]} by ${by}`;
+  const back =
+    (isFinal(from) && !isFinal(to)) || (FLOW.indexOf(to) >= 0 && FLOW.indexOf(to) < FLOW.indexOf(flowStep(from)));
+  if (back) return `Moved back to ${STATUS_LABEL[to]} by ${by}`;
   switch (to) {
     case "confirmed":
       return `Confirmed by ${by}`;

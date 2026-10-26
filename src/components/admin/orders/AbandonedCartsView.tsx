@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, Mail, Phone, Store, Truck } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Mail, MapPin, Phone, Store, Trash2, Truck } from "lucide-react";
 
 export interface AbandonedCartDoc {
   _id: string;
@@ -11,6 +11,7 @@ export interface AbandonedCartDoc {
     name?: string;
     email?: string;
     phone?: string;
+    address?: string;
   };
   items: Array<{ name: string; quantity: number }>;
   lastActiveAt: string;
@@ -21,9 +22,14 @@ export interface AbandonedCartDoc {
 export function AbandonedCartsView({
   abandonedCarts,
   abandonedTotalValue,
+  onDelete,
+  deletingId,
 }: {
   abandonedCarts: AbandonedCartDoc[];
   abandonedTotalValue: number;
+  /** Shows a delete button on each row */
+  onDelete?: (cart: AbandonedCartDoc) => void;
+  deletingId?: string | null;
 }) {
   return (
     <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
@@ -64,6 +70,7 @@ export function AbandonedCartsView({
                 <th className="py-3 px-4 font-semibold">Items In Cart</th>
                 <th className="py-3 px-4 font-semibold">Cart Value</th>
                 <th className="py-3 px-4 font-semibold">Last Activity</th>
+                {onDelete && <th className="py-3 px-4" aria-label="Delete" />}
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-foreground">
@@ -78,7 +85,7 @@ export function AbandonedCartsView({
                     </div>
                   </td>
                   <td className="py-3 px-4">
-                    {cart.customerInfo?.email || cart.customerInfo?.phone ? (
+                    {cart.customerInfo?.email || cart.customerInfo?.phone || cart.customerInfo?.address ? (
                       <div className="space-y-0.5">
                         {cart.customerInfo?.phone && (
                           <div className="text-foreground font-medium flex items-center gap-1">
@@ -88,6 +95,11 @@ export function AbandonedCartsView({
                         {cart.customerInfo?.email && (
                           <div className="text-muted-foreground text-[11px] flex items-center gap-1">
                             <Mail className="w-3 h-3 text-blue-600 dark:text-blue-400" /> {cart.customerInfo.email}
+                          </div>
+                        )}
+                        {cart.customerInfo?.address && (
+                          <div className="text-muted-foreground text-[11px] flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-muted-foreground" /> {cart.customerInfo.address}
                           </div>
                         )}
                       </div>
@@ -122,6 +134,19 @@ export function AbandonedCartsView({
                       minute: "2-digit",
                     })}
                   </td>
+                  {onDelete && (
+                    <td className="py-3 px-4 text-right">
+                      <button
+                        type="button"
+                        onClick={() => onDelete(cart)}
+                        disabled={deletingId === cart._id}
+                        aria-label="Delete this abandoned cart"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border text-rose-600 hover:bg-rose-50 disabled:opacity-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

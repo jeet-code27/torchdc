@@ -6,9 +6,23 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/context/cart-context";
 import { unitOf, nextStep, nextStepOz, normalizeTier } from "@/lib/deals";
-import { CartAddToOrder } from "@/components/storefront/cart-add-to-order";
 import { MinNote } from "@/components/storefront/order-minimum";
 import { orderLabel } from "@/lib/orders/display";
+import { CheckoutAddress, type PickedPlace, type Zone } from "@/components/storefront/checkout-address";
+import { OrderConfirmation, type PlacedOrder } from "@/components/storefront/order-confirmation";
+
+const money = (n: number) => `$${(Math.round(n * 100) / 100).toLocaleString("en-US")}`;
+const newSessionId = () =>
+  "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === "x" ? r : (r & 3) | 8).toString(16);
+  });
+const PIN = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A805B" strokeWidth="2" aria-hidden="true">
+    <path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z" />
+    <circle cx="12" cy="10" r="2.5" />
+  </svg>
+);
 
 export default function CartPage() {
   const { data: session } = useSession();
@@ -27,48 +41,103 @@ export default function CartPage() {
     sessionId,
     minShortfall,
     setIsMinSheetOpen,
+    syncCustomerInfo,
   } = useCart();
 
-  // Form states
+  // Form states (Oct 24: no email, apartment, change, first-order or 21+ fields)
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
-  const [email, setEmail] = React.useState("");
   const [address, setAddress] = React.useState("");
-  const [apt, setApt] = React.useState("");
-  const [changeFor, setChangeFor] = React.useState("");
   const [notes, setNotes] = React.useState("");
-  const [firstOrder, setFirstOrder] = React.useState(false);
-  const [over21, setOver21] = React.useState(true);
+
+  // Delivery area and the picked Google address (fee decided by the server)
+  const [zone, setZoneState] = React.useState<Zone>("DC");
+  const [place, setPlaceState] = React.useState<PickedPlace | null>(null);
+  const [acOff, setAcOff] = React.useState(false);
+  const [placeSession, setPlaceSession] = React.useState("");
 
   const [formError, setFormError] = React.useState("");
   const [isPlacing, setIsPlacing] = React.useState(false);
-  const [placedOrder, setPlacedOrder] = React.useState<{
-    orderNumber: string;
-    total: number;
-    phone: string;
-  } | null>(null);
+  const [placedOrder, setPlacedOrder] = React.useState<PlacedOrder | null>(null);
 
-  // Restore saved details from localStorage or Session
+  // Restore saved details, area and picked address
   React.useEffect(() => {
+    setPlaceSession(newSessionId());
     try {
       const saved = localStorage.getItem("torch_details");
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.name) setName(parsed.name);
         if (parsed.phone) setPhone(parsed.phone);
-        if (parsed.email) setEmail(parsed.email);
-        if (parsed.address) setAddress(parsed.address);
-        if (parsed.apt) setApt(parsed.apt);
+      }
+      const z = localStorage.getItem("torch_zone");
+      if (z === "DC" || z === "MD" || z === "VA") setZoneState(z);
+      const p = JSON.parse(localStorage.getItem("torch_place") || "null");
+      if (p && p.id && p.address) {
+        setPlaceState(p);
+        setAddress(p.address);
       }
     } catch {
       // ignore
     }
 
-    if (session?.user) {
-      if (session.user.name && !name) setName(session.user.name);
-      if (session.user.email && !email) setEmail(session.user.email);
-    }
+    if (session?.user?.name) setName((cur) => cur || session.user!.name || "");
   }, [session]);
+
+  // Contact details typed so far go with the cart, so abandoned carts show who to follow up with
+  React.useEffect(() => {
+    if (!name.trim() && !phone.trim() && !address.trim()) return;
+    syncCustomerInfo({ name: name.trim(), phone: phone.trim(), address: address.trim() });
+  }, [name, phone, address, syncCustomerInfo]);
+
+  const setZone = (z: Zone) => {
+    setZoneState(z);
+    try {
+      localStorage.setItem("torch_zone", z);
+    } catch {}
+    // A picked address in another state no longer fits
+    if (place && place.state !== z) {
+      setPlace(null);
+      setAddress("");
+    }
+  };
+  const setPlace = (p: PickedPlace | null) => {
+    setPlaceState(p);
+    try {
+      if (p) localStorage.setItem("torch_place", JSON.stringify(p));
+      else localStorage.removeItem("torch_place");
+    } catch {}
+    if (p && (p.state === "DC" || p.state === "MD" || p.state === "VA") && p.state !== zone) {
+      setZoneState(p.state);
+      try {
+        localStorage.setItem("torch_zone", p.state);
+      } catch {}
+    }
+  };
+
+  const isDelivery = fulfillment === "delivery";
+  const quote = isDelivery ? place?.quote || null : null;
+  const tooFar = quote?.band === "far";
+  const otherState = quote?.band === "other";
+  // DC free; MD/VA $20 near the Beltway, $40 farther (known once an address is picked)
+  const fee = !isDelivery ? 0 : quote ? quote.fee || 0 : zone !== "DC" && acOff ? 20 : 0;
+  const totalDue = finalTotal + fee;
+  const feeText = !isDelivery
+    ? null
+    : tooFar
+    ? "Text us"
+    : quote
+    ? quote.fee
+      ? money(quote.fee)
+      : null
+    : zone === "DC"
+    ? null
+    : acOff
+    ? "$20"
+    : "$20 or $40";
+  const smsHref = `sms:+12024681966?&body=${encodeURIComponent(
+    `Hi! I'd like a delivery to ${place?.address || address}. Can you deliver there?`
+  )}`;
 
   // Aggregate item weights per flower tier
   const flowerCounts = React.useMemo(() => {
@@ -92,12 +161,20 @@ export default function CartPage() {
       return;
     }
 
+    // Out of range: the button texts the store instead of ordering
+    if (isDelivery && tooFar) {
+      window.location.href = smsHref;
+      return;
+    }
+
     const problems: string[] = [];
     if (!name.trim()) problems.push("your name");
     const cleanPhone = phone.replace(/\D/g, "");
     if (cleanPhone.length < 10) problems.push("a valid mobile number");
-    if (fulfillment === "delivery" && !address.trim()) problems.push("your delivery address");
-    if (!over21) problems.push("confirmation that you are 21+");
+    if (isDelivery && !place && !(acOff && address.trim())) {
+      problems.push(acOff ? "your delivery address" : "your address (pick it from the list)");
+    }
+    if (isDelivery && otherState) problems.push("an address in DC, Maryland or Virginia");
 
     if (problems.length > 0) {
       setFormError(`Please add ${problems.join(", ")}.`);
@@ -108,7 +185,7 @@ export default function CartPage() {
     try {
       localStorage.setItem(
         "torch_details",
-        JSON.stringify({ name, phone, email, address, apt })
+        JSON.stringify({ name, phone })
       );
     } catch {
       // ignore
@@ -121,20 +198,14 @@ export default function CartPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customer: { name, phone, email },
+          customer: { name, phone },
           fulfillment,
-          deliveryAddress: {
-            street: address,
-            apartment: apt,
-            city: "Washington",
-            state: "DC",
-            zip: "20001",
-          },
+          zone,
+          placeId: place?.id || "",
+          placeSession,
+          deliveryAddress: { street: place?.address || address },
           deliveryNotes: notes,
-          changeFor: changeFor.replace(/[^\d.]/g, ""),
-          firstOrder,
           prerollBonus: hasPrerollBonus,
-          isAgeVerified: over21,
           items: items.map((it) => ({
             id: it.id,
             name: it.name,
@@ -157,10 +228,17 @@ export default function CartPage() {
 
       setPlacedOrder({
         orderNumber: data.orderNumber || "ORDER",
-        total: Number(data.total) || finalTotal,
-        phone,
+        firstName: name.trim().split(/\s+/)[0] || "",
+        isDelivery,
+        address: data.address || place?.address || address,
+        lines: items.map((it) => ({ name: it.name, weight: it.weight, quantity: it.quantity, total: it.price * it.quantity })),
+        deals: deals.items.map((d) => ({ label: d.label, amount: d.amount })),
+        fee: Number(data.deliveryFee) || 0,
+        total: Number(data.total) || totalDue,
       });
 
+      setPlace(null);
+      setAddress("");
       clearCart();
       window.scrollTo(0, 0);
     } catch (err: any) {
@@ -173,8 +251,8 @@ export default function CartPage() {
   return (
     <main>
       <div className="cartpage">
-        {/* Page Head */}
-        <div className="pagehead">
+        {/* Page Head (hidden on the confirmation screen) */}
+        <div className="pagehead" hidden={Boolean(placedOrder)}>
           <div>
             <h1>Your Cart</h1>
             <span className="muted">
@@ -197,17 +275,7 @@ export default function CartPage() {
         {/* Success screen */}
         {placedOrder && (
           <div className="done">
-            <span className="okdot okdot--big">✓</span>
-            <h2>Order placed</h2>
-            <p>
-              Order {orderLabel(placedOrder.orderNumber)} · ${placedOrder.total}, paid in cash on delivery.
-            </p>
-            <p>
-              We&apos;ll text <strong>{placedOrder.phone}</strong> when it&apos;s on the way. Have your 21+ ID ready.
-            </p>
-            <Link className="pill pill--green" href="/">
-              Back to home
-            </Link>
+            <OrderConfirmation order={{ ...placedOrder, orderNumber: orderLabel(placedOrder.orderNumber) }} />
           </div>
         )}
 
@@ -374,9 +442,6 @@ export default function CartPage() {
                   </div>
                 ))}
               </div>
-
-              {/* Quick Add-on cross-sells */}
-              <CartAddToOrder compact={true} />
             </div>
 
             {/* Right Column: Checkout form & live order summary */}
@@ -388,10 +453,6 @@ export default function CartPage() {
                     Account: {session.user.name || session.user.email}
                   </span>
                 )}
-              </div>
-
-              <div className="paynote">
-                <span>Cash on delivery. We&apos;ll text you when your driver is outside.</span>
               </div>
 
               <label htmlFor="c-name">Full name</label>
@@ -417,39 +478,70 @@ export default function CartPage() {
                 onChange={(e) => setPhone(e.target.value)}
               />
 
-              <label htmlFor="c-email">
-                Email <span className="opt">(optional)</span>
-              </label>
-              <input
-                id="c-email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-
-              {fulfillment === "delivery" && (
+              {isDelivery && (
                 <div>
+                  <label id="c-zone-l">Delivering to</label>
+                  <div className="seg seg--3 seg--green zoneseg" role="radiogroup" aria-labelledby="c-zone-l">
+                    {(
+                      [
+                        ["DC", "DC"],
+                        ["MD", "Maryland"],
+                        ["VA", "Virginia"],
+                      ] as [Zone, string][]
+                    ).map(([z, label]) => (
+                      <button
+                        key={z}
+                        type="button"
+                        role="radio"
+                        aria-checked={zone === z}
+                        className={zone === z ? "is-on" : ""}
+                        onClick={() => setZone(z)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="zonehint" hidden={zone === "DC"}>
+                    Inside or near the Beltway: <b>$20</b>. Farther: <b>$40</b>.
+                  </p>
                   <label htmlFor="c-addr">Delivery address</label>
-                  <input
-                    id="c-addr"
-                    name="address"
-                    autoComplete="street-address"
-                    placeholder="Street address in Washington, DC"
+                  <CheckoutAddress
                     value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                    onValueChange={setAddress}
+                    place={place}
+                    onPlace={setPlace}
+                    acOff={acOff}
+                    onAcOff={() => setAcOff(true)}
+                    session={placeSession}
+                    onNewSession={() => setPlaceSession(newSessionId())}
                   />
-                  <label htmlFor="c-apt">
-                    Apt, suite or buzzer <span className="opt">(optional)</span>
-                  </label>
-                  <input
-                    id="c-apt"
-                    name="apt"
-                    autoComplete="address-line2"
-                    value={apt}
-                    onChange={(e) => setApt(e.target.value)}
-                  />
+                  <div>
+                    {tooFar && (
+                      <div className="toofar">
+                        <b>
+                          Uh-oh, that&apos;s a little outside
+                          <br />
+                          our delivery range.
+                        </b>
+                        <span>
+                          Reach out at <a href={smsHref}>(202) 468-1966</a> and we&apos;ll see what we can do.
+                        </span>
+                      </div>
+                    )}
+                    {otherState && (
+                      <div className="toofar">
+                        <b>We deliver in DC, Maryland and Virginia.</b>
+                        <span>Please pick an address there.</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="meetnote">
+                    {PIN}
+                    <span>
+                      Your driver will text you when they&apos;re on the way and when they&apos;re outside, so you can step out
+                      and grab your order.
+                    </span>
+                  </p>
                 </div>
               )}
 
@@ -459,21 +551,6 @@ export default function CartPage() {
                   <span>We text you when it&apos;s ready.</span>
                 </div>
               )}
-
-              <label htmlFor="c-change">
-                Need change? Paying with <span className="opt">(optional)</span>
-              </label>
-              <div className="moneyin">
-                <span>$</span>
-                <input
-                  id="c-change"
-                  name="changeFor"
-                  inputMode="numeric"
-                  placeholder="e.g. 100"
-                  value={changeFor}
-                  onChange={(e) => setChangeFor(e.target.value)}
-                />
-              </div>
 
               <label htmlFor="c-notes">
                 Notes for your driver <span className="opt">(optional)</span>
@@ -485,27 +562,6 @@ export default function CartPage() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />
-
-              <label className="check">
-                <input
-                  type="checkbox"
-                  name="firstOrder"
-                  checked={firstOrder}
-                  onChange={(e) => setFirstOrder(e.target.checked)}
-                />
-                This is my first Torch order
-              </label>
-
-              <label className="check">
-                <input
-                  type="checkbox"
-                  name="over21"
-                  required
-                  checked={over21}
-                  onChange={(e) => setOver21(e.target.checked)}
-                />
-                I&apos;m 21 or older and will show a valid ID
-              </label>
 
               {/* Order summary breakdown */}
               <div className="summary">
@@ -522,8 +578,8 @@ export default function CartPage() {
                 ))}
 
                 <div>
-                  <span>{fulfillment === "delivery" ? "Delivery" : "Pickup"}</span>
-                  <span className="ok">Free</span>
+                  <span>{isDelivery ? "Delivery" : "Pickup"}</span>
+                  {feeText ? <span>{feeText}</span> : <span className="ok">Free</span>}
                 </div>
 
                 {hasPrerollBonus && (
@@ -535,7 +591,7 @@ export default function CartPage() {
 
                 <div className="total">
                   <span>Total, paid in cash</span>
-                  <span>${finalTotal}</span>
+                  <span>{money(totalDue)}</span>
                 </div>
                 <MinNote />
               </div>
@@ -554,13 +610,11 @@ export default function CartPage() {
                 {isPlacing
                   ? "Placing your order…"
                   : minShortfall > 0
-                  ? `Add $${minShortfall} more to order`
-                  : `Place order · $${finalTotal}`}
+                  ? `Add ${money(minShortfall)} more to order`
+                  : isDelivery && tooFar
+                  ? "Text us about delivery"
+                  : `Place order · ${money(totalDue)}`}
               </button>
-
-              <span className="fine">
-                Free delivery across DC. We text you when your order is on the way.
-              </span>
             </form>
           </div>
         )}

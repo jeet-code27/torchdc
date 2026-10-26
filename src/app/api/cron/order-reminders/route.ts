@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { connectDB } from '@/lib/push/adapters';
 import { alertStillPending, type OrderForAlert } from '@/lib/push/order-alerts';
 import { isPushConfigured } from '@/lib/push/webpush';
+import { sendAdminNewOrderNotification } from '@/lib/email';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,8 +20,6 @@ export async function GET(req: Request) {
   if (!secret || req.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  if (!isPushConfigured()) return NextResponse.json({ ok: true, checked: 0, reminded: 0, skipped: 'push not configured' });
 
   await connectDB();
   const orders = mongoose.connection.collection(process.env.ORDERS_COLLECTION || 'orders');
@@ -43,12 +42,13 @@ export async function GET(req: Request) {
       { $set: { alertReminderSentAt: new Date() } }
     );
     if (claim.modifiedCount !== 1) continue;
-    try {
-      await alertStillPending(order as unknown as OrderForAlert);
-      reminded++;
-    } catch (err) {
-      console.error('[push] reminder failed', String(order._id), err);
-    }
+    // "Still waiting" push (when set up) and email
+    const results = await Promise.allSettled([
+      isPushConfigured() ? alertStillPending(order as unknown as OrderForAlert) : Promise.resolve(),
+      sendAdminNewOrderNotification(order as unknown as OrderForAlert, 'reminder'),
+    ]);
+    results.forEach((r) => r.status === 'rejected' && console.error('[reminder] failed', String(order._id), r.reason));
+    reminded++;
   }
   return NextResponse.json({ ok: true, checked: due.length, reminded });
 }

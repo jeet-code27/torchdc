@@ -3,14 +3,9 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-export type AttentionItem = {
-  id: string;
-  tone: 'urgent' | 'warning';
-  title: string; // "#1007 waiting 2 days"
-  detail: string; // "Maddie M. · Confirmed Oct 20, never sent out"
-  actionLabel: string;
-  href: string;
-};
+import NeedsAttention, { type AttentionItem } from './NeedsAttention';
+import type { SetOrderStatus } from '../orders/types';
+export type { AttentionItem };
 
 export type StoreSettingKey = 'deliveryEnabled' | 'pickupEnabled' | 'offerPopupEnabled';
 
@@ -21,6 +16,8 @@ export type DashboardTodayProps = {
   /** Test orders must be excluded by the caller. */
   week: { cashCollected: number; pendingCash: number; orders: number; avgOrder: number };
   attention: AttentionItem[];
+  setStatus: SetOrderStatus;
+  setTestFlag: (orderIds: string[], isTest: boolean) => Promise<void>;
   /** offerPopupEnabled: the "Want $10 Off Your Order?" cart pop-up switch (shown when provided). */
   store: { deliveryEnabled: boolean; pickupEnabled: boolean; offerPopupEnabled?: boolean; hoursLabel: string };
   setStoreSetting: (key: StoreSettingKey, value: boolean) => Promise<void>;
@@ -38,6 +35,8 @@ export default function DashboardToday({
   today,
   week,
   attention,
+  setStatus,
+  setTestFlag,
   store,
   setStoreSetting,
   alertsSlot,
@@ -107,33 +106,7 @@ export default function DashboardToday({
         <Tile href={ordersHref} label="Cash to collect" value={usd(today.cashToCollect)} sub="Open COD orders" valueClass="text-[#3f5c40]" wide />
       </div>
 
-      {attention.length > 0 && (
-        <section className="flex flex-col gap-2.5 px-4 pt-6">
-          <div className="flex items-center justify-between">
-            <h2 className="m-0 text-lg font-bold">Needs attention</h2>
-            <span className="rounded-full bg-[#be123c] px-2.5 py-0.5 text-[13px] font-semibold text-white">{attention.length}</span>
-          </div>
-          {attention.map((a) => (
-            <div
-              key={a.id}
-              className={`flex flex-col gap-2.5 rounded-xl border p-3.5 ${a.tone === 'urgent' ? 'border-[#f5c2c7] bg-[#fff5f5]' : 'border-[#f3d9a4] bg-[#fffaf0]'}`}
-            >
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[15px] font-semibold">{a.title}</span>
-                <span className="text-[13px] text-[#3f3f46]">{a.detail}</span>
-              </div>
-              <Link
-                href={a.href}
-                className={`flex h-11 items-center justify-center rounded-[10px] text-sm font-semibold ${
-                  a.tone === 'urgent' ? 'bg-[#3f3f46] text-white' : 'border border-[#d4a24c] bg-white'
-                }`}
-              >
-                {a.actionLabel}
-              </Link>
-            </div>
-          ))}
-        </section>
-      )}
+      <NeedsAttention items={attention} setStatus={setStatus} setTestFlag={setTestFlag} />
 
       <section className="flex flex-col gap-2.5 px-4 pt-6">
         <h2 className="m-0 text-lg font-bold">This week</h2>
@@ -167,12 +140,12 @@ export default function DashboardToday({
         {saveError && <p className="text-sm text-[#be123c]">Couldn&apos;t save that change. Try again.</p>}
       </section>
 
-      <div className="grid grid-cols-2 gap-2.5 px-4 pt-6">
-        <Link href={ordersHref} className="flex h-12 items-center justify-center rounded-[10px] bg-[#4c6e4d] text-[15px] font-semibold text-white">
-          Orders
+      <div className="flex justify-center gap-2.5 px-4 pt-6">
+        <Link href={ordersHref} className="flex h-11 items-center rounded-full bg-[#4c6e4d] px-6 text-[15px] font-semibold text-white">
+          Orders ›
         </Link>
-        <Link href={productsHref} className="flex h-12 items-center justify-center rounded-[10px] border border-[#d4d4d8] text-[15px] font-semibold">
-          Products
+        <Link href={productsHref} className="flex h-11 items-center rounded-full border border-[#d4d4d8] px-6 text-[15px] font-semibold">
+          Products ›
         </Link>
       </div>
     </div>

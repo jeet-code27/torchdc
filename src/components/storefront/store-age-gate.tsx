@@ -116,88 +116,35 @@ export function StoreAgeGate() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/assets/img/logo.webp" alt="Torch" />
 
-        {step === "ask" ? (
-          <div
-            className="agegate__ask"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "12px",
-              width: "100%",
-            }}
-          >
-            <span className="tag">21+ ONLY</span>
-            <p className="agegate__h" id="age-title">Are you 21 or older?</p>
-            <p>
-              You must be 21+ to shop Torch. A valid government ID is checked at
-              delivery or pickup.
-            </p>
-            <button
-              className="btn-wide"
-              type="button"
-              onClick={handleConfirmAge}
-              style={{ cursor: "pointer" }}
-            >
-              YES, I&apos;M 21+
-            </button>
-            <button
-              className="btn-wide btn-wide--ghost"
-              type="button"
-              onClick={handleRejectAge}
-              style={{ cursor: "pointer" }}
-            >
-              No, I&apos;m under 21
-            </button>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "14px",
-                color: "#4F5A50",
-                minHeight: "44px",
-                cursor: "pointer",
-              }}
-            >
-              <input
-                id="age-remember"
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-                style={{
-                  width: "20px",
-                  height: "20px",
-                  accentColor: "#5A805B",
-                  cursor: "pointer",
-                }}
-              />{" "}
-              Remember me for 30 days
-            </label>
-          </div>
-        ) : (
-          <div
-            className="agegate__no"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "12px",
-              width: "100%",
-            }}
-          >
-            <p className="agegate__h">Sorry, you must be 21 or older</p>
-            <p>Come back when you&apos;re 21. Thanks for understanding.</p>
-            <button
-              className="btn-wide btn-wide--ghost"
-              type="button"
-              onClick={handleRetry}
-              style={{ cursor: "pointer" }}
-            >
-              I entered the wrong answer
-            </button>
-          </div>
-        )}
+        {/* Oct 24 design: frosted page behind, "Are You 21+?", two short lines, slim centered buttons, toggle */}
+        <div className="agegate__ask" hidden={step !== "ask"}>
+          <p className="agegate__h" id="age-title">Are You 21+?</p>
+          <p>
+            <span>You must be 21 or older to enter.</span> <span>A valid ID is required with every order.</span>
+          </p>
+          <button className="btn-wide" type="button" onClick={handleConfirmAge}>
+            Yes, I&apos;m 21+
+          </button>
+          <button className="btn-wide btn-wide--ghost" type="button" onClick={handleRejectAge}>
+            No, I&apos;m under 21
+          </button>
+          <label className="agegate__rem">
+            <input
+              id="age-remember"
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+            />{" "}
+            Remember me for 30 days
+          </label>
+        </div>
+        <div className="agegate__no" hidden={step !== "no"}>
+          <p className="agegate__h">Sorry, you must be 21 or older</p>
+          <p>Come back when you&apos;re 21. Thanks for understanding.</p>
+          <button className="btn-wide btn-wide--ghost" type="button" onClick={handleRetry}>
+            I entered the wrong answer
+          </button>
+        </div>
         {/* Shown under both steps, like the client site */}
         <small>
           By entering you agree to our{" "}

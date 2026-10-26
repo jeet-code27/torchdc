@@ -41,6 +41,22 @@ const shortName = (name?: string) => {
   return last ? `${first} ${last[0]}.` : first;
 };
 
+const usd = (n: number) => `$${Number(n || 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+
+/** Placeholder details people type when testing checkout (name "Test", example.com email, 555 phone). */
+function looksLikeTest(c?: { name?: string; email?: string; phone?: string }) {
+  const name = (c?.name || "").toLowerCase();
+  const email = (c?.email || "").toLowerCase();
+  const phone = (c?.phone || "").replace(/\D/g, "").slice(-10);
+  return (
+    /\b(test|tert|demo|asdf|sample)\b/.test(name) ||
+    /example\.(com|org)|mailinator|@test\.|^test@/.test(email) ||
+    /^\d{3}555\d{4}$/.test(phone) ||
+    /^(\d)\1{9}$/.test(phone) ||
+    /^(1234567890|0123456789)$/.test(phone)
+  );
+}
+
 const day = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
 
 // GET /api/admin/dashboard/today - numbers for the mobile "Today" dashboard (test orders excluded)
@@ -57,7 +73,7 @@ export async function GET() {
 
     const [open, deliveredToday, week] = await Promise.all([
       Order.find({ ...real, orderStatus: { $in: OPEN } })
-        .select("orderNumber customer.name orderStatus paymentStatus total createdAt history")
+        .select("orderNumber customer orderStatus paymentStatus total createdAt history")
         .sort({ createdAt: 1 })
         .lean(),
       Order.countDocuments({
@@ -79,39 +95,62 @@ export async function GET() {
       .filter((o) => o.orderStatus === "completed" || o.paymentStatus === "paid")
       .reduce((s, o) => s + (o.total || 0), 0);
 
-    // Needs attention: pending > 15 min, confirmed but not sent out after 2 hr
-    const attention: Array<{ id: string; tone: "urgent" | "warning"; title: string; detail: string; actionLabel: string; href: string; age: number }> = [];
+    // Needs attention (admin update v3, one-tap cards):
+    // pending > 15 min → Confirm · Decline; confirmed 2+ hr, never sent out → Send out · Complete · Cancel;
+    // test-looking orders still in the live queue → Mark all as test
+    type OrderCard = {
+      kind: "pending" | "stale";
+      orderId: string;
+      orderNumber: string;
+      status: string;
+      title: string;
+      detail: string;
+      href: string;
+      age: number;
+    };
+    const cards: OrderCard[] = [];
+    const tests: typeof open = [];
     for (const o of open) {
+      if (looksLikeTest(o.customer)) {
+        tests.push(o);
+        continue;
+      }
       const created = new Date(o.createdAt);
       const age = now - created.getTime();
-      const href = `/admin/orders/${o._id}`;
+      const base = { orderId: String(o._id), orderNumber: o.orderNumber, status: o.orderStatus, href: `/admin/orders/${o._id}`, age };
+      const who = `${shortName(o.customer?.name)} · ${usd(o.total)}`;
       if (o.orderStatus === "pending" && age >= PENDING_ALERT_MIN * 60_000) {
-        attention.push({
-          id: String(o._id),
-          tone: "urgent",
-          title: `${orderLabel(o.orderNumber)} not confirmed · ${waited(created, now)}`,
-          detail: `${shortName(o.customer?.name)} · Placed ${day(created)}`,
-          actionLabel: "Review order",
-          href,
-          age,
-        });
+        cards.push({ ...base, kind: "pending", title: `${orderLabel(o.orderNumber)} new, waiting ${waited(created, now)}`, detail: `${who} · Placed ${day(created)}` });
       } else if (o.orderStatus === "confirmed") {
         const confirmedAt = [...(o.history || [])].reverse().find((h) => h.status === "confirmed")?.at;
         const since = confirmedAt ? new Date(confirmedAt) : created;
         if (now - since.getTime() >= CONFIRMED_ALERT_HOURS * 3_600_000) {
-          attention.push({
-            id: String(o._id),
-            tone: "warning",
+          cards.push({
+            ...base,
+            kind: "stale",
             title: `${orderLabel(o.orderNumber)} waiting ${waited(since, now)}`,
-            detail: `${shortName(o.customer?.name)} · Confirmed ${day(since)}, never sent out`,
-            actionLabel: "Open order",
-            href,
-            age,
+            detail: `${who} · Confirmed ${day(since)}, never sent out`,
           });
         }
       }
     }
-    attention.sort((a, b) => Number(b.tone === "urgent") - Number(a.tone === "urgent") || a.age - b.age);
+    cards.sort((x, y) => Number(y.kind === "pending") - Number(x.kind === "pending") || x.age - y.age);
+
+    const attention: unknown[] = cards.slice(0, 12).map(({ age: _age, ...c }) => c);
+    if (tests.length) {
+      const names = new Map<string, number>();
+      for (const o of tests) {
+        const n = (o.customer?.name || "Customer").trim().split(/\s+/)[0];
+        names.set(n, (names.get(n) || 0) + 1);
+      }
+      const testCash = tests.filter((o) => o.paymentStatus !== "paid").reduce((sum, o) => sum + (o.total || 0), 0);
+      attention.push({
+        kind: "tests",
+        orderIds: tests.map((o) => String(o._id)),
+        title: `${tests.length} test order${tests.length === 1 ? "" : "s"} in the live queue`,
+        detail: `${[...names].map(([n, c]) => (c > 1 ? `${n} (${c})` : n)).join(", ")}. Adding ${usd(testCash)} to cash to collect`,
+      });
+    }
 
     return NextResponse.json({
       success: true,
@@ -126,7 +165,7 @@ export async function GET() {
         orders: week.length,
         avgOrder: week.length ? Number((weekTotal / week.length).toFixed(2)) : 0,
       },
-      attention: attention.slice(0, 12).map(({ age: _age, ...a }) => a),
+      attention,
     });
   } catch (error) {
     console.error("GET /api/admin/dashboard/today error:", error);

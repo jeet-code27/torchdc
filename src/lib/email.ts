@@ -1,6 +1,8 @@
 import nodemailer from "nodemailer";
 import { IOrder } from "@/models/Order";
 import { orderLabel } from "@/lib/orders/display";
+import { buildOrderEmail } from "@/lib/orders/order-email";
+import type { OrderForAlert } from "@/lib/push/order-alerts";
 
 function getTransporter() {
   const host = process.env.SMTP_HOST;
@@ -188,66 +190,26 @@ export async function sendOrderConfirmationEmail(order: IOrder) {
 }
 
 /**
- * Sends immediate order alert to store admin
+ * New order alert to the store (admin update v3 design: order #, first name, item count, ZIP, cash,
+ * note and an "Open order to confirm" button; no product names, same as push alerts).
+ * kind "reminder" is the "Still waiting" email sent when an order is still pending after 5 minutes.
  */
-export async function sendAdminNewOrderNotification(order: IOrder) {
+export async function sendAdminNewOrderNotification(order: IOrder | OrderForAlert, kind: "new" | "reminder" = "new") {
   try {
     const transporter = getTransporter();
     if (!transporter) {
-      console.log(
-        `[Email Simulation] Admin new order alert for ${orderLabel(order.orderNumber)} ($${order.total})`
-      );
+      console.log(`[Email Simulation] Admin ${kind} order alert for ${orderLabel(order.orderNumber)} ($${order.total})`);
       return { success: true, simulated: true };
     }
 
-    const itemsSummary = order.items
-      .map((it) => `${it.quantity}x ${esc(it.name)}${it.weight ? ` · ${esc(it.weight)}` : ""} ($${it.price * it.quantity})`)
-      .join("<br/>");
-
-    const html = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 580px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">
-        <div style="margin-bottom: 16px; border-bottom: 2px solid ${BRAND_GREEN}; padding-bottom: 12px;">
-          <img src="${TORCH_LOGO_URL}" alt="TORCH" style="height: 36px; display: block; margin-bottom: 8px;" />
-          <h2 style="color: #111827; margin: 0; font-size: 18px;">🚨 NEW ORDER ALERT: ${orderLabel(order.orderNumber)}</h2>
-        </div>
-        
-        <p style="font-size: 16px; font-weight: bold; color: #111827; margin: 8px 0;">
-          Total: <span style="color: ${BRAND_GREEN};">$${order.total.toFixed(2)}</span> (${order.fulfillment.toUpperCase()} · ${order.paymentMethod.replace(/_/g, " ").toUpperCase()})
-        </p>
-
-        <div style="background: #f7f9f7; border: 1px solid #e2ebe3; border-radius: 8px; padding: 14px; margin: 16px 0; font-size: 13px; line-height: 1.5;">
-          <strong>Customer:</strong> ${esc(order.customer.name)}<br/>
-          <strong>Phone:</strong> <a href="tel:${esc(order.customer.phone)}">${esc(order.customer.phone)}</a><br/>
-          ${order.customer.email ? `<strong>Email:</strong> <a href="mailto:${esc(order.customer.email)}">${esc(order.customer.email)}</a><br/>` : ""}
-          ${
-            order.fulfillment === "delivery"
-              ? `<strong>Delivery Address:</strong> ${esc(order.deliveryAddress?.street)}${order.deliveryAddress?.apartment ? `, Apt ${esc(order.deliveryAddress.apartment)}` : ""}, ${esc(order.deliveryAddress?.city || "Washington")}, DC ${esc(order.deliveryAddress?.zip)}<br/>`
-              : `<strong>Fulfillment:</strong> Store Pickup at 1000 G St NW<br/>`
-          }
-          ${order.deliveryNotes ? `<strong>Customer Notes:</strong> "${esc(order.deliveryNotes).replace(/\n/g, "<br/>")}"<br/>` : ""}
-        </div>
-
-        <div style="margin: 16px 0; font-size: 13px;">
-          <strong>Items Ordered:</strong>
-          <div style="margin-top: 6px; padding: 10px; background: #fafafa; border-radius: 6px;">
-            ${itemsSummary}
-          </div>
-        </div>
-
-        <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f3f4f6;">
-          <a href="${SITE_URL}/admin/orders/${order._id}" style="display: inline-block; background: ${BRAND_GREEN}; color: #ffffff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
-            Open Order in Admin Panel →
-          </a>
-        </div>
-      </div>
-    `;
-
+    const alertOrder: OrderForAlert = { ...(order as OrderForAlert), orderNumber: orderLabel(order.orderNumber) };
+    const { subject, html, text } = buildOrderEmail(alertOrder, kind, SITE_URL);
     const info = await transporter.sendMail({
       from: FROM_EMAIL,
       to: ADMIN_RECIPIENTS.join(", "),
-      replyTo: order.customer.email || undefined,
-      subject: `🚨 NEW ORDER ${orderLabel(order.orderNumber)} - $${order.total.toFixed(2)} (${order.fulfillment})`,
+      subject,
       html,
+      text,
     });
 
     return { success: true, messageId: info.messageId };

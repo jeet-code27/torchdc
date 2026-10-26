@@ -160,7 +160,6 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
             Pickup
           </button>
         </div>
-        <p className="ordernote">Free delivery in DC · Pickup at 1000 G St NW</p>
 
         {/* Shop By Category */}
         <MobileCategoryGrid />

@@ -9,6 +9,8 @@ export type OrderForAlert = {
   customer?: { name?: string };
   deliveryAddress?: { zip?: string; city?: string };
   items?: Array<{ quantity?: number }>;
+  deliveryNotes?: string;
+  createdAt?: string | Date;
 };
 
 const money = (n: number) => `$${Number(n || 0).toFixed(2).replace(/\.00$/, '')}`;

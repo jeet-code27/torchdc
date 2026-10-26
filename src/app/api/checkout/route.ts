@@ -13,6 +13,8 @@ import {
   sendAdminNewOrderNotification,
 } from "@/lib/email";
 import { nextOrderNumber } from "@/lib/orders/order-number";
+import { lookupPlace, type PickedAddress } from "@/lib/google-places";
+import { FEE_FAR, FEE_NEAR } from "@/lib/delivery-zones";
 import { alertNewOrder } from "@/lib/push/order-alerts";
 
 export const dynamic = "force-dynamic";
@@ -30,9 +32,12 @@ export async function POST(request: Request) {
       prerollBonus,
       items,
       sessionId,
-      isAgeVerified,
       couponCode,
+      zone: rawZone,
+      placeId,
+      placeSession,
     } = body;
+    const zone = ["DC", "MD", "VA"].includes(rawZone) ? rawZone : "DC";
 
     // Validate customer fields
     if (!customer?.name?.trim()) {
@@ -64,12 +69,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!isAgeVerified) {
-      return NextResponse.json(
-        { success: false, error: "You must confirm you are 21 years of age or older." },
-        { status: 400 }
-      );
-    }
+    // 21+ is confirmed by the age gate on entry and the ID check at the door (Oct 24: no checkbox at checkout)
 
     await connectToDatabase();
 
@@ -86,6 +86,39 @@ export async function POST(request: Request) {
         { success: false, error: "We're not taking delivery orders right now. Please call or text (202) 468-1966." },
         { status: 400 }
       );
+    }
+
+    // Delivery fee (Oct 24): DC free; Maryland/Virginia $20 near the Beltway, $40 farther; none past 25 miles.
+    // Worked out here from the picked Google address, never taken from the browser.
+    let place: PickedAddress | null = null;
+    let deliveryFee = 0;
+    let feeNote = "";
+    if (fulfillment !== "pickup") {
+      try {
+        place = placeId ? await lookupPlace(String(placeId), String(placeSession || "")) : null;
+      } catch (err) {
+        console.error("Checkout address lookup failed:", err);
+        place = null;
+      }
+      const q = place?.quote;
+      if (q?.band === "far") {
+        return NextResponse.json(
+          { success: false, error: "Uh-oh, that's a little outside our delivery range. Reach out at (202) 468-1966 and we'll see what we can do." },
+          { status: 400 }
+        );
+      }
+      if (q?.band === "other") {
+        return NextResponse.json(
+          { success: false, error: "We deliver in DC, Maryland and Virginia. Please pick an address there." },
+          { status: 400 }
+        );
+      }
+      if (q) {
+        deliveryFee = q.fee || 0;
+      } else if (zone !== "DC") {
+        deliveryFee = FEE_NEAR;
+        feeNote = `CHECK DELIVERY FEE: address was not matched on the map. Charged $${FEE_NEAR}, may be $${FEE_FAR}.`;
+      }
     }
 
     const session = await auth();
@@ -165,7 +198,7 @@ export async function POST(request: Request) {
     }
 
     const discountAmount = Number((dealsDiscount + couponDiscountAmount).toFixed(2));
-    const deliveryFee = 0; // Free delivery across DC
+    // The $60 minimum (checked above) is before the delivery fee
     const total = Math.max(0, Number((subtotal - discountAmount + deliveryFee).toFixed(2)));
 
     // Short sequential order number (#1001, #1002, ...); older orders keep their TORCH-xxxxxx numbers
@@ -175,6 +208,7 @@ export async function POST(request: Request) {
       deliveryNotes?.trim() || "",
       changeFor ? `Needs change for $${changeFor}` : "",
       firstOrder ? "FIRST ORDER: throw in something on the house" : "",
+      feeNote,
       prerollBonus ? "Switched from pickup: add a free pre-roll" : "",
     ]
       .filter(Boolean)
@@ -190,13 +224,21 @@ export async function POST(request: Request) {
       fulfillment: fulfillment === "pickup" ? "pickup" : "delivery",
       deliveryAddress:
         fulfillment === "delivery"
-          ? {
-              street: deliveryAddress?.street?.trim() || "",
-              apartment: deliveryAddress?.apartment?.trim() || "",
-              city: deliveryAddress?.city?.trim() || "Washington",
-              state: "DC",
-              zip: deliveryAddress?.zip?.trim() || "20004",
-            }
+          ? place
+            ? {
+                street: place.street || place.address,
+                apartment: "",
+                city: place.city,
+                state: place.state,
+                zip: place.zip,
+              }
+            : {
+                street: deliveryAddress?.street?.trim() || "",
+                apartment: deliveryAddress?.apartment?.trim() || "",
+                city: deliveryAddress?.city?.trim() || (zone === "DC" ? "Washington" : ""),
+                state: zone,
+                zip: deliveryAddress?.zip?.trim() || "",
+              }
           : undefined,
       deliveryNotes: formattedNotes,
       changeFor: changeFor ? String(changeFor).trim() : "",
@@ -221,7 +263,18 @@ export async function POST(request: Request) {
       userId: userId ? new mongoose.Types.ObjectId(userId) : null,
     });
 
-    await newOrder.save();
+    // If the number counter is ever behind the saved orders, take the next number instead of failing
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await newOrder.save();
+        break;
+      } catch (err) {
+        const dup = (err as { code?: number; keyPattern?: Record<string, unknown> })?.code === 11000 &&
+          Boolean((err as { keyPattern?: Record<string, unknown> }).keyPattern?.orderNumber);
+        if (!dup || attempt >= 20) throw err;
+        newOrder.orderNumber = await nextOrderNumber();
+      }
+    }
 
     // Mark active cart as converted so it doesn't get flagged as abandoned
     if (sessionId) {
@@ -264,6 +317,8 @@ export async function POST(request: Request) {
       orderId: newOrder._id.toString(),
       orderNumber: newOrder.orderNumber,
       total: newOrder.total,
+      deliveryFee: newOrder.deliveryFee,
+      address: place?.address || newOrder.deliveryAddress?.street || "",
     });
   } catch (error) {
     console.error("Checkout order creation error:", error);

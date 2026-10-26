@@ -2,13 +2,21 @@
 
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
-import OrdersList from "@/components/admin/orders/OrdersList";
+import OrdersList, { type OrdersFilter } from "@/components/admin/orders/OrdersList";
+import PullToRefresh from "@/components/admin/PullToRefresh";
 import { postOrderStatus, toAdminOrder } from "@/components/admin/orders/map";
 import type { AdminOrder, OrderStatus } from "@/components/admin/orders/types";
-import { AbandonedCartsView, type AbandonedCartDoc } from "@/components/admin/orders/AbandonedCartsView";
 import { LightSurface } from "@/components/admin/light-surface";
 
-const FILTERS: Array<OrderStatus | "all"> = ["all", "pending", "confirmed", "out_for_delivery", "completed", "cancelled"];
+// ?filter=pending|confirmed|done, or the older ?status= links from the dashboard
+const FILTER_OF: Record<string, OrdersFilter> = {
+  pending: "pending",
+  confirmed: "confirmed",
+  out_for_delivery: "confirmed",
+  done: "done",
+  completed: "done",
+  cancelled: "done",
+};
 
 export default function AdminOrdersPage() {
   return (
@@ -20,13 +28,11 @@ export default function AdminOrdersPage() {
 
 function OrdersScreen() {
   const searchParams = useSearchParams();
-  const statusParam = searchParams.get("status") as OrderStatus | "all" | null;
-  const initialStatus = statusParam && FILTERS.includes(statusParam) ? statusParam : "all";
+  const initialFilter = FILTER_OF[searchParams.get("filter") || searchParams.get("status") || ""] || "pending";
 
   const [orders, setOrders] = React.useState<AdminOrder[] | null>(null);
   const [loadError, setLoadError] = React.useState<string | null>(null);
-  const [abandonedCarts, setAbandonedCarts] = React.useState<AbandonedCartDoc[]>([]);
-  const [abandonedTotalValue, setAbandonedTotalValue] = React.useState(0);
+  const [abandonedCount, setAbandonedCount] = React.useState(0);
 
   const loadOrders = React.useCallback(async () => {
     try {
@@ -48,10 +54,7 @@ function OrdersScreen() {
     try {
       const res = await fetch("/api/admin/carts/abandoned");
       const data = await res.json();
-      if (data.success) {
-        setAbandonedCarts(data.carts || []);
-        setAbandonedTotalValue(data.totalAbandonedValue || 0);
-      }
+      if (data.success) setAbandonedCount(data.count || 0);
     } catch (err) {
       console.error("Failed to load abandoned carts:", err);
     }
@@ -60,11 +63,11 @@ function OrdersScreen() {
   React.useEffect(() => {
     loadOrders();
     loadAbandoned();
-    // New orders show up without a manual refresh
-    const timer = window.setInterval(() => {
-      if (document.visibilityState === "visible") loadOrders();
-    }, 60_000);
-    return () => window.clearInterval(timer);
+  }, [loadOrders, loadAbandoned]);
+
+  // Pull to refresh / auto-refresh every 30 s (PullToRefresh)
+  const refreshAll = React.useCallback(async () => {
+    await Promise.all([loadOrders(), loadAbandoned()]);
   }, [loadOrders, loadAbandoned]);
 
   const setStatus = React.useCallback(async (ids: string[], status: OrderStatus) => {
@@ -82,15 +85,16 @@ function OrdersScreen() {
 
   return (
     <LightSurface>
-      <OrdersList
-        // remount when a dashboard link changes ?status=
-        key={initialStatus}
-        orders={orders}
-        setStatus={setStatus}
-        abandonedCount={abandonedCarts.length}
-        abandonedView={<AbandonedCartsView abandonedCarts={abandonedCarts} abandonedTotalValue={abandonedTotalValue} />}
-        initialStatus={initialStatus}
-      />
+      <PullToRefresh onRefresh={refreshAll}>
+        <OrdersList
+          // remount when a dashboard link changes ?filter= / ?status=
+          key={initialFilter}
+          orders={orders}
+          setStatus={setStatus}
+          abandonedCount={abandonedCount}
+          initialFilter={initialFilter}
+        />
+      </PullToRefresh>
     </LightSurface>
   );
 }

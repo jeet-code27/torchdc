@@ -1,4 +1,6 @@
-/** "#1042" for new orders, "#TORCH-806546" for older ones; never "##1042". */
+/** "#1042" for new orders; older "TORCH-806546" numbers show as they are (never "#TORCH-..." or "##1042"). */
 export function orderLabel(orderNumber: string) {
-  return orderNumber.startsWith("#") ? orderNumber : `#${orderNumber}`;
+  const v = String(orderNumber || "").trim();
+  if (/^#/.test(v) || /^[A-Za-z]/.test(v)) return v;
+  return `#${v}`;
 }
