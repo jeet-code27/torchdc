@@ -8,15 +8,11 @@ import { useCart } from "@/context/cart-context";
 import { unitOf, nextStep, nextStepOz, normalizeTier } from "@/lib/deals";
 import { MinNote } from "@/components/storefront/order-minimum";
 import { orderLabel } from "@/lib/orders/display";
-import { CheckoutAddress, type PickedPlace, type Zone } from "@/components/storefront/checkout-address";
+import { FEE_NEAR } from "@/lib/delivery-fees";
 import { OrderConfirmation, type PlacedOrder } from "@/components/storefront/order-confirmation";
 
+type Zone = "DC" | "MD" | "VA";
 const money = (n: number) => `$${(Math.round(n * 100) / 100).toLocaleString("en-US")}`;
-const newSessionId = () =>
-  "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    return (c === "x" ? r : (r & 3) | 8).toString(16);
-  });
 const PIN = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A805B" strokeWidth="2" aria-hidden="true">
     <path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z" />
@@ -52,11 +48,8 @@ export default function CartPage() {
   const [address, setAddress] = React.useState("");
   const [notes, setNotes] = React.useState("");
 
-  // Delivery area and the picked Google address (fee decided by the server)
+  // Delivery area: DC free, Maryland/Virginia fee (checked by staff for $20 vs $40)
   const [zone, setZoneState] = React.useState<Zone>("DC");
-  const [place, setPlaceState] = React.useState<PickedPlace | null>(null);
-  const [acOff, setAcOff] = React.useState(false);
-  const [placeSession, setPlaceSession] = React.useState("");
 
   const [formError, setFormError] = React.useState("");
   const [isPlacing, setIsPlacing] = React.useState(false);
@@ -64,7 +57,6 @@ export default function CartPage() {
 
   // Restore saved details, area and picked address
   React.useEffect(() => {
-    setPlaceSession(newSessionId());
     try {
       const saved = localStorage.getItem("torch_details");
       if (saved) {
@@ -75,11 +67,6 @@ export default function CartPage() {
       }
       const z = localStorage.getItem("torch_zone");
       if (z === "DC" || z === "MD" || z === "VA") setZoneState(z);
-      const p = JSON.parse(localStorage.getItem("torch_place") || "null");
-      if (p && p.id && p.address) {
-        setPlaceState(p);
-        setAddress(p.address);
-      }
     } catch {
       // ignore
     }
@@ -99,49 +86,14 @@ export default function CartPage() {
     try {
       localStorage.setItem("torch_zone", z);
     } catch {}
-    // A picked address in another state no longer fits
-    if (place && place.state !== z) {
-      setPlace(null);
-      setAddress("");
-    }
-  };
-  const setPlace = (p: PickedPlace | null) => {
-    setPlaceState(p);
-    try {
-      if (p) localStorage.setItem("torch_place", JSON.stringify(p));
-      else localStorage.removeItem("torch_place");
-    } catch {}
-    if (p && (p.state === "DC" || p.state === "MD" || p.state === "VA") && p.state !== zone) {
-      setZoneState(p.state);
-      try {
-        localStorage.setItem("torch_zone", p.state);
-      } catch {}
-    }
   };
 
   const isDelivery = fulfillment === "delivery";
-  const quote = isDelivery ? place?.quote || null : null;
-  const tooFar = quote?.band === "far";
-  const otherState = quote?.band === "other";
-  // DC free; MD/VA $20 near the Beltway, $40 farther (known once an address is picked)
-  const fee = !isDelivery ? 0 : quote ? quote.fee || 0 : zone !== "DC" && acOff ? 20 : 0;
+  // DC free. Maryland/Virginia: $20 is charged online; staff check it against the address
+  // ($20 inside or near the Beltway, $40 farther) before sending the order out.
+  const fee = isDelivery && zone !== "DC" ? FEE_NEAR : 0;
   const totalDue = finalTotal + fee;
-  const feeText = !isDelivery
-    ? null
-    : tooFar
-    ? "Text us"
-    : quote
-    ? quote.fee
-      ? money(quote.fee)
-      : null
-    : zone === "DC"
-    ? null
-    : acOff
-    ? "$20"
-    : "$20 or $40";
-  const smsHref = `sms:+12024681966?&body=${encodeURIComponent(
-    `Hi! I'd like a delivery to ${place?.address || address}. Can you deliver there?`
-  )}`;
+  const feeText = fee ? money(fee) : null;
 
   // Aggregate item weights per flower tier
   const flowerCounts = React.useMemo(() => {
@@ -165,20 +117,11 @@ export default function CartPage() {
       return;
     }
 
-    // Out of range: the button texts the store instead of ordering
-    if (isDelivery && tooFar) {
-      window.location.href = smsHref;
-      return;
-    }
-
     const problems: string[] = [];
     if (!name.trim()) problems.push("your name");
     const cleanPhone = phone.replace(/\D/g, "");
     if (cleanPhone.length < 10) problems.push("a valid mobile number");
-    if (isDelivery && !place && !(acOff && address.trim())) {
-      problems.push(acOff ? "your delivery address" : "your address (pick it from the list)");
-    }
-    if (isDelivery && otherState) problems.push("an address in DC, Maryland or Virginia");
+    if (isDelivery && !address.trim()) problems.push("your delivery address");
 
     if (problems.length > 0) {
       setFormError(`Please add ${problems.join(", ")}.`);
@@ -205,9 +148,7 @@ export default function CartPage() {
           customer: { name, phone, email },
           fulfillment,
           zone,
-          placeId: place?.id || "",
-          placeSession,
-          deliveryAddress: { street: place?.address || address },
+          deliveryAddress: { street: address.trim() },
           deliveryNotes: notes,
           prerollBonus: hasPrerollBonus,
           items: items.map((it) => ({
@@ -234,14 +175,13 @@ export default function CartPage() {
         orderNumber: data.orderNumber || "ORDER",
         firstName: name.trim().split(/\s+/)[0] || "",
         isDelivery,
-        address: data.address || place?.address || address,
+        address: data.address || address,
         lines: items.map((it) => ({ name: it.name, weight: it.weight, quantity: it.quantity, total: it.price * it.quantity })),
         deals: deals.items.map((d) => ({ label: d.label, amount: d.amount })),
         fee: Number(data.deliveryFee) || 0,
         total: Number(data.total) || totalDue,
       });
 
-      setPlace(null);
       setAddress("");
       clearCart();
       window.scrollTo(0, 0);
@@ -522,36 +462,14 @@ export default function CartPage() {
                     Inside or near the Beltway: <b>$20</b>. Farther: <b>$40</b>.
                   </p>
                   <label htmlFor="c-addr">Delivery address</label>
-                  <CheckoutAddress
+                  <input
+                    id="c-addr"
+                    name="address"
+                    autoComplete="street-address"
+                    placeholder="Street address"
                     value={address}
-                    onValueChange={setAddress}
-                    place={place}
-                    onPlace={setPlace}
-                    acOff={acOff}
-                    onAcOff={() => setAcOff(true)}
-                    session={placeSession}
-                    onNewSession={() => setPlaceSession(newSessionId())}
+                    onChange={(e) => setAddress(e.target.value)}
                   />
-                  <div>
-                    {tooFar && (
-                      <div className="toofar">
-                        <b>
-                          Uh-oh, that&apos;s a little outside
-                          <br />
-                          our delivery range.
-                        </b>
-                        <span>
-                          Reach out at <a href={smsHref}>(202) 468-1966</a> and we&apos;ll see what we can do.
-                        </span>
-                      </div>
-                    )}
-                    {otherState && (
-                      <div className="toofar">
-                        <b>We deliver in DC, Maryland and Virginia.</b>
-                        <span>Please pick an address there.</span>
-                      </div>
-                    )}
-                  </div>
                   <p className="meetnote">
                     {PIN}
                     <span>
@@ -628,8 +546,6 @@ export default function CartPage() {
                   ? "Placing your order…"
                   : minShortfall > 0
                   ? `Add ${money(minShortfall)} more to order`
-                  : isDelivery && tooFar
-                  ? "Text us about delivery"
                   : `Place order · ${money(totalDue)}`}
               </button>
             </form>
