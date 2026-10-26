@@ -47,6 +47,8 @@ export default function CartPage() {
   // Form states (Oct 24: no email, apartment, change, first-order or 21+ fields)
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
+  // Optional: kept so customers who want one get the order receipt email
+  const [email, setEmail] = React.useState("");
   const [address, setAddress] = React.useState("");
   const [notes, setNotes] = React.useState("");
 
@@ -69,6 +71,7 @@ export default function CartPage() {
         const parsed = JSON.parse(saved);
         if (parsed.name) setName(parsed.name);
         if (parsed.phone) setPhone(parsed.phone);
+        if (parsed.email) setEmail(parsed.email);
       }
       const z = localStorage.getItem("torch_zone");
       if (z === "DC" || z === "MD" || z === "VA") setZoneState(z);
@@ -82,13 +85,14 @@ export default function CartPage() {
     }
 
     if (session?.user?.name) setName((cur) => cur || session.user!.name || "");
+    if (session?.user?.email) setEmail((cur) => cur || session.user!.email || "");
   }, [session]);
 
   // Contact details typed so far go with the cart, so abandoned carts show who to follow up with
   React.useEffect(() => {
-    if (!name.trim() && !phone.trim() && !address.trim()) return;
-    syncCustomerInfo({ name: name.trim(), phone: phone.trim(), address: address.trim() });
-  }, [name, phone, address, syncCustomerInfo]);
+    if (!name.trim() && !phone.trim() && !email.trim() && !address.trim()) return;
+    syncCustomerInfo({ name: name.trim(), phone: phone.trim(), email: email.trim(), address: address.trim() });
+  }, [name, phone, email, address, syncCustomerInfo]);
 
   const setZone = (z: Zone) => {
     setZoneState(z);
@@ -185,7 +189,7 @@ export default function CartPage() {
     try {
       localStorage.setItem(
         "torch_details",
-        JSON.stringify({ name, phone })
+        JSON.stringify({ name, phone, email })
       );
     } catch {
       // ignore
@@ -198,7 +202,7 @@ export default function CartPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customer: { name, phone },
+          customer: { name, phone, email },
           fulfillment,
           zone,
           placeId: place?.id || "",
@@ -476,6 +480,19 @@ export default function CartPage() {
                 placeholder="We text you order updates"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+              />
+
+              <label htmlFor="c-email">
+                Email <span className="opt">(optional, for your receipt)</span>
+              </label>
+              <input
+                id="c-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                inputMode="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
 
               {isDelivery && (

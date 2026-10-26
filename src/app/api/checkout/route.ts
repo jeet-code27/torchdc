@@ -218,7 +218,10 @@ export async function POST(request: Request) {
       orderNumber,
       customer: {
         name: customer.name.trim(),
-        email: customer.email ? customer.email.trim().toLowerCase() : "",
+        // Optional; a mistyped address is dropped so the receipt never bounces
+        email: /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(customer.email || "").trim())
+          ? String(customer.email).trim().toLowerCase().slice(0, 120)
+          : "",
         phone: customer.phone.trim(),
       },
       fulfillment: fulfillment === "pickup" ? "pickup" : "delivery",
