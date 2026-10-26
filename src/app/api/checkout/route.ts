@@ -13,7 +13,8 @@ import {
   sendAdminNewOrderNotification,
 } from "@/lib/email";
 import { nextOrderNumber } from "@/lib/orders/order-number";
-import { FEE_FAR, FEE_NEAR } from "@/lib/delivery-fees";
+import { FEE_FAR, FEE_NEAR } from "@/lib/delivery-zones";
+import { locateAddress, type LocatedAddress } from "@/lib/geoapify";
 import { alertNewOrder } from "@/lib/push/order-alerts";
 
 export const dynamic = "force-dynamic";
@@ -94,13 +95,40 @@ export async function POST(request: Request) {
       );
     }
 
-    // Delivery fee (Oct 24): DC free; Maryland/Virginia $20 online. The exact fee ($20 inside or near the
-    // Beltway, $40 farther) is checked by staff from the address, so the order carries a note for them.
+    // Delivery fee (Oct 24): DC free; Maryland/Virginia $20 inside or near the Beltway, $40 farther,
+    // no online orders past 25 miles. Worked out here from the delivery address (never from the browser).
+    // When the address can't be matched for sure, MD/VA pay $20 and the order carries a note for staff.
+    let located: LocatedAddress | null = null;
     let deliveryFee = 0;
     let feeNote = "";
-    if (fulfillment !== "pickup" && zone !== "DC") {
-      deliveryFee = FEE_NEAR;
-      feeNote = `CHECK DELIVERY FEE (${zone}): charged $${FEE_NEAR}. $${FEE_FAR} if more than 2 miles outside the Beltway; no delivery past 25 miles.`;
+    if (fulfillment !== "pickup") {
+      try {
+        located = await locateAddress(String(deliveryAddress?.street || ""));
+      } catch (err) {
+        console.error("Checkout address lookup failed:", err);
+      }
+      const q = located?.quote;
+      if (q?.band === "far") {
+        return NextResponse.json(
+          { success: false, error: "Uh-oh, that's a little outside our delivery range. Reach out at (202) 468-1966 and we'll see what we can do." },
+          { status: 400 }
+        );
+      }
+      if (q?.band === "other") {
+        return NextResponse.json(
+          { success: false, error: "We deliver in DC, Maryland and Virginia. Please enter an address there." },
+          { status: 400 }
+        );
+      }
+      if (q) {
+        deliveryFee = q.fee || 0;
+      } else {
+        located = null;
+        if (zone !== "DC") {
+          deliveryFee = FEE_NEAR;
+          feeNote = `CHECK DELIVERY FEE (${zone}): address was not matched on the map. Charged $${FEE_NEAR}; $${FEE_FAR} if more than 2 miles outside the Beltway, no delivery past 25 miles.`;
+        }
+      }
     }
 
     const session = await auth();
@@ -206,13 +234,15 @@ export async function POST(request: Request) {
       fulfillment: fulfillment === "pickup" ? "pickup" : "delivery",
       deliveryAddress:
         fulfillment === "delivery"
-          ? {
-              street: deliveryAddress?.street?.trim() || "",
-              apartment: deliveryAddress?.apartment?.trim() || "",
-              city: deliveryAddress?.city?.trim() || (zone === "DC" ? "Washington" : ""),
-              state: zone,
-              zip: deliveryAddress?.zip?.trim() || "",
-            }
+          ? located
+            ? { street: located.street || located.address, apartment: "", city: located.city, state: located.state, zip: located.zip }
+            : {
+                street: deliveryAddress?.street?.trim() || "",
+                apartment: deliveryAddress?.apartment?.trim() || "",
+                city: deliveryAddress?.city?.trim() || (zone === "DC" ? "Washington" : ""),
+                state: zone,
+                zip: deliveryAddress?.zip?.trim() || "",
+              }
           : undefined,
       deliveryNotes: formattedNotes,
       changeFor: changeFor ? String(changeFor).trim() : "",
@@ -292,7 +322,7 @@ export async function POST(request: Request) {
       orderNumber: newOrder.orderNumber,
       total: newOrder.total,
       deliveryFee: newOrder.deliveryFee,
-      address: newOrder.deliveryAddress?.street || "",
+      address: located?.address || newOrder.deliveryAddress?.street || "",
     });
   } catch (error) {
     console.error("Checkout order creation error:", error);
