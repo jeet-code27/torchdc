@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PushSubscriptionModel } from '@/models/PushSubscription';
 import { connectDB, getAdminUserId } from '@/lib/push/adapters';
+import { vapidPublicKey } from '@/lib/push/webpush';
 
 export const runtime = 'nodejs';
 
@@ -9,6 +10,15 @@ type Body = {
   endpoint?: string;
   reminders?: boolean;
 };
+
+/** The public key a phone needs to sign up for alerts (read from .env at runtime). */
+export async function GET(req: Request) {
+  const userId = await getAdminUserId(req);
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const publicKey = vapidPublicKey();
+  if (!publicKey) return NextResponse.json({ error: 'Push alerts are not set up on the server yet (VAPID keys missing).' }, { status: 503 });
+  return NextResponse.json({ publicKey }, { headers: { 'Cache-Control': 'no-store' } });
+}
 
 /** Save (or refresh) this device's push subscription. */
 export async function POST(req: Request) {

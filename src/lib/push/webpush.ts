@@ -11,14 +11,23 @@ export type AlertPayload = {
 
 let configured = false;
 
+/**
+ * Public VAPID key, read when the server runs (not baked in at build time like a plain
+ * process.env.NEXT_PUBLIC_* read would be), so adding it to .env only needs a restart.
+ */
+export function vapidPublicKey(): string {
+  const env = process.env as Record<string, string | undefined>;
+  return (env["VAPID_PUBLIC_KEY"] || env["NEXT_PUBLIC_" + "VAPID_PUBLIC_KEY"] || "").trim();
+}
+
 /** True once the three VAPID env vars are set on the server. */
 export function isPushConfigured() {
-  return Boolean(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY && process.env.VAPID_SUBJECT);
+  return Boolean(vapidPublicKey() && process.env.VAPID_PRIVATE_KEY && process.env.VAPID_SUBJECT);
 }
 
 function configure() {
   if (configured) return;
-  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const publicKey = vapidPublicKey();
   const privateKey = process.env.VAPID_PRIVATE_KEY;
   const subject = process.env.VAPID_SUBJECT; // e.g. "mailto:torchdc@icloud.com"
   if (!publicKey || !privateKey || !subject) {

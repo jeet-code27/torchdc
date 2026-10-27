@@ -114,8 +114,12 @@ export default function OrderAlertsCard() {
         return;
       }
       const reg = await getRegistration();
-      const key = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-      if (!key) throw new Error('NEXT_PUBLIC_VAPID_PUBLIC_KEY missing');
+      // Key comes from the server at runtime, so a build without it in .env can't break alerts
+      const keyRes = await fetch('/api/admin/push/subscribe', { cache: 'no-store' });
+      const keyData = (await keyRes.json().catch(() => ({}))) as { publicKey?: string; error?: string };
+      if (keyRes.status === 401) throw new Error('you are signed out. Log in again and retry');
+      const key = keyData.publicKey;
+      if (!key) throw new Error(keyData.error || 'the server has no alert key yet');
       const sub =
         (await reg.pushManager.getSubscription()) ||
         (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(key) }));
