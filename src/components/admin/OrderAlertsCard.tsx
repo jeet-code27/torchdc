@@ -35,8 +35,35 @@ function readDismissed() {
   }
 }
 
+function isAndroid() {
+  return /android/i.test(navigator.userAgent);
+}
+
+/**
+ * The alerts service worker, started. Safari (iPhone) refuses to subscribe until the worker is
+ * active, while Chrome waits on its own, so wait for activation here.
+ */
 async function getRegistration() {
-  return (await navigator.serviceWorker.getRegistration('/admin')) || navigator.serviceWorker.register(SW_URL, { scope: '/admin' });
+  const reg =
+    (await navigator.serviceWorker.getRegistration('/admin')) ||
+    (await navigator.serviceWorker.register(SW_URL, { scope: '/admin' }));
+  if (reg.active) return reg;
+  const sw = reg.installing || reg.waiting;
+  if (sw) {
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('the alerts service did not start')), 15000);
+      sw.addEventListener('statechange', () => {
+        if (sw.state === 'activated') {
+          clearTimeout(timer);
+          resolve();
+        } else if (sw.state === 'redundant') {
+          clearTimeout(timer);
+          reject(new Error('the alerts service failed to install'));
+        }
+      });
+    });
+  }
+  return reg;
 }
 
 /** Dashboard card: "Get new order alerts" → Allow → "Alerts are on" + test button. */
@@ -44,6 +71,8 @@ export default function OrderAlertsCard() {
   const [status, setStatus] = useState<Status>('loading');
   const [busy, setBusy] = useState(false);
   const [testState, setTestState] = useState<'idle' | 'sent' | 'failed'>('idle');
+  // Shown on the card when turning alerts on fails, so the reason can be read off the phone
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
@@ -69,16 +98,19 @@ export default function OrderAlertsCard() {
   }, []);
 
   useEffect(() => {
-    refresh().catch(() => setStatus('unsupported'));
+    // Keep the card visible on a slow or failed start, so tapping it shows the reason
+    refresh().catch(() => setStatus(readDismissed() ? 'dismissed' : 'prompt'));
   }, [refresh]);
 
   // Must run straight from the button tap: iPhone only shows the Allow prompt after a user gesture.
   const turnOn = async () => {
     setBusy(true);
+    setError(null);
     try {
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
-        setStatus(permission === 'denied' ? 'denied' : 'prompt');
+        if (permission === 'denied') setStatus('denied');
+        else setError('The Allow prompt was closed. Tap Turn on alerts again and choose Allow.');
         return;
       }
       const reg = await getRegistration();
@@ -92,10 +124,12 @@ export default function OrderAlertsCard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subscription: sub.toJSON() }),
       });
-      if (!res.ok) throw new Error(`subscribe failed: ${res.status}`);
+      if (res.status === 401) throw new Error('you are signed out. Log in again and retry');
+      if (!res.ok) throw new Error(`the server did not save this phone (${res.status})`);
       setStatus('on');
     } catch (err) {
       console.error('[alerts] could not turn on', err);
+      setError(`Couldn't turn on alerts: ${err instanceof Error ? err.message : String(err)}`);
       setStatus('prompt');
     } finally {
       setBusy(false);
@@ -145,7 +179,20 @@ export default function OrderAlertsCard() {
     return (
       <section className="mx-4 mt-4 flex flex-col gap-2 rounded-[14px] border border-[#f3d9a4] bg-[#fffaf0] p-4">
         <h2 className="text-base font-bold">Alerts are blocked</h2>
-        <p className="text-sm leading-snug text-[#3f3f46]">To turn them on: iPhone Settings › Notifications › Torch Admin › Allow Notifications.</p>
+        {isAndroid() ? (
+          <p className="text-sm leading-snug text-[#3f3f46]">
+            To turn them on in Chrome: tap the icon left of the web address (or ⋮ › Settings › Site settings › Notifications), find
+            torchdc.co and set Notifications to <strong>Allow</strong>. Then come back and tap below.
+          </p>
+        ) : isIOS() ? (
+          <p className="text-sm leading-snug text-[#3f3f46]">
+            To turn them on: iPhone Settings › Notifications › Torch Admin › Allow Notifications.
+          </p>
+        ) : (
+          <p className="text-sm leading-snug text-[#3f3f46]">
+            To turn them on: click the icon left of the web address, set Notifications to <strong>Allow</strong>, then reload.
+          </p>
+        )}
         <button type="button" onClick={() => refresh()} className="h-11 rounded-[10px] border border-[#d4a24c] bg-white text-sm font-semibold">
           I turned them on
         </button>
@@ -183,6 +230,7 @@ export default function OrderAlertsCard() {
       <button type="button" disabled={busy} onClick={turnOn} className="h-12 rounded-[10px] bg-[#3f6b40] text-[15px] font-semibold text-white">
         {busy ? 'Turning on…' : 'Turn on alerts'}
       </button>
+      {error && <p className="rounded-lg bg-[#fff1f2] px-3 py-2 text-sm text-[#be123c]">{error}</p>}
       <button type="button" onClick={notNow} className="h-10 text-sm font-medium text-[#52525b]">
         Not now
       </button>
