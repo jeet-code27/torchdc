@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo-settings";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | Torch",
-  description:
-    "How Torch collects and uses your name, phone and address to fill orders in Washington, DC. We never sell your information.",
-};
+// Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("privacy");
+}
 
 export const revalidate = 86400;
 

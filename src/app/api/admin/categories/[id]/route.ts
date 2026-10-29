@@ -114,6 +114,7 @@ export async function PUT(
             body.seo.metaRobotsIndex !== undefined
               ? body.seo.metaRobotsIndex
               : category.seo.metaRobotsIndex,
+          useCustom: typeof body.seo.useCustom === "boolean" ? body.seo.useCustom : category.seo.useCustom,
         };
         await category.save();
       }
@@ -188,6 +189,7 @@ export async function PUT(
       focusKeyword: data.seo.focusKeyword || `${data.name} Washington DC`,
       canonicalUrl: data.seo.canonicalUrl || `https://torchdc.com/category/${data.slug}`,
       metaRobotsIndex: data.seo.metaRobotsIndex ?? true,
+      useCustom: data.seo.useCustom ?? category.seo?.useCustom ?? false,
     };
 
     await category.save();

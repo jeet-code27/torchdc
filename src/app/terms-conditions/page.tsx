@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo-settings";
 
-export const metadata: Metadata = {
-  title: "Terms and Conditions | Torch",
-  description:
-    "Terms for ordering from Torch: 21+ only, cash on delivery, delivery within Washington, DC, deals and responsible use.",
-};
+// Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("terms");
+}
 
 export const revalidate = 86400;
 

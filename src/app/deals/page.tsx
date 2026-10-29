@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { DealsView } from "@/components/storefront/deals-view";
+import { pageMetadata } from "@/lib/seo-settings";
 
-export const metadata: Metadata = {
-  title: "Cannabis Deals in DC | Bundle Deal, Stack & Save | Torch",
-  description:
-    "Bulk flower deals on Midshelf, Topshelf and Exotic: Bundle Deals on half ounces, Stack & Save ounces and the Half-Pound Haul. Free DC delivery.",
-};
+// Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("deals");
+}
 
 export const revalidate = 60;
 

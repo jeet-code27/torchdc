@@ -21,6 +21,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { usePermissions } from "@/hooks/use-permissions";
 import { Button } from "@/components/ui/button";
 
 interface CategoryFormProps {
@@ -47,6 +48,7 @@ interface CategoryData {
     focusKeyword?: string;
     canonicalUrl?: string;
     metaRobotsIndex: boolean;
+    useCustom?: boolean;
   };
   createdAt?: string;
   updatedAt?: string;
@@ -63,6 +65,9 @@ function slugify(text: string): string {
 
 export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
   const router = useRouter();
+  // SEO-only accounts: the server saves the SEO section and ignores the rest
+  const { hasPermission } = usePermissions();
+  const seoOnly = !hasPermission("categories.edit") && hasPermission("categories.seo");
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const [isLoading, setIsLoading] = React.useState(initialMode === "edit");
@@ -94,6 +99,7 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
   const [metaDescription, setMetaDescription] = React.useState("");
   const [canonicalUrl, setCanonicalUrl] = React.useState("");
   const [metaRobotsIndex, setMetaRobotsIndex] = React.useState(true);
+  const [useCustomSeo, setUseCustomSeo] = React.useState(false);
 
   // Timestamps
   const [createdAt, setCreatedAt] = React.useState<string>("");
@@ -145,6 +151,7 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
               setMetaDescription(cat.seo.metaDescription || "");
               setCanonicalUrl(cat.seo.canonicalUrl || "");
               setMetaRobotsIndex(cat.seo.metaRobotsIndex ?? true);
+              setUseCustomSeo(Boolean(cat.seo.useCustom));
             }
 
             if (cat.createdAt) setCreatedAt(cat.createdAt);
@@ -177,7 +184,7 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
         setFocusKeyword(`${val} Washington DC`);
       }
       if (!canonicalUrl || initialMode === "create") {
-        setCanonicalUrl(`https://torchdc.com/category/${generated}`);
+        setCanonicalUrl(`https://torchdc.co/category/${generated}`);
       }
     }
   };
@@ -275,8 +282,9 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
           metaDescription.trim() ||
           `Shop premium ${name} in Washington DC at Torch Dispensary. Fast local weed delivery.`,
         focusKeyword: focusKeyword.trim() || `${name} Washington DC`,
-        canonicalUrl: canonicalUrl.trim() || `https://torchdc.com/category/${slug}`,
+        canonicalUrl: canonicalUrl.trim() || `https://torchdc.co/category/${slug}`,
         metaRobotsIndex,
+        useCustom: useCustomSeo,
       },
     };
 
@@ -386,6 +394,13 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
           </Button>
         </div>
       </div>
+
+      {seoOnly && (
+        <div className="rounded-xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Your account can change the <strong>Search Engine Optimization (SEO)</strong> section only. Changes to anything
+          else on this page are not saved.
+        </div>
+      )}
 
       {/* Main 2-Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -505,6 +520,21 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
               </span>
             </div>
 
+            {/* The website only uses the title and description below when this is on */}
+            <label className="flex items-start gap-3 rounded-lg border border-border bg-background p-3 cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 accent-[#5A805B]"
+                checked={useCustomSeo}
+                onChange={(e) => setUseCustomSeo(e.target.checked)}
+              />
+              <span className="text-xs leading-relaxed text-muted-foreground">
+                <strong className="block text-sm text-foreground">Use this title &amp; description on the website</strong>
+                Off: the website shows its automatic title and description for this category page. On: it shows the Meta Title and Meta
+                Description below.
+              </span>
+            </label>
+
             {/* Live Google Search Result Box */}
             <div className="bg-background border border-border/80 rounded-xl p-4 sm:p-5 shadow-xs space-y-2">
               <div className="flex items-center justify-between">
@@ -525,7 +555,7 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
                       Torch Dispensary
                     </span>
                     <span className="text-[11px] text-emerald-600 dark:text-emerald-400 truncate max-w-md mt-0.5">
-                      https://torchdc.com › category › {previewSlug}
+                      https://torchdc.co › category › {previewSlug}
                     </span>
                   </div>
                 </div>
@@ -642,7 +672,7 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
                   type="url"
                   value={canonicalUrl}
                   onChange={(e) => setCanonicalUrl(e.target.value)}
-                  placeholder={`https://torchdc.com/category/${slug}`}
+                  placeholder={`https://torchdc.co/category/${slug}`}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
                 />
                 <p className="text-[11px] text-muted-foreground mt-1">

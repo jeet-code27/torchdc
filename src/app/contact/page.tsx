@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import { ContactView } from "@/components/storefront/contact-view";
+import { pageMetadata } from "@/lib/seo-settings";
 
-export const metadata: Metadata = {
-  title: "Contact Torch | Cannabis Delivery in Washington, DC",
-  description:
-    "Call, text or email Torch. 1000 G St NW, Washington, DC 20001. Open 7 days a week, 7AM to 11PM.",
-  alternates: {
-    canonical: "/contact-us",
-  },
-};
+// Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("contact", { alternates: { canonical: "/contact-us" } });
+}
 
 export default function ContactPage() {
   return <ContactView />;

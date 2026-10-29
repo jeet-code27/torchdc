@@ -114,6 +114,7 @@ export async function PUT(
             body.seo.metaRobotsIndex !== undefined
               ? body.seo.metaRobotsIndex
               : product.seo.metaRobotsIndex,
+          useCustom: typeof body.seo.useCustom === "boolean" ? body.seo.useCustom : product.seo.useCustom,
         };
         await product.save();
       }
@@ -197,6 +198,7 @@ export async function PUT(
       focusKeyword: data.seo.focusKeyword || `${data.name} DC`,
       canonicalUrl: data.seo.canonicalUrl || `https://torchdc.com/product/${data.slug}`,
       metaRobotsIndex: data.seo.metaRobotsIndex ?? true,
+      useCustom: data.seo.useCustom ?? product.seo?.useCustom ?? false,
     };
 
     await product.save();

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { getShopProducts } from "@/lib/get-shop-products";
 import { FlowersView } from "@/components/storefront/flowers-view";
+import { pageMetadata } from "@/lib/seo-settings";
 
-export const metadata: Metadata = {
-  title: "Cannabis Flower Delivery in DC | Midshelf, Topshelf, Exotic | Torch",
-  description:
-    "Hand-picked cannabis flower in three tiers: Midshelf, Topshelf and Exotic. Free same-day delivery across Washington, DC.",
-};
+// Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("flowers");
+}
 
 export const revalidate = 60;
 

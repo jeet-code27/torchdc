@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { ShopCatalog } from "@/components/storefront/shop-catalog";
 import { getShopProducts } from "@/lib/get-shop-products";
+import { pageMetadata } from "@/lib/seo-settings";
 
-export const metadata: Metadata = {
-  title: "Shop Cannabis Online in DC | Torch Cannabis Delivery",
-  description:
-    "Shop flower, pre-rolls, disposables, concentrates and edibles for free delivery across Washington, DC. Pay cash on delivery.",
-};
+// Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("shop");
+}
 
 export const revalidate = 60;
 

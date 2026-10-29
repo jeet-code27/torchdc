@@ -8,6 +8,7 @@ import {
   ProductDetailView,
   ProductDetailData,
 } from "@/components/storefront/product-detail-view";
+import { itemSeo } from "@/lib/seo-settings";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -62,14 +63,19 @@ export async function generateMetadata({
     const label = CATEGORY_LABEL[mainCat || "flowers"] || "cannabis";
     let title = `${product.name}${tier} | Torch Cannabis Delivery`;
     if (title.length > 60) title = `${product.name}${tier} | Torch`;
-    const description = `${product.name}${tier}: ${label} delivered free across Washington, DC. Order online, pay cash on delivery. 21+ only.`;
+    let description = `${product.name}${tier}: ${label} delivered free across Washington, DC. Order online, pay cash on delivery. 21+ only.`;
+    // Admin SEO fields win when "Use this title & description on the website" is on
+    const own = itemSeo(product.seo);
+    if (own.title) title = own.title;
+    if (own.description) description = own.description;
 
     return {
       // Absolute so the root "%s" template (if any) doesn't append a second brand
       title: { absolute: title },
       description,
       // Old WordPress slugs (e.g. /product/jack-herer) also resolve here; point search engines at the real URL
-      alternates: { canonical: `/product/${product.slug}` },
+      alternates: { canonical: own.canonical || `/product/${product.slug}` },
+      ...(own.noindex ? { robots: { index: false, follow: true } } : {}),
       openGraph: {
         title,
         description,

@@ -155,6 +155,7 @@ export async function POST(req: NextRequest) {
         data.seo?.canonicalUrl?.trim() ||
         `https://torchdc.com/product/${data.slug}`,
       metaRobotsIndex: data.seo?.metaRobotsIndex ?? true,
+      useCustom: data.seo?.useCustom ?? false,
     };
 
     const newProduct = await Product.create({

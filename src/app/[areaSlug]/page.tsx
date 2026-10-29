@@ -5,6 +5,7 @@ import { AreaPageView } from "@/components/storefront/area-page-view";
 import { getShopProducts } from "@/lib/get-shop-products";
 import { getPublishedPost } from "@/lib/blog";
 import { BlogPostView } from "@/components/storefront/blog-post-view";
+import { pageMetadata } from "@/lib/seo-settings";
 
 interface AreaPageProps {
   params: Promise<{ areaSlug: string }>;
@@ -47,15 +48,8 @@ export async function generateMetadata({
     };
   }
 
-  const at = area.name.endsWith("Street") ? "on" : "in";
-
-  return {
-    title: `Weed Delivery ${at} ${area.name}, DC | Torch Cannabis Delivery`,
-    description: `Free same-day cannabis delivery ${at} ${area.name}, Washington, DC. Flower, pre-rolls, vapes and edibles. Cash on delivery, 21+ only.`,
-    alternates: {
-      canonical: `/${area.slug}`,
-    },
-  };
+  // Built-in title (src/lib/seo-pages.ts) or the one set on Admin › SEO
+  return pageMetadata(`area:${area.slug}`, { alternates: { canonical: `/${area.slug}` } });
 }
 
 export default async function AreaPage({ params }: AreaPageProps) {

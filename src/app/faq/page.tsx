@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { FaqPageView } from "@/components/storefront/faq-page-view";
+import { pageMetadata } from "@/lib/seo-settings";
 
-export const metadata: Metadata = {
-  title: "Cannabis FAQ for Washington, DC | Torch Cannabis Delivery",
-  description:
-    "Answers about Torch hours, cash on delivery, ID, deals, flower tiers and DC cannabis law. Free same-day cannabis delivery across Washington, DC.",
-};
+// Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("faq");
+}
 
 // FAQ schema from the client site's cannabis-faq-dc.html (Oct 22)
 const FAQ_LD = {

@@ -24,6 +24,7 @@ export const categorySchema = z.object({
     focusKeyword: z.string().optional(),
     canonicalUrl: z.string().optional(),
     metaRobotsIndex: z.boolean(),
+    useCustom: z.boolean().optional(),
   }),
 });
 

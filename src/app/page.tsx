@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { HomeStorefrontView } from "@/components/storefront/home-storefront-view";
 import { getShopProducts } from "@/lib/get-shop-products";
+import { pageMetadata } from "@/lib/seo-settings";
 
-export const metadata: Metadata = {
-  title: "Weed Delivery in Washington, DC | Torch Cannabis Delivery",
-  description:
-    "Torch delivers flower, pre-rolls, vapes, concentrates and edibles across Washington, DC. Free delivery, pay cash on delivery. 21+ only.",
-};
+// Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("home");
+}
 
 export const revalidate = 60;
 

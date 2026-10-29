@@ -93,6 +93,7 @@ export async function POST(req: NextRequest) {
       focusKeyword: data.seo?.focusKeyword?.trim() || `${data.name} Washington DC`,
       canonicalUrl: data.seo?.canonicalUrl?.trim() || `https://torchdc.com/category/${data.slug}`,
       metaRobotsIndex: data.seo?.metaRobotsIndex ?? true,
+      useCustom: data.seo?.useCustom ?? false,
     };
 
     const newCategory = await Category.create({

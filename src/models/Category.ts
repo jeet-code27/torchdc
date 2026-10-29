@@ -12,6 +12,7 @@ export interface ICategorySEO {
   focusKeyword?: string;
   canonicalUrl?: string;
   metaRobotsIndex: boolean;
+  useCustom?: boolean;
 }
 
 export interface ICategory extends Document {
@@ -78,6 +79,8 @@ const CategorySchema = new Schema<ICategory>(
       focusKeyword: { type: String, default: "" },
       canonicalUrl: { type: String, default: "" },
       metaRobotsIndex: { type: Boolean, default: true },
+      // Use metaTitle / metaDescription on the website (off: the automatic title and description)
+      useCustom: { type: Boolean, default: false },
     },
   },
   {

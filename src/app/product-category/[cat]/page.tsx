@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ShopCatalog } from "@/components/storefront/shop-catalog";
 import { getShopProducts } from "@/lib/get-shop-products";
+import { connectToDatabase } from "@/lib/db";
+import { Category } from "@/models/Category";
+import { itemSeo } from "@/lib/seo-settings";
 
 interface CategoryPageProps {
   params: Promise<{ cat: string }>;
@@ -41,10 +44,23 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const { cat } = await params;
   const seo = CATEGORY_SEO[cat];
   if (!seo) return {};
+  // Category's own SEO fields from Admin › Categories win when switched on there
+  let own = itemSeo(null);
+  try {
+    await connectToDatabase();
+    const doc = await Category.findOne({ slug: cat }).select("seo").lean();
+    own = itemSeo(doc?.seo);
+  } catch {
+    // database unreachable: built-in title
+  }
+  const title = own.title || seo.title;
+  const description = own.description || seo.description;
   return {
-    title: { absolute: seo.title },
-    description: seo.description,
-    alternates: { canonical: `/product-category/${cat}` },
+    title: { absolute: title },
+    description,
+    alternates: { canonical: own.canonical || `/product-category/${cat}` },
+    openGraph: { title, description },
+    ...(own.noindex ? { robots: { index: false, follow: true } } : {}),
   };
 }
 

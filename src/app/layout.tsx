@@ -7,6 +7,7 @@ import { CartProvider } from "@/context/cart-context";
 import { StoreAgeGate } from "@/components/storefront/store-age-gate";
 import { StorefrontShell } from "@/components/storefront/storefront-shell";
 import { pageKeyInlineScript } from "@/lib/page-key";
+import { getSeoSettings } from "@/lib/seo-settings";
 
 import { SessionProvider } from "@/components/auth/session-provider";
 
@@ -17,7 +18,7 @@ const jost = Jost({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   // Production domain: canonical and Open Graph URLs resolve against it
   metadataBase: new URL("https://torchdc.co"),
   // Defaults = homepage (client site index.html); other pages set their own
@@ -45,6 +46,26 @@ export const metadata: Metadata = {
     images: ["/assets/img/og.jpg"],
   },
 };
+
+// Search Console / Bing verification and the share image come from Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeoSettings();
+  const other: Record<string, string> = {};
+  if (seo.bingVerification) other["msvalidate.01"] = seo.bingVerification;
+  const image = seo.defaultShareImage;
+  return {
+    ...baseMetadata,
+    ...(seo.googleVerification || seo.bingVerification
+      ? { verification: { ...(seo.googleVerification ? { google: seo.googleVerification } : {}), other } }
+      : {}),
+    ...(image
+      ? {
+          openGraph: { ...baseMetadata.openGraph, images: [{ url: image }] },
+          twitter: { ...baseMetadata.twitter, images: [image] },
+        }
+      : {}),
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#5A805B",

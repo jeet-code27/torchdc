@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/db";
 import { Product } from "@/models/Product";
 import { Blog } from "@/models/Blog";
 import { AREAS_LIST } from "@/lib/areas-data";
+import { noindexPaths } from "@/lib/seo-settings";
 
 const SITE = "https://torchdc.co";
 
@@ -34,14 +35,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
+  // Pages switched to "hide from search" on Admin › SEO stay out of the sitemap
+  const hidden = await noindexPaths();
+  const visible = pages.filter((p) => !hidden.has(new URL(p.url).pathname));
+
   try {
     await connectToDatabase();
     const [products, posts] = await Promise.all([
-      Product.find({ isActive: true }).select("slug updatedAt").lean(),
+      Product.find({ isActive: true, "seo.metaRobotsIndex": { $ne: false } }).select("slug updatedAt").lean(),
       Blog.find({ isPublished: true }).select("slug updatedAt").lean(),
     ]);
     return [
-      ...pages,
+      ...visible,
       ...products.map((p) => ({
         url: `${SITE}/product/${p.slug}`,
         lastModified: p.updatedAt,
@@ -58,6 +63,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
   } catch {
     // Database unreachable at build/revalidate time: still serve the static pages
-    return pages;
+    return visible;
   }
 }

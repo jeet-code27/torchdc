@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { AboutStorefrontView } from "@/components/storefront/about-storefront-view";
+import { pageMetadata } from "@/lib/seo-settings";
 
-export const metadata: Metadata = {
-  title: "About Torch | Cannabis Delivery in Washington, DC",
-  description:
-    "Torch is a Downtown DC cannabis delivery service with hand-picked flower, real expertise and free, discreet delivery across the District.",
-};
+// Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("about");
+}
 
 export default function AboutPage() {
   return <AboutStorefrontView />;

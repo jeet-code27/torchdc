@@ -25,6 +25,7 @@ export const productSeoSchema = z.object({
   focusKeyword: z.string().optional().default(""),
   canonicalUrl: z.string().optional().default(""),
   metaRobotsIndex: z.boolean().default(true),
+  useCustom: z.boolean().optional().default(false),
 });
 
 export const productSchema = z.object({
@@ -57,6 +58,7 @@ export const productSchema = z.object({
     focusKeyword: "",
     canonicalUrl: "",
     metaRobotsIndex: true,
+    useCustom: false,
   }),
 });
 

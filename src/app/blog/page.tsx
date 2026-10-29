@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublishedPosts, formatPostDate, blogImage, type BlogListItem } from "@/lib/blog";
+import { pageMetadata } from "@/lib/seo-settings";
 
-export const metadata: Metadata = {
-  title: "Cannabis Blog | Torch Cannabis Delivery",
-  description:
-    "Guides to cannabis in Washington, DC from Torch: strains, flower tiers, deals, delivery tips and neighborhood guides for adults 21+.",
-  alternates: { canonical: "/blog" },
-};
+// Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("blog", { alternates: { canonical: "/blog" } });
+}
 
 export const revalidate = 3600;
 

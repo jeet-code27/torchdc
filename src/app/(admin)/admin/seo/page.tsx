@@ -8,13 +8,8 @@ import {
   Search,
   Trash2,
   Edit,
-  ExternalLink,
   CheckCircle2,
-  FileText,
-  Share2,
-  Sparkles,
   Zap,
-  Save,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { PermissionGuard } from "@/components/auth/permission-guard";
@@ -22,6 +17,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { SeoSettingsPanel } from "@/components/admin/seo/seo-settings-panel";
+import { usePermissions } from "@/hooks/use-permissions";
 
 interface RedirectItem {
   _id: string;
@@ -35,6 +32,7 @@ interface RedirectItem {
 }
 
 export default function SeoManagementPage() {
+  const { hasPermission } = usePermissions();
   const [activeTab, setActiveTab] = React.useState<"redirects" | "meta">("redirects");
 
   // Redirects state
@@ -60,16 +58,6 @@ export default function SeoManagementPage() {
   const [deleteRedirect, setDeleteRedirect] = React.useState<RedirectItem | null>(null);
   const [isDeleting, setIsDeleting] = React.useState(false);
 
-  // Global SEO Meta settings state
-  const [metaSettings, setMetaSettings] = React.useState({
-    siteTitle: "Torch | Premium Cannabis Delivery in Washington D.C.",
-    metaDescription:
-      "Order premium flower, cartridges, pre-rolls, and edibles for direct delivery across Washington D.C. Fast, discreet delivery. 21+ only.",
-    canonicalUrl: "https://torchdc.com",
-    googleSiteVerification: "google-site-verification=torch-dc-auth-2026",
-    ogImage: "https://torchdc.com/og-image.jpg",
-  });
-  const [isSavingMeta, setIsSavingMeta] = React.useState(false);
 
   const fetchRedirects = React.useCallback(async () => {
     setIsLoading(true);
@@ -189,15 +177,6 @@ export default function SeoManagementPage() {
     }
   };
 
-  const handleSaveMeta = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSavingMeta(true);
-    setTimeout(() => {
-      setIsSavingMeta(false);
-      toast.success("Global SEO settings saved successfully!");
-    }, 500);
-  };
-
   const addWooCommercePresets = async () => {
     const presets = [
       { sourceUrl: "/shop-2", targetUrl: "/shop", notes: "Old WooCommerce shop duplicate" },
@@ -285,7 +264,7 @@ export default function SeoManagementPage() {
             }`}
           >
             <Globe className="w-4 h-4" />
-            Global Meta & SERP Previews
+            Search settings & page titles
           </button>
         </div>
 
@@ -439,160 +418,8 @@ export default function SeoManagementPage() {
             </div>
           </div>
         ) : (
-          /* Global SEO Tab */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div className="p-6 rounded-xl border border-border bg-card space-y-4">
-                <h3 className="text-base font-bold text-foreground">Global Meta Configuration</h3>
-                <p className="text-xs text-muted-foreground">
-                  Default title and description applied when specific product or category tags are not set.
-                </p>
-
-                <form onSubmit={handleSaveMeta} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-semibold text-foreground">Default Page Title</label>
-                      <span className="text-[11px] text-muted-foreground">
-                        {metaSettings.siteTitle.length}/60 chars
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      value={metaSettings.siteTitle}
-                      onChange={(e) =>
-                        setMetaSettings({ ...metaSettings, siteTitle: e.target.value })
-                      }
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-semibold text-foreground">Default Meta Description</label>
-                      <span className="text-[11px] text-muted-foreground">
-                        {metaSettings.metaDescription.length}/160 chars
-                      </span>
-                    </div>
-                    <textarea
-                      rows={3}
-                      value={metaSettings.metaDescription}
-                      onChange={(e) =>
-                        setMetaSettings({ ...metaSettings, metaDescription: e.target.value })
-                      }
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground">Canonical Domain URL</label>
-                    <input
-                      type="url"
-                      value={metaSettings.canonicalUrl}
-                      onChange={(e) =>
-                        setMetaSettings({ ...metaSettings, canonicalUrl: e.target.value })
-                      }
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground">Google Verification Code</label>
-                    <input
-                      type="text"
-                      value={metaSettings.googleSiteVerification}
-                      onChange={(e) =>
-                        setMetaSettings({ ...metaSettings, googleSiteVerification: e.target.value })
-                      }
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background font-mono text-xs focus:outline-none focus:ring-2 focus:ring-[#5A805B]/30 focus:border-[#5A805B]"
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    disabled={isSavingMeta}
-                    className="bg-[#5A805B] hover:bg-[#4a6b4b] text-white text-xs font-medium flex items-center gap-1.5"
-                  >
-                    <Save className="w-4 h-4" />
-                    {isSavingMeta ? "Saving..." : "Save Meta Settings"}
-                  </Button>
-                </form>
-              </div>
-
-              {/* Sitemap info */}
-              <div className="p-5 rounded-xl border border-border bg-card flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-bold text-foreground">XML Sitemap</h4>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Live dynamic XML sitemap generated automatically for search engines.
-                  </p>
-                </div>
-                <a
-                  href="/sitemap.xml"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 text-xs font-medium hover:bg-neutral-50"
-                >
-                  View Sitemap
-                  <ExternalLink className="w-3.5 h-3.5 text-neutral-500" />
-                </a>
-              </div>
-            </div>
-
-            {/* Google SERP Live Preview */}
-            <div className="space-y-6">
-              <div className="p-6 rounded-xl border border-border bg-card space-y-4">
-                <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                  Live Google SERP Preview
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  How your storefront appears in Google desktop & mobile search results.
-                </p>
-
-                {/* Google Snippet Box */}
-                <div className="p-4 rounded-xl bg-white border border-neutral-200 shadow-sm space-y-1.5 font-sans">
-                  <div className="flex items-center gap-2 text-xs text-neutral-600">
-                    <span className="w-4 h-4 rounded-full bg-[#5A805B] text-white flex items-center justify-center font-bold text-[9px]">
-                      T
-                    </span>
-                    <span className="font-medium text-neutral-800">Torch</span>
-                    <span className="text-neutral-400">›</span>
-                    <span className="text-neutral-500">torchdc.com</span>
-                  </div>
-                  <h4 className="text-lg font-medium text-[#1a0dab] hover:underline cursor-pointer line-clamp-1">
-                    {metaSettings.siteTitle}
-                  </h4>
-                  <p className="text-xs leading-relaxed text-[#4d5156] line-clamp-2">
-                    {metaSettings.metaDescription}
-                  </p>
-                </div>
-              </div>
-
-              {/* Social OG Card Preview */}
-              <div className="p-6 rounded-xl border border-border bg-card space-y-4">
-                <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                  <Share2 className="w-4 h-4 text-blue-500" />
-                  Social Card Preview (iMessage, Twitter, FB)
-                </h3>
-                <div className="rounded-xl border border-neutral-200 overflow-hidden bg-neutral-50">
-                  <div className="h-32 bg-gradient-to-r from-[#5A805B] to-[#3f5d40] flex items-center justify-center text-white font-bold text-lg">
-                    Torch • Washington D.C. Delivery
-                  </div>
-                  <div className="p-3 bg-white space-y-1">
-                    <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
-                      torchdc.com
-                    </p>
-                    <p className="text-xs font-bold text-neutral-900 line-clamp-1">
-                      {metaSettings.siteTitle}
-                    </p>
-                    <p className="text-[11px] text-neutral-600 line-clamp-1">
-                      {metaSettings.metaDescription}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          /* Search settings: verification, share image and page titles (saved and used by the live site) */
+          <SeoSettingsPanel canEdit={hasPermission("seo.manage")} />
         )}
 
         {/* Create / Edit Modal Dialog */}

@@ -25,6 +25,7 @@ import {
   Tag,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { usePermissions } from "@/hooks/use-permissions";
 import { Button } from "@/components/ui/button";
 
 interface ProductFormProps {
@@ -78,6 +79,7 @@ interface ProductData {
     focusKeyword?: string;
     canonicalUrl?: string;
     metaRobotsIndex: boolean;
+    useCustom?: boolean;
   };
   createdAt?: string;
   updatedAt?: string;
@@ -95,6 +97,9 @@ function slugify(text: string): string {
 
 export function ProductForm({ productId, initialMode }: ProductFormProps) {
   const router = useRouter();
+  // SEO-only accounts: the server saves the SEO section and ignores the rest
+  const { hasPermission } = usePermissions();
+  const seoOnly = !hasPermission("products.edit") && hasPermission("products.seo");
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const [isLoading, setIsLoading] = React.useState(initialMode === "edit");
@@ -144,6 +149,7 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
   const [metaDescription, setMetaDescription] = React.useState("");
   const [canonicalUrl, setCanonicalUrl] = React.useState("");
   const [metaRobotsIndex, setMetaRobotsIndex] = React.useState(true);
+  const [useCustomSeo, setUseCustomSeo] = React.useState(false);
 
   // Timestamps
   const [createdAt, setCreatedAt] = React.useState<string>("");
@@ -208,6 +214,7 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
               setMetaDescription(prod.seo.metaDescription || "");
               setCanonicalUrl(prod.seo.canonicalUrl || "");
               setMetaRobotsIndex(prod.seo.metaRobotsIndex ?? true);
+              setUseCustomSeo(Boolean(prod.seo.useCustom));
             }
 
             if (prod.createdAt) setCreatedAt(prod.createdAt);
@@ -240,7 +247,7 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
         setFocusKeyword(`${val} DC`);
       }
       if (!canonicalUrl || initialMode === "create") {
-        setCanonicalUrl(`https://torchdc.com/product/${generated}`);
+        setCanonicalUrl(`https://torchdc.co/product/${generated}`);
       }
     }
   };
@@ -396,8 +403,9 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
           metaDescription.trim() ||
           `Shop premium ${name} in Washington DC at Torch Dispensary. Fast local weed delivery and pickup.`,
         focusKeyword: focusKeyword.trim() || `${name} DC`,
-        canonicalUrl: canonicalUrl.trim() || `https://torchdc.com/product/${slug}`,
+        canonicalUrl: canonicalUrl.trim() || `https://torchdc.co/product/${slug}`,
         metaRobotsIndex,
+        useCustom: useCustomSeo,
       },
     };
 
@@ -510,6 +518,13 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
           </Button>
         </div>
       </div>
+
+      {seoOnly && (
+        <div className="rounded-xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Your account can change the <strong>Search Engine Optimization (SEO)</strong> section only. Changes to anything
+          else on this page are not saved.
+        </div>
+      )}
 
       {/* Main 2-Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -883,6 +898,21 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
               </span>
             </div>
 
+            {/* The website only uses the title and description below when this is on */}
+            <label className="flex items-start gap-3 rounded-lg border border-border bg-background p-3 cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 accent-[#5A805B]"
+                checked={useCustomSeo}
+                onChange={(e) => setUseCustomSeo(e.target.checked)}
+              />
+              <span className="text-xs leading-relaxed text-muted-foreground">
+                <strong className="block text-sm text-foreground">Use this title &amp; description on the website</strong>
+                Off: the website shows its automatic title and description for this product. On: it shows the Meta Title and Meta
+                Description below.
+              </span>
+            </label>
+
             {/* Live Google Search Result Box */}
             <div className="bg-background border border-border/80 rounded-xl p-4 sm:p-5 shadow-xs space-y-2">
               <div className="flex items-center justify-between">
@@ -903,7 +933,7 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
                       Torch Dispensary
                     </span>
                     <span className="text-[11px] text-emerald-600 dark:text-emerald-400 truncate max-w-md mt-0.5">
-                      https://torchdc.com › product › {previewSlug}
+                      https://torchdc.co › product › {previewSlug}
                     </span>
                   </div>
                 </div>
@@ -1016,7 +1046,7 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
                   type="url"
                   value={canonicalUrl}
                   onChange={(e) => setCanonicalUrl(e.target.value)}
-                  placeholder={`https://torchdc.com/product/${slug}`}
+                  placeholder={`https://torchdc.co/product/${slug}`}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
                 />
               </div>
