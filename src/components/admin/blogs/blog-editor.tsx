@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ExternalLink, Eye, Code2, Loader2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Eye, Code2, Loader2, ImagePlus, Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 
@@ -45,6 +45,41 @@ const labelCls = "text-xs font-semibold text-foreground";
 
 const toSlug = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
+const escAttr = (v: string) => v.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+/**
+ * Big photos are scaled to 2000px and saved as WEBP in the browser first, so uploads stay small
+ * (the VPS's Nginx rejects large request bodies) and the post loads fast. GIFs are sent as they are.
+ */
+async function shrinkImage(file: File): Promise<Blob> {
+  if (file.type === "image/gif" || (file.size < 900 * 1024 && !/heic|heif/i.test(file.type))) return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 2000 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.85));
+    return blob && blob.size < file.size ? blob : file;
+  } catch {
+    return file;
+  }
+}
+
+/** Uploads an image for the blog and returns its Cloudinary URL. */
+async function uploadBlogImage(file: File): Promise<string> {
+  if (!file.type.startsWith("image/")) throw new Error("Please choose an image file (JPG, PNG, WEBP)");
+  const body = await shrinkImage(file);
+  const form = new FormData();
+  form.append("file", body, file.name.replace(/\.[^.]+$/, "") + (body.type === "image/webp" ? ".webp" : ""));
+  const res = await fetch("/api/admin/blogs/upload-image", { method: "POST", body: form });
+  if (res.status === 413) throw new Error("Image is too large for the server. Try a smaller image.");
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) throw new Error(data.error || "Upload failed");
+  return data.data.url as string;
+}
+
 /** Full-page create / edit form for a blog post (posts are served at the site root: /<slug>). */
 export function BlogEditor({ blogId }: { blogId?: string }) {
   const router = useRouter();
@@ -54,6 +89,10 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
   const [isSaving, setIsSaving] = React.useState(false);
   const [preview, setPreview] = React.useState(false);
   const [savedSlug, setSavedSlug] = React.useState("");
+  const [uploading, setUploading] = React.useState<"cover" | "content" | null>(null);
+  const coverInputRef = React.useRef<HTMLInputElement | null>(null);
+  const contentInputRef = React.useRef<HTMLInputElement | null>(null);
+  const contentRef = React.useRef<HTMLTextAreaElement | null>(null);
 
   React.useEffect(() => {
     if (!blogId) return;
@@ -121,6 +160,50 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
       toast.error((err as Error).message || "Failed to save article");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const onCoverFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploading("cover");
+    try {
+      set("coverImage", await uploadBlogImage(file));
+      toast.success("Cover image uploaded");
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  // Uploads an image and puts an <img> tag where the cursor is in the content
+  const onContentFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const suggested = file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
+    const alt = window.prompt("Describe the image for Google and screen readers (alt text):", suggested);
+    if (alt === null) return;
+    setUploading("content");
+    try {
+      const url = await uploadBlogImage(file);
+      const tag = `<img src="${escAttr(url)}" alt="${escAttr(alt.trim())}" loading="lazy" />`;
+      const el = contentRef.current;
+      setForm((prev) => {
+        const start = el && !preview ? el.selectionStart : prev.content.length;
+        const end = el && !preview ? el.selectionEnd : prev.content.length;
+        const before = prev.content.slice(0, start);
+        const after = prev.content.slice(end);
+        const pad = before && !before.endsWith("\n") ? "\n" : "";
+        return { ...prev, content: `${before}${pad}${tag}\n${after}` };
+      });
+      toast.success("Image added to the post");
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setUploading(null);
     }
   };
 
@@ -220,6 +303,17 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className={labelCls}>Content (HTML) *</label>
+              <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => contentInputRef.current?.click()}
+                disabled={uploading !== null}
+                className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md border border-border text-xs font-medium text-foreground hover:bg-muted disabled:opacity-60"
+              >
+                {uploading === "content" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
+                {uploading === "content" ? "Uploading..." : "Insert image"}
+              </button>
+              <input ref={contentInputRef} type="file" accept="image/*" className="hidden" onChange={onContentFile} />
               <div className="flex items-center gap-1 p-0.5 rounded-lg bg-muted text-xs font-medium">
                 <button
                   type="button"
@@ -236,6 +330,7 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
                   <Eye className="w-3.5 h-3.5" /> Preview
                 </button>
               </div>
+              </div>
             </div>
             {preview ? (
               <div
@@ -244,6 +339,7 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
               />
             ) : (
               <textarea
+                ref={contentRef}
                 required
                 value={form.content}
                 onChange={(e) => set("content", e.target.value)}
@@ -280,16 +376,37 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
           <section className="rounded-xl border border-border bg-card p-4 space-y-3">
             <h2 className="text-sm font-bold text-foreground">Cover image</h2>
             {form.coverImage && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={form.coverImage} alt="" className="w-full aspect-video object-cover rounded-lg border border-border" />
+              <div className="relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={form.coverImage} alt="" className="w-full aspect-video object-cover rounded-lg border border-border" />
+                <button
+                  type="button"
+                  onClick={() => set("coverImage", "")}
+                  aria-label="Remove cover image"
+                  className="absolute top-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             )}
+            <button
+              type="button"
+              onClick={() => coverInputRef.current?.click()}
+              disabled={uploading !== null}
+              className="w-full inline-flex items-center justify-center gap-1.5 h-10 rounded-lg border border-dashed border-border text-sm font-medium text-foreground hover:bg-muted disabled:opacity-60"
+            >
+              {uploading === "cover" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              {uploading === "cover" ? "Uploading..." : form.coverImage ? "Replace image" : "Upload image"}
+            </button>
+            <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={onCoverFile} />
             <input
               type="url"
-              placeholder="https://res.cloudinary.com/..."
+              placeholder="…or paste an image link"
               value={form.coverImage}
               onChange={(e) => set("coverImage", e.target.value)}
               className={inputCls}
             />
+            <p className="text-[11px] text-muted-foreground">Best size: 1200 × 630 px. Big photos are shrunk automatically.</p>
           </section>
 
           <section className="rounded-xl border border-border bg-card p-4 space-y-3">

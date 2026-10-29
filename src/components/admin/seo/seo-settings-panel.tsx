@@ -20,11 +20,21 @@ function Counter({ value, max }: { value: string; max: number }) {
   );
 }
 
+/** What each page shows right now: the text saved here, otherwise its built-in text. */
+function effectiveDrafts(list: PageEntry[], saved: Record<string, Override>): Record<string, Override> {
+  return Object.fromEntries(
+    list.map((p) => {
+      const s = saved[p.key] || {};
+      return [p.key, { title: s.title || p.title, description: s.description || p.description, noindex: Boolean(s.noindex) }];
+    })
+  );
+}
+
 /** Admin › SEO › Search settings: verification codes, share image and per-page titles (all used by the live site). */
 export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
   const [pages, setPages] = React.useState<PageEntry[]>([]);
   const [settings, setSettings] = React.useState<Settings | null>(null);
-  const [global, setGlobal] = React.useState({ googleVerification: "", bingVerification: "", defaultShareImage: "" });
+  const [global, setGlobal] = React.useState({ bingVerification: "", defaultShareImage: "" });
   const [drafts, setDrafts] = React.useState<Record<string, Override>>({});
   const [savingKey, setSavingKey] = React.useState<string | null>(null);
   const [filter, setFilter] = React.useState("");
@@ -37,12 +47,8 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
         if (!data.success) throw new Error(data.error);
         setPages(data.pageList);
         setSettings(data.settings);
-        setGlobal({
-          googleVerification: data.settings.googleVerification,
-          bingVerification: data.settings.bingVerification,
-          defaultShareImage: data.settings.defaultShareImage,
-        });
-        setDrafts(data.settings.pages || {});
+        setGlobal({ bingVerification: data.settings.bingVerification, defaultShareImage: data.settings.defaultShareImage });
+        setDrafts(effectiveDrafts(data.pageList, data.settings.pages || {}));
       } catch {
         toast.error("Couldn't load search settings");
       }
@@ -60,12 +66,8 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || "Save failed");
       setSettings(data.settings);
-      setDrafts(data.settings.pages || {});
-      setGlobal({
-        googleVerification: data.settings.googleVerification,
-        bingVerification: data.settings.bingVerification,
-        defaultShareImage: data.settings.defaultShareImage,
-      });
+      setDrafts(effectiveDrafts(pages, data.settings.pages || {}));
+      setGlobal({ bingVerification: data.settings.bingVerification, defaultShareImage: data.settings.defaultShareImage });
       toast.success(okText);
     } catch (err) {
       toast.error((err as Error).message || "Save failed");
@@ -87,20 +89,10 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
         <div>
           <h3 className="text-base font-bold text-foreground">Search engines &amp; sharing</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Added to every page of the website. Paste the whole tag or just the code; both work.
+            Google Search Console is already verified (verification file on the site), so nothing is needed for Google here.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label className="space-y-1.5 block">
-            <span className="text-xs font-semibold text-foreground">Google Search Console code (HTML tag)</span>
-            <input
-              className={`${inputCls} font-mono text-xs`}
-              disabled={!canEdit}
-              placeholder='<meta name="google-site-verification" content="…" />'
-              value={global.googleVerification}
-              onChange={(e) => setGlobal({ ...global, googleVerification: e.target.value })}
-            />
-          </label>
           <label className="space-y-1.5 block">
             <span className="text-xs font-semibold text-foreground">Bing Webmaster code (msvalidate.01)</span>
             <input
@@ -151,8 +143,8 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
           <div>
             <h3 className="text-base font-bold text-foreground">Page titles &amp; descriptions</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Leave a field empty to keep the built-in text (shown in grey). Products and categories are edited on their own
-              pages, and blog posts in the blog editor.
+              Each field shows the title and description the page uses right now. Edit and save to change them. Products and
+              categories are edited on their own pages, and blog posts in the blog editor.
             </p>
           </div>
           <input
@@ -171,10 +163,16 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
               .map((p) => {
                 const d = drafts[p.key] || {};
                 const saved = settings.pages[p.key] || {};
+                const liveTitle = saved.title || p.title;
+                const liveDesc = saved.description || p.description;
                 const dirty =
-                  (d.title || "") !== (saved.title || "") ||
-                  (d.description || "") !== (saved.description || "") ||
-                  Boolean(d.noindex) !== Boolean(saved.noindex);
+                  (d.title ?? "") !== liveTitle || (d.description ?? "") !== liveDesc || Boolean(d.noindex) !== Boolean(saved.noindex);
+                // Text equal to the built-in text is saved as "nothing set", so the page keeps the built-in version
+                const payload = {
+                  title: (d.title || "").trim() === p.title ? "" : (d.title || "").trim(),
+                  description: (d.description || "").trim() === p.description ? "" : (d.description || "").trim(),
+                  noindex: Boolean(d.noindex),
+                };
                 const custom = Boolean(saved.title || saved.description || saved.noindex);
                 const set = (patch: Override) => setDrafts((cur) => ({ ...cur, [p.key]: { ...cur[p.key], ...patch } }));
                 const title = d.title || "";
@@ -202,13 +200,13 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
                     </div>
                     <label className="block space-y-1">
                       <span className="flex justify-between text-xs font-semibold text-foreground">
-                        Title <Counter value={title || p.title} max={60} />
+                        Title <Counter value={title} max={60} />
                       </span>
                       <input className={inputCls} disabled={!canEdit} placeholder={p.title} value={title} onChange={(e) => set({ title: e.target.value })} />
                     </label>
                     <label className="block space-y-1">
                       <span className="flex justify-between text-xs font-semibold text-foreground">
-                        Description <Counter value={desc || p.description} max={160} />
+                        Description <Counter value={desc} max={160} />
                       </span>
                       <textarea
                         rows={2}
@@ -250,7 +248,11 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
                             type="button"
                             size="sm"
                             disabled={!dirty || savingKey === p.key}
-                            onClick={() => save(p.key, { pages: { [p.key]: d } }, `${p.label} saved`)}
+                            onClick={() => {
+                              if (!payload.title && !(d.title || "").trim()) return toast.error("Title can't be empty");
+                              if (!payload.description && !(d.description || "").trim()) return toast.error("Description can't be empty");
+                              save(p.key, { pages: { [p.key]: payload } }, `${p.label} saved`);
+                            }}
                             className="bg-[#5A805B] hover:bg-[#4a6b4b] text-white text-xs"
                           >
                             {savingKey === p.key ? "Saving..." : "Save"}
