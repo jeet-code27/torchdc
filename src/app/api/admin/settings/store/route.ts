@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/permissions";
+import { canEditOrders } from "@/lib/orders/access";
 import { StoreSettings } from "@/models/StoreSettings";
 import { ActivityLog } from "@/models/ActivityLog";
 
@@ -49,6 +50,13 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 }
+      );
+    }
+    // Delivery / pickup / offer switches change what every shopper sees
+    if (!canEditOrders(user)) {
+      return NextResponse.json(
+        { success: false, error: "Forbidden: only store staff can change these settings" },
+        { status: 403 }
       );
     }
 

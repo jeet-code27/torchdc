@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requirePermission } from "@/lib/permissions";
+import { canViewOrders } from "@/lib/orders/access";
 import { Order, type IOrder } from "@/models/Order";
 import { orderLabel } from "@/lib/orders/display";
 
@@ -64,6 +65,9 @@ export async function GET() {
   try {
     const perm = await requirePermission("dashboard.view");
     if (!perm.authorized) return perm.response;
+    if (!canViewOrders(perm.user)) {
+      return NextResponse.json({ success: false, error: "Forbidden: Missing orders permission" }, { status: 403 });
+    }
 
     await connectDB();
     const now = Date.now();

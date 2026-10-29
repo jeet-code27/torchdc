@@ -47,7 +47,44 @@ interface StoreSettingsData {
   offerPopupEnabled: boolean;
 }
 
+type PermissionKey = Parameters<ReturnType<typeof usePermissions>["hasPermission"]>[0];
+
+/** Staff without order access (e.g. the SEO role) get a simple start page instead of the store dashboard. */
+const STAFF_LINKS: Array<{ href: string; title: string; text: string; permission: PermissionKey }> = [
+  { href: "/admin/seo", title: "SEO & redirects", text: "Redirects for old or changed URLs", permission: "seo.view" },
+  { href: "/admin/blogs", title: "Blog", text: "Write, edit and publish posts", permission: "blogs.view" },
+  { href: "/admin/products", title: "Products", text: "Product titles, descriptions and SEO fields", permission: "products.view" },
+  { href: "/admin/categories", title: "Categories", text: "Category pages and their SEO fields", permission: "categories.view" },
+];
+
 export default function AdminDashboardPage() {
+  const { hasPermission, isLoading, user } = usePermissions();
+  if (isLoading) {
+    return <LightSurface className="px-4 py-16 text-center text-sm text-[#52525b]">Loading…</LightSurface>;
+  }
+  if (!hasPermission("orders.view")) {
+    const links = STAFF_LINKS.filter((l) => hasPermission(l.permission));
+    return (
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Welcome{user?.name ? `, ${user.name}` : ""}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">These are the parts of the site you can work on.</p>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {links.map((l) => (
+            <Link key={l.href} href={l.href} className="rounded-xl border border-border bg-card p-4 hover:border-[#5A805B]/50">
+              <span className="block text-base font-semibold text-foreground">{l.title}</span>
+              <span className="mt-0.5 block text-sm text-muted-foreground">{l.text}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return <StoreDashboard />;
+}
+
+function StoreDashboard() {
   const { hasPermission } = usePermissions();
   const [today, setToday] = React.useState<TodayData | null>(null);
   const [stats, setStats] = React.useState<StatsData | null>(null);

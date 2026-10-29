@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requirePermission } from "@/lib/permissions";
+import { canViewOrders } from "@/lib/orders/access";
 import { Order, Product, Category, Brand, User, Role } from "@/models";
 
 export const dynamic = "force-dynamic";
@@ -88,7 +89,9 @@ export async function GET(_req: NextRequest) {
     });
 
     // 4. Recent 5 Orders
-    const recentOrders = allOrders.slice(0, 5).map((o) => ({
+    // Sales figures and customer names stay with staff who can see orders
+    const seesOrders = canViewOrders(perm.user);
+    const recentOrders = (seesOrders ? allOrders.slice(0, 5) : []).map((o) => ({
       _id: o._id.toString(),
       orderNumber: o.orderNumber,
       customerName: o.customer?.name || "Customer",
@@ -102,7 +105,7 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json({
       success: true,
       stats: {
-        totalRevenue,
+        totalRevenue: seesOrders ? totalRevenue : 0,
         todayOrdersCount,
         todayDelivery,
         todayPickup,

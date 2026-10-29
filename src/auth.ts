@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { authConfig } from "@/auth.config";
+import { authConfig, isStaffRole } from "@/auth.config";
 import { connectToDatabase } from "@/lib/db";
 import { User } from "@/models/User";
 import "@/models/Role"; // Ensure Role model is registered in Mongoose schema cache
@@ -76,13 +76,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
 
         const roleKey = String(roleObj.key).toLowerCase();
-        const isStaffOrAdmin = [
-          "superadmin",
-          "super_admin",
-          "admin",
-          "manager",
-          "staff",
-        ].includes(roleKey);
+        const isStaffOrAdmin = isStaffRole(roleKey);
 
         // Strict Separation: Admin portal only for staff/admins
         if (portal === "admin" && !isStaffOrAdmin) {

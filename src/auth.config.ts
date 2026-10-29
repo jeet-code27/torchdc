@@ -1,6 +1,16 @@
 import type { NextAuthConfig } from "next-auth";
 
 /**
+ * Every role except "customer" is a staff role that may open the admin (super_admin, admin,
+ * seo, or any role made in Staff & Roles). What each one can see and change is still decided by
+ * the role's permissions.
+ */
+export function isStaffRole(role: unknown) {
+  const key = String(role || "").trim().toLowerCase();
+  return key !== "" && key !== "customer";
+}
+
+/**
  * Public origin of the site. Behind a reverse proxy (Nginx on the VPS) the request URL is the app's
  * internal address (e.g. https://localhost:3009), so prefer SITE_URL, then the proxy's forwarded headers.
  */
@@ -35,13 +45,7 @@ export const authConfig: NextAuthConfig = {
     authorized({ auth, request }) {
       const { nextUrl } = request;
       const userRole = (auth?.user?.role || "").toLowerCase();
-      const isAdminStaff = [
-        "superadmin",
-        "super_admin",
-        "admin",
-        "manager",
-        "staff",
-      ].includes(userRole);
+      const isAdminStaff = isStaffRole(userRole);
       const isLoggedIn = !!auth?.user;
       const isOnAdmin = nextUrl.pathname.startsWith("/admin");
       const isOnLogin = nextUrl.pathname === "/admin/login";
