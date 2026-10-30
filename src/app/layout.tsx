@@ -28,11 +28,11 @@ const baseMetadata: Metadata = {
   // Tab, home screen and app icons from the client site (Oct 22)
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/assets/img/favicon-32.png", type: "image/png", sizes: "32x32" },
-      { url: "/assets/img/favicon-16.png", type: "image/png", sizes: "16x16" },
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/icon0.svg", type: "image/svg+xml" },
+      { url: "/icon1.png", type: "image/png", sizes: "96x96" },
     ],
-    apple: "/assets/img/apple-touch-icon.png",
+    apple: "/apple-icon.png",
   },
   manifest: "/site.webmanifest",
   openGraph: {

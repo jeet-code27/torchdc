@@ -17,9 +17,9 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "Torch Admin", statusBarStyle: "default" },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/assets/img/favicon-32.png", type: "image/png", sizes: "32x32" },
-      { url: "/assets/img/favicon-16.png", type: "image/png", sizes: "16x16" },
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/icon0.svg", type: "image/svg+xml" },
+      { url: "/icon1.png", type: "image/png", sizes: "96x96" },
     ],
     apple: "/admin-icons/icon-192.png",
   },
