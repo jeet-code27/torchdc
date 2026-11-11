@@ -1,0 +1,360 @@
+{
+ "DC": [
+  {
+   "slug": "affordable-cannabis-in-downtown-dc-weed-deals",
+   "name": "Downtown"
+  },
+  {
+   "slug": "adams-morgan-weed-delivery-dc",
+   "name": "Adams Morgan"
+  },
+  {
+   "slug": "affordable-cannabis-columbia-heights-dc",
+   "name": "Columbia Heights"
+  },
+  {
+   "slug": "brookland-dc-weed-delivery-catholic-university-area-torch-cannabis",
+   "name": "Brookland"
+  },
+  {
+   "slug": "shaw-dc-cannabis-delivery-dispensary",
+   "name": "Shaw"
+  },
+  {
+   "slug": "cannabis-delivery-in-logan-circle-dc-torch-dispensary",
+   "name": "Logan Circle"
+  },
+  {
+   "slug": "cannabis-delivery-in-capitol-hill-dc-torch-dispensary",
+   "name": "Capitol Hill"
+  },
+  {
+   "slug": "cannabis-delivery-in-navy-yard-dc-torch",
+   "name": "Navy Yard"
+  },
+  {
+   "slug": "cannabis-delivery-in-dupont-circle-dc-torch-dispensary",
+   "name": "Dupont Circle"
+  },
+  {
+   "slug": "cannabis-delivery-in-petworth-dc-torch",
+   "name": "Petworth"
+  },
+  {
+   "slug": "cannabis-delivery-on-u-street-dc-torch",
+   "name": "U Street"
+  },
+  {
+   "slug": "cannabis-delivery-in-georgetown-dc-torch-dispensary",
+   "name": "Georgetown"
+  },
+  {
+   "slug": "cannabis-delivery-on-h-street-ne-dc-torch",
+   "name": "H Street"
+  },
+  {
+   "slug": "cannabis-delivery-in-penn-quarter-dc-torch",
+   "name": "Penn Quarter"
+  },
+  {
+   "slug": "cannabis-delivery-in-woodley-park-dc-torch",
+   "name": "Woodley Park"
+  },
+  {
+   "slug": "cannabis-delivery-in-foggy-bottom-dc-torch",
+   "name": "Foggy Bottom"
+  },
+  {
+   "slug": "cannabis-delivery-in-noma-dc-torch",
+   "name": "NoMa"
+  },
+  {
+   "slug": "cannabis-delivery-in-anacostia-dc-torch",
+   "name": "Anacostia"
+  },
+  {
+   "slug": "cannabis-delivery-in-congress-heights-dc-torch",
+   "name": "Congress Heights"
+  },
+  {
+   "slug": "cannabis-delivery-in-hillcrest-dc-torch",
+   "name": "Hillcrest"
+  },
+  {
+   "slug": "cannabis-delivery-in-fairlawn-dc-torch",
+   "name": "Fairlawn"
+  },
+  {
+   "slug": "cannabis-delivery-in-friendship-heights-dc-torch",
+   "name": "Friendship Heights"
+  },
+  {
+   "slug": "cannabis-delivery-in-the-wharf-dc-torch",
+   "name": "The Wharf"
+  },
+  {
+   "slug": "cannabis-delivery-in-mount-pleasant-dc-torch",
+   "name": "Mount Pleasant"
+  },
+  {
+   "slug": "cannabis-delivery-in-cleveland-park-dc-torch",
+   "name": "Cleveland Park"
+  },
+  {
+   "slug": "cannabis-delivery-in-takoma-dc-torch",
+   "name": "Takoma"
+  },
+  {
+   "slug": "cannabis-delivery-in-chinatown-dc-torch",
+   "name": "Chinatown"
+  },
+  {
+   "slug": "cannabis-delivery-in-kalorama-dc-torch",
+   "name": "Kalorama"
+  },
+  {
+   "slug": "cannabis-delivery-in-tenleytown-dc-torch",
+   "name": "Tenleytown"
+  },
+  {
+   "slug": "cannabis-delivery-in-glover-park-dc-torch",
+   "name": "Glover Park"
+  },
+  {
+   "slug": "cannabis-delivery-in-eckington-dc-torch",
+   "name": "Eckington"
+  },
+  {
+   "slug": "cannabis-delivery-in-trinidad-dc-torch",
+   "name": "Trinidad"
+  },
+  {
+   "slug": "cannabis-delivery-in-brightwood-dc-torch",
+   "name": "Brightwood"
+  },
+  {
+   "slug": "cannabis-delivery-in-bloomingdale-dc-torch",
+   "name": "Bloomingdale"
+  },
+  {
+   "slug": "cannabis-delivery-in-mount-vernon-triangle-dc-torch",
+   "name": "Mount Vernon Triangle"
+  },
+  {
+   "slug": "cannabis-delivery-in-union-market-dc-torch",
+   "name": "Union Market"
+  },
+  {
+   "slug": "cannabis-delivery-in-van-ness-dc-torch",
+   "name": "Van Ness"
+  },
+  {
+   "slug": "cannabis-delivery-in-chevy-chase-dc-torch",
+   "name": "Chevy Chase"
+  },
+  {
+   "slug": "cannabis-delivery-in-shepherd-park-dc-torch",
+   "name": "Shepherd Park"
+  },
+  {
+   "slug": "cannabis-delivery-in-deanwood-dc-torch",
+   "name": "Deanwood"
+  },
+  {
+   "slug": "cannabis-delivery-in-buzzard-point-dc-torch",
+   "name": "Buzzard Point"
+  },
+  {
+   "slug": "cannabis-delivery-in-palisades-dc-torch",
+   "name": "Palisades"
+  },
+  {
+   "slug": "cannabis-delivery-in-hill-east-dc-torch",
+   "name": "Hill East"
+  },
+  {
+   "slug": "cannabis-delivery-in-eastern-market-dc-torch",
+   "name": "Eastern Market"
+  },
+  {
+   "slug": "cannabis-delivery-in-barracks-row-dc-torch",
+   "name": "Barracks Row"
+  },
+  {
+   "slug": "cannabis-delivery-in-west-end-dc-torch",
+   "name": "West End"
+  },
+  {
+   "slug": "cannabis-delivery-in-ivy-city-dc-torch",
+   "name": "Ivy City"
+  }
+ ],
+ "MD": [
+  {
+   "slug": "cannabis-delivery-in-bethesda-md-torch",
+   "name": "Bethesda"
+  },
+  {
+   "slug": "cannabis-delivery-in-silver-spring-md-torch",
+   "name": "Silver Spring"
+  },
+  {
+   "slug": "cannabis-delivery-in-takoma-park-md-torch",
+   "name": "Takoma Park"
+  },
+  {
+   "slug": "cannabis-delivery-in-hyattsville-md-torch",
+   "name": "Hyattsville"
+  },
+  {
+   "slug": "cannabis-delivery-in-college-park-md-torch",
+   "name": "College Park"
+  },
+  {
+   "slug": "cannabis-delivery-in-national-harbor-md-torch",
+   "name": "National Harbor"
+  },
+  {
+   "slug": "cannabis-delivery-in-oxon-hill-md-torch",
+   "name": "Oxon Hill"
+  },
+  {
+   "slug": "cannabis-delivery-in-largo-md-torch",
+   "name": "Largo"
+  },
+  {
+   "slug": "cannabis-delivery-in-wheaton-md-torch",
+   "name": "Wheaton"
+  },
+  {
+   "slug": "cannabis-delivery-in-greenbelt-md-torch",
+   "name": "Greenbelt"
+  },
+  {
+   "slug": "cannabis-delivery-in-rockville-md-torch",
+   "name": "Rockville"
+  },
+  {
+   "slug": "cannabis-delivery-in-bowie-md-torch",
+   "name": "Bowie"
+  },
+  {
+   "slug": "cannabis-delivery-in-gaithersburg-md-torch",
+   "name": "Gaithersburg"
+  },
+  {
+   "slug": "cannabis-delivery-in-north-bethesda-md-torch",
+   "name": "North Bethesda"
+  },
+  {
+   "slug": "cannabis-delivery-in-chevy-chase-md-torch",
+   "name": "Chevy Chase, MD"
+  },
+  {
+   "slug": "cannabis-delivery-in-kensington-md-torch",
+   "name": "Kensington"
+  },
+  {
+   "slug": "cannabis-delivery-in-laurel-md-torch",
+   "name": "Laurel"
+  },
+  {
+   "slug": "cannabis-delivery-in-capitol-heights-md-torch",
+   "name": "Capitol Heights"
+  },
+  {
+   "slug": "cannabis-delivery-in-fort-washington-md-torch",
+   "name": "Fort Washington"
+  }
+ ],
+ "VA": [
+  {
+   "slug": "cannabis-delivery-in-arlington-va-torch",
+   "name": "Arlington"
+  },
+  {
+   "slug": "cannabis-delivery-in-alexandria-va-torch",
+   "name": "Alexandria"
+  },
+  {
+   "slug": "cannabis-delivery-in-tysons-va-torch",
+   "name": "Tysons"
+  },
+  {
+   "slug": "cannabis-delivery-in-vienna-va-torch",
+   "name": "Vienna"
+  },
+  {
+   "slug": "cannabis-delivery-in-falls-church-va-torch",
+   "name": "Falls Church"
+  },
+  {
+   "slug": "cannabis-delivery-in-annandale-va-torch",
+   "name": "Annandale"
+  },
+  {
+   "slug": "cannabis-delivery-in-springfield-va-torch",
+   "name": "Springfield"
+  },
+  {
+   "slug": "cannabis-delivery-in-fairfax-va-torch",
+   "name": "Fairfax"
+  },
+  {
+   "slug": "cannabis-delivery-in-woodbridge-va-torch",
+   "name": "Woodbridge"
+  },
+  {
+   "slug": "cannabis-delivery-in-reston-va-torch",
+   "name": "Reston"
+  },
+  {
+   "slug": "cannabis-delivery-in-herndon-va-torch",
+   "name": "Herndon"
+  },
+  {
+   "slug": "cannabis-delivery-in-crystal-city-va-torch",
+   "name": "Crystal City"
+  },
+  {
+   "slug": "cannabis-delivery-in-pentagon-city-va-torch",
+   "name": "Pentagon City"
+  },
+  {
+   "slug": "cannabis-delivery-in-rosslyn-va-torch",
+   "name": "Rosslyn"
+  },
+  {
+   "slug": "cannabis-delivery-in-clarendon-va-torch",
+   "name": "Clarendon"
+  },
+  {
+   "slug": "cannabis-delivery-in-ballston-va-torch",
+   "name": "Ballston"
+  },
+  {
+   "slug": "cannabis-delivery-in-old-town-alexandria-va-torch",
+   "name": "Old Town Alexandria"
+  },
+  {
+   "slug": "cannabis-delivery-in-mclean-va-torch",
+   "name": "McLean"
+  },
+  {
+   "slug": "cannabis-delivery-in-shirlington-va-torch",
+   "name": "Shirlington"
+  },
+  {
+   "slug": "cannabis-delivery-in-merrifield-va-torch",
+   "name": "Merrifield"
+  },
+  {
+   "slug": "cannabis-delivery-in-baileys-crossroads-va-torch",
+   "name": "Bailey's Crossroads"
+  },
+  {
+   "slug": "cannabis-delivery-in-burke-va-torch",
+   "name": "Burke"
+  }
+ ]
+}

@@ -748,6 +748,38 @@ body:has(.cartbar.is-on) .footer { padding-bottom: 100px; }
 .done .conf__btns .pill { margin-top: 0; }
 .conf__help { font-size: 14px; font-weight: 600; color: var(--green-dark); text-decoration: underline; text-underline-offset: 3px; }
 
+/* Oct 25 content update */
+.factchips { list-style: none; margin: 2px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.factchips li { padding: 6px 12px; border-radius: 999px; background: var(--mint); color: var(--green-dark); font-size: 13px; font-weight: 600; }
+.home-about { padding-top: 22px; }
+.catintro { margin: 8px 16px 0; font-size: 15px; line-height: 1.55; color: #333333; max-width: 760px; }
+.phero .catintro { margin: 8px 0 0; }
+.updated { display: block; margin-top: 6px; font-size: 13px; color: var(--muted); }
+.dealsum { margin: 8px 0 0; font-size: 15px; line-height: 1.55; color: #333333; }
+.tablewrap { margin: 14px 16px 6px; overflow-x: auto; border: 1px solid var(--line-2); border-radius: 16px; }
+.dealtable { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 13.5px; }
+.dealtable th, .dealtable td { padding: 10px 12px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); line-height: 1.5; }
+.dealtable td { white-space: nowrap; }
+.dealtable thead th { border-top: 0; background: var(--mint); color: var(--green-dark); font-size: 12.5px; letter-spacing: .3px; }
+.dealtable tbody th { font-weight: 700; color: var(--ink); white-space: nowrap; }
+.dealtable tbody th small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; white-space: normal; max-width: 150px; }
+.faq summary .faq__q { display: inline; margin: 0; font: inherit; letter-spacing: inherit; }
+.arealinks { margin: 24px 0 8px; font-size: 14.5px; line-height: 1.7; }
+.arealinks p { margin: 0; }
+.arealinks a { font-weight: 600; }
+@media (min-width: 900px) { .dinfo--faq { display: block; } .dinfo--faq .faq { max-width: 820px; } }
+
+/* "No walk-ins" banner under the open/closed bar, every page. The outline pulses every 2s. */
+.nowalkin { position: relative; z-index: 2; background: #FBCBB2; color: #8E3108; text-align: center; font-size: 14.5px; font-weight: 800; letter-spacing: .2px; padding: 9px 10px; border-top: 2px solid #E8561E; border-bottom: 2px solid #E8561E; animation: nowalkin-pulse 2s ease-in-out infinite; }
+@keyframes nowalkin-pulse { 0%, 100% { border-color: rgba(232, 86, 30, .25); box-shadow: 0 0 0 0 rgba(232, 86, 30, 0); } 50% { border-color: rgba(232, 86, 30, 1); box-shadow: 0 0 8px 1px rgba(232, 86, 30, .45); } }
+@media (prefers-reduced-motion: reduce) { .nowalkin { animation: none; border-color: #E8561E; } }
+
+/* Delivery fee notice (Maryland and Virginia) */
+.feebox { display: flex; gap: 12px; align-items: center; margin-top: 12px; padding: 14px 16px; border-radius: 18px; background: #FFF3EC; color: #8A3B12; }
+.feebox__ic { flex: none; width: 36px; height: 36px; border-radius: 12px; background: #FFFFFF; color: var(--orange-text); display: flex; align-items: center; justify-content: center; }
+.feebox > span:last-child { font-size: 14px; line-height: 1.4; }
+.feebox b { display: block; font-size: 16px; }
+
 /* Checkout offer pop-up (cart page, once per session) */
 .offer { position: fixed; inset: 0; z-index: 60; background: rgba(17,17,17,0.32); display: flex; align-items: center; justify-content: center; padding: 16px; }
 .offer[hidden] { display: none; }
@@ -765,6 +797,64 @@ body:has(.cartbar.is-on) .footer { padding-bottom: 100px; }
 .offer__num small { font-size: 12.5px; color: var(--muted); }
 .offer__num b { font-size: 18px; letter-spacing: 0.2px; }
 .offer__fine { margin: 12px 0 0; font-size: 11.5px; line-height: 1.4; color: #8A938B; }
+
+/* Neighborhoods grouped by state (Nov 8) */
+.htabs { display: flex; gap: 6px; margin-top: 14px; }
+.htab { flex: none; padding: 8px 14px; border-radius: 999px; border: 1px solid #DCE8DB; background: #FFFFFF; color: var(--green-dark); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.htab.is-on { background: var(--green); border-color: var(--green); color: #FFFFFF; }
+.hoods__rail[hidden] { display: none; }
+.fgrp, .mgrp { border-bottom: 1px solid rgba(255,255,255,0.18); }
+.fgrp summary, .mgrp summary { display: flex; align-items: center; gap: 8px; padding: 10px 0; font-weight: 700; font-size: 15px; list-style: none; cursor: pointer; }
+.fgrp summary::-webkit-details-marker, .mgrp summary::-webkit-details-marker { display: none; }
+.fgrp summary span, .mgrp summary span { font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: rgba(255,255,255,0.18); }
+.fgrp summary svg, .mgrp summary svg { margin-left: auto; transition: transform .2s; }
+.fgrp[open] summary svg, .mgrp[open] summary svg { transform: rotate(180deg); }
+.fgrp .areas { padding: 2px 0 12px; }
+.mgrp { border-bottom: 1px solid #EEF2EE; }
+.mgrp summary { font-size: 15px; color: var(--green-dark); padding: 12px 2px; }
+.mgrp summary span { background: #F4F8F3; color: var(--green-dark); }
+.mgrp .mnav__areas { border-bottom: 0; padding-top: 0; }
+.fgrps, .mgrps { display: flex; flex-direction: column; }
+.fgrp summary svg { width: 16px; height: 16px; }
+.fgrp summary svg, .mgrp summary svg { flex: none; overflow: visible; }
+.mnav__acc[open] .mgrp:not([open]) > summary svg { transform: none; }
+.areas a.more { background: transparent; border: 1px solid rgba(255,255,255,.7); font-weight: 700; }
+.mnav__areas a.more, .hoods__rail a.more { background: #FFFFFF; border: 1px dashed var(--green); color: var(--green); font-weight: 700; justify-content: center; }
+.fmore-note { margin: 10px 0 0; font-size: 13px; opacity: .85; }
+
+/* Flower hero: intro text wraps around the jar image (Nov 9) */
+.phero--wrap { display: block; }
+.phero--wrap img { float: right; width: 96px; height: 96px; margin: 2px 0 4px 10px; shape-outside: circle(50%); }
+.phero--wrap .catintro { margin-top: 8px; }
+.phero--wrap > div::after { content: ""; display: block; clear: both; }
+@media (min-width: 900px) {
+  .phero--wrap > div { display: grid; grid-template-columns: 1fr auto; column-gap: 32px; align-items: center; }
+  .phero--wrap > div > * { grid-column: 1; }
+  .phero--wrap > div > img { grid-column: 2; grid-row: 1 / span 3; float: none; margin: 0; width: 140px; height: 140px; }
+  .phero--wrap > div::after { display: none; }
+}
+
+/* Tier cards: strain count beside the name, description full width (Nov 9) */
+.tiers .tier { display: grid; grid-template-columns: 1fr auto; align-items: center; align-content: start; column-gap: 10px; row-gap: 4px; padding: 14px 16px; }
+.tiers .tier__l { display: contents; }
+.tiers .tier__n { grid-column: 1; grid-row: 1; }
+.tiers .tier__c { grid-column: 2; grid-row: 1; }
+.tiers .tier__d { grid-column: 1 / -1; grid-row: 2; }
+.catlabel { display: block; margin-bottom: 2px; }
+.catlabel[hidden] { display: none; }
+.nearlist { margin: 8px 0 0; padding-left: 18px; line-height: 1.8; }
+.nearlist a { font-weight: 700; }
+
+
+/* Hotel delivery guide (Nov 9) */
+.hsteps { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; line-height: 1.55; }
+.hsteps b { color: var(--green-dark); }
+.hotelcta { display: flex; justify-content: center; width: 100%; margin: 4px 0 8px; }
+@media (min-width: 900px) { .hotelcta { width: auto; display: inline-flex; padding-left: 40px; padding-right: 40px; } }
+
+/* Nov 10: hotel and quadrant pages: chips wrap, no extra side padding */
+.narrow .hoods { padding-left: 0; padding-right: 0; }
+.narrow .hoods__rail { display: flex; flex-wrap: wrap; overflow: visible; margin: 14px 0 0; padding: 0; }
 
 
 /* ==========================================================================

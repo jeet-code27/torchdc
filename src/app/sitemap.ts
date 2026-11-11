@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { connectToDatabase } from "@/lib/db";
 import { Product } from "@/models/Product";
 import { Blog } from "@/models/Blog";
-import { AREAS_LIST } from "@/lib/areas-data";
+import { LOCATION_PAGES } from "@/lib/location-pages";
 import { noindexPaths } from "@/lib/seo-settings";
 
 const SITE = "https://torchdc.co";
@@ -28,7 +28,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE}/blog`, changeFrequency: "weekly", priority: 0.4 },
     { url: `${SITE}/privacy-policy`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE}/terms-conditions`, changeFrequency: "yearly", priority: 0.2 },
-    ...AREAS_LIST.map((a) => ({
+    // Neighborhood pages (DC, Maryland, Virginia), DC quadrant hubs and the hotel page
+    ...LOCATION_PAGES.map((a) => ({
       url: `${SITE}/${a.slug}`,
       changeFrequency: "monthly" as const,
       priority: 0.7,

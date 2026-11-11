@@ -2,10 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { AREAS_LIST } from "@/lib/areas-data";
+import { FooterNeighborhoods } from "./location-lists";
 
-// Same list and order as the client site (AREAS in its build.py)
-const DC_NEIGHBORHOODS = AREAS_LIST.map((a) => ({ name: a.name, href: `/${a.slug}` }));
 
 export function StoreFooter() {
   return (
@@ -119,13 +117,7 @@ export function StoreFooter() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <h3>Neighborhoods</h3>
-        <div className="areas">
-          {DC_NEIGHBORHOODS.map((hood) => (
-            <Link key={hood.name} href={hood.href}>
-              {hood.name}
-            </Link>
-          ))}
-        </div>
+        <FooterNeighborhoods />
 
         <div className="social">
           <a

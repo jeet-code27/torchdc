@@ -1,10 +1,10 @@
-import { AREAS_LIST } from "@/lib/areas-data";
+import { LOCATION_PAGES } from "@/lib/location-pages";
 
 /**
  * Pages whose search title / description can be changed on Admin › SEO.
  * title/description here are the built-in defaults (used when nothing is set in the admin).
  */
-export type SeoPage = { key: string; path: string; label: string; group: "Main pages" | "Neighborhoods"; title: string; description: string };
+export type SeoPage = { key: string; path: string; label: string; group: string; title: string; description: string };
 
 const MAIN: SeoPage[] = [
   {
@@ -98,17 +98,16 @@ const MAIN: SeoPage[] = [
   },
 ];
 
-const AREAS: SeoPage[] = AREAS_LIST.map((area) => {
-  const at = area.name.endsWith("Street") ? "on" : "in";
-  return {
-    key: `area:${area.slug}`,
-    path: `/${area.slug}`,
-    label: area.name,
-    group: "Neighborhoods",
-    title: `Weed Delivery ${at} ${area.name}, DC | Torch Cannabis Delivery`,
-    description: `Free same-day cannabis delivery ${at} ${area.name}, Washington, DC. Flower, pre-rolls, vapes and edibles. Cash on delivery, 21+ only.`,
-  };
-});
+// Location pages from the client site: titles and descriptions as the client wrote them
+const GROUP_OF = { DC: "Neighborhoods: Washington, DC", MD: "Neighborhoods: Maryland", VA: "Neighborhoods: Virginia" } as const;
+const AREAS: SeoPage[] = LOCATION_PAGES.map((p) => ({
+  key: `area:${p.slug}`,
+  path: `/${p.slug}`,
+  label: p.name,
+  group: p.kind === "area" && p.state ? GROUP_OF[p.state] : "Hotel & DC quadrant pages",
+  title: p.title,
+  description: p.description,
+}));
 
 export const SEO_PAGES: SeoPage[] = [...MAIN, ...AREAS];
 export const SEO_PAGE_BY_KEY: Record<string, SeoPage> = Object.fromEntries(SEO_PAGES.map((p) => [p.key, p]));

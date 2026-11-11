@@ -1,4 +1,4 @@
-import { AREAS_LIST } from "@/lib/areas-data";
+import { ALL_LOCATION_SLUGS } from "@/lib/location-groups";
 
 /** body[data-page] values, same as the client site; its CSS has page-specific rules keyed on them. */
 export const STATIC_PAGES: Record<string, string> = {
@@ -14,9 +14,16 @@ export const STATIC_PAGES: Record<string, string> = {
   "/privacy-policy": "legal",
   "/terms-conditions": "legal",
   "/blog": "blog",
+  // DC quadrant hubs and the hotel page (client site, Nov 10)
+  "/weed-delivery-northwest-dc": "quad",
+  "/weed-delivery-northeast-dc": "quad",
+  "/weed-delivery-southeast-dc": "quad",
+  "/weed-delivery-southwest-dc": "quad",
+  "/cannabis-delivery-to-dc-hotels": "hotels",
 };
 
-const AREA_SLUGS = AREAS_LIST.map((a) => a.slug);
+// All neighborhood pages (DC, Maryland, Virginia)
+const AREA_SLUGS = [...ALL_LOCATION_SLUGS];
 
 export function pageKey(pathname: string): string | null {
   const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;

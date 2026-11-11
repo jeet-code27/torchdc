@@ -33,6 +33,13 @@ export function ShopCatalog({
   const { fulfillment, setFulfillment } = useCart();
   const products = initialProducts;
 
+  // Links like /shop?mode=delivery (client site Delivery / Pickup buttons) pick the order mode
+  React.useEffect(() => {
+    const mode = new URLSearchParams(window.location.search).get("mode");
+    if (mode === "delivery" || mode === "pickup") setFulfillment(mode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // "best" / "new" are sorts on the client site; categories are tabs.
   // The page remounts this component (key) when the URL's category or search changes.
   const initial = initialCategory || "all";

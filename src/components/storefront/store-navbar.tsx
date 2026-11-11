@@ -5,10 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/context/cart-context";
-import { AREAS_LIST } from "@/lib/areas-data";
+import { MenuNeighborhoods } from "./location-lists";
 
-// Same list and order as the client site (AREAS in its build.py)
-const DC_NEIGHBORHOODS = AREAS_LIST.map((a) => ({ name: a.name, href: `/${a.slug}` }));
 
 // Mobile menu, same order as the client site (Oct 22)
 const MOBILE_LINKS = [
@@ -258,49 +256,7 @@ export function StoreNavbar() {
               </Link>
             )}
 
-            <details className="mnav__acc">
-              <summary>
-                Neighborhoods
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </summary>
-              <div className="mnav__areas">
-                {DC_NEIGHBORHOODS.map((area) => (
-                  <Link
-                    key={area.name}
-                    href={area.href}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
-                      <circle cx="12" cy="9.5" r="2.5" />
-                    </svg>
-                    {area.name}
-                  </Link>
-                ))}
-              </div>
-            </details>
+            <MenuNeighborhoods onNavigate={() => setMenuOpen(false)} />
           </nav>
 
           <a className="mnav__call" href="tel:+12024681966" aria-label="Call Torch">

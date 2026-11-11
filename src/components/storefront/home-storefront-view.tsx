@@ -12,10 +12,8 @@ import { StoreHeroCarousel } from "./store-hero-carousel";
 import { StoreFaqSection, HOME_FAQS } from "./store-faq-section";
 import { MobileCategoryGrid } from "./mobile-category-grid";
 import { DeliverySteps } from "./delivery-steps";
-import { AREAS_LIST } from "@/lib/areas-data";
+import { HomeNeighborhoodTabs } from "./location-lists";
 
-// Same list and order as the client site (AREAS in its build.py)
-const DC_NEIGHBORHOODS = AREAS_LIST.map((a) => ({ name: a.name, href: `/${a.slug}` }));
 
 interface HomeStorefrontViewProps {
   products: ShopProduct[];
@@ -191,34 +189,8 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
           ))}
         </div>
 
-        {/* Delivery areas (one block; client CSS lays it out for mobile and desktop) */}
-        <section className="hoods" aria-labelledby="hoods-h">
-          <div className="sec__head">
-            <h2 id="hoods-h">We deliver to your neighborhood</h2>
-          </div>
-          <p className="hoods__sub">Free same-day delivery across DC. Tap yours.</p>
-          <div className="hoods__rail">
-            {DC_NEIGHBORHOODS.map((hood) => (
-              <Link key={hood.name} href={hood.href}>
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
-                  <circle cx="12" cy="9.5" r="2.5" />
-                </svg>
-                <span>{hood.name}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
+        {/* Delivery areas grouped by state (one block; client CSS lays it out for mobile and desktop) */}
+        <HomeNeighborhoodTabs />
 
         {/* Desktop sections (shown >= 1100px by client CSS), ids match the left menu */}
         <div className="dsecs">
