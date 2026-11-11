@@ -1,4 +1,5 @@
 import { LOCATION_PAGES } from "@/lib/location-pages";
+import staticPages from "@/content/static-pages.json";
 
 /**
  * Pages whose search title / description can be changed on Admin › SEO.
@@ -14,7 +15,7 @@ const MAIN: SeoPage[] = [
     group: "Main pages",
     title: "Weed Delivery in Washington, DC | Torch Cannabis Delivery",
     description:
-      "Torch delivers flower, pre-rolls, vapes, concentrates and edibles across Washington, DC. Free delivery, pay cash on delivery. 21+ only.",
+      "Cannabis delivery across DC, Maryland and Virginia in 30 to 90 minutes, 7AM to 11PM daily. Free delivery in DC, cash on delivery, 21+.",
   },
   {
     key: "shop",
@@ -108,6 +109,15 @@ const AREAS: SeoPage[] = LOCATION_PAGES.map((p) => ({
   title: p.title,
   description: p.description,
 }));
+
+// FAQ, About, Terms, Privacy: the client's titles and descriptions (Nov 10 zip)
+const STATIC = staticPages as Record<string, { title: string; description: string }>;
+for (const p of MAIN) {
+  if (STATIC[p.key]) {
+    p.title = STATIC[p.key].title;
+    p.description = STATIC[p.key].description;
+  }
+}
 
 export const SEO_PAGES: SeoPage[] = [...MAIN, ...AREAS];
 export const SEO_PAGE_BY_KEY: Record<string, SeoPage> = Object.fromEntries(SEO_PAGES.map((p) => [p.key, p]));

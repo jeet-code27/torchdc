@@ -9,6 +9,8 @@ export type AdminOrderItem = {
   price: number;
   weight?: string;
   category?: string;
+  /** Flower tier (Midshelf / Topshelf / Exotic), shown in the admin order copy only */
+  tier?: string;
 };
 
 export type AdminOrderHistoryEntry = {

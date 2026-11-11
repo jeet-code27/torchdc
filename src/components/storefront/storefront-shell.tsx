@@ -9,6 +9,7 @@ import { StoreAddedToCartSheet } from "./store-added-to-cart-sheet";
 import { OrderMinimumSheet } from "./order-minimum";
 import { CheckoutOffer } from "./checkout-offer";
 import { pageKey } from "@/lib/page-key";
+import { LOCAL_BUSINESS_LD, jsonLd } from "@/lib/business-schema";
 
 interface StorefrontShellProps {
   children: React.ReactNode;
@@ -33,8 +34,13 @@ export function StorefrontShell({ children }: StorefrontShellProps) {
   return (
     // Plain block layout like the client site (a flex column would stop margins collapsing into the footer gap)
     <div className="storefront">
+      {/* Sitewide business schema (one per page) */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(LOCAL_BUSINESS_LD) }} />
+
       {/* 1. Global Announcement Status Bar (Open Hours & Location) */}
       <StoreStatusBar />
+      {/* People kept walking in at 1000 G St NW (client site, Nov 8) */}
+      <div className="nowalkin">Delivery &amp; Curbside Pickup · No Walk-Ins</div>
 
       {/* 2. Persistent Global Navbar (Search, Cart Drawer, User Menu, Mobile Navigation) */}
       <StoreNavbar />

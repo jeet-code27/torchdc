@@ -112,7 +112,7 @@ export function StoreHeroCarousel() {
                   marginTop: "2px",
                 }}
               >
-                Delivering to <b>all four quadrants</b> of DC.
+                Delivering across <b>DC, Maryland and Virginia</b>. Free in DC.
               </span>
               <Link
                 href="/shop"
@@ -630,7 +630,7 @@ export function StoreHeroCarousel() {
                   marginTop: "4px",
                 }}
               >
-                Delivering to <b>all four quadrants</b> of DC.
+                Delivering across <b>DC, Maryland and Virginia</b>. Free in DC.
               </span>
               <Link
                 href="/shop"

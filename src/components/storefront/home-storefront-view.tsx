@@ -9,7 +9,8 @@ import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { ShopProduct, ShopProductCard } from "./shop-product-card";
 import { StoreHeroCarousel } from "./store-hero-carousel";
-import { StoreFaqSection, HOME_FAQS } from "./store-faq-section";
+import { FaqSection } from "@/lib/category-content";
+import { HOME_FACT_CHIPS, HOME_FAQ, HOME_H1, HOME_PARAGRAPHS } from "@/lib/home-content";
 import { MobileCategoryGrid } from "./mobile-category-grid";
 import { DeliverySteps } from "./delivery-steps";
 import { HomeNeighborhoodTabs } from "./location-lists";
@@ -25,7 +26,6 @@ const withBadge = (p: ShopProduct, badge: string): ShopProduct =>
 export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
   const router = useRouter();
   const { fulfillment, setFulfillment } = useCart();
-  const [showFullLegalText, setShowFullLegalText] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
 
   // Group products by category - Exactly 4 client Best Sellers
@@ -77,11 +77,12 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
   }, [products]);
 
   const disposables = React.useMemo(() => {
-    const list = products.filter(
-      (p) => p.category === "disposables" || p.category === "cartridges"
-    );
+    const list = products.filter((p) => p.category === "disposables");
     return list.length > 0 ? list.slice(0, 6) : products.slice(1, 7);
   }, [products]);
+
+  // Shown only when some are in stock
+  const cartridges = React.useMemo(() => products.filter((p) => p.category === "cartridges").slice(0, 6), [products]);
 
   const concentrates = React.useMemo(() => {
     const list = products.filter((p) => p.category === "concentrates");
@@ -101,6 +102,7 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
     { id: "flowers", title: "Flower", list: flowers, badge: "", href: "/flowers" },
     { id: "pre-rolls", title: "Pre-rolls", list: preRolls, badge: "", href: "/product-category/pre-rolls" },
     { id: "disposables", title: "Disposables", list: disposables, badge: "", href: "/product-category/disposables" },
+    { id: "cartridges", title: "Cartridges", list: cartridges, badge: "", href: "/product-category/cartridges" },
     { id: "concentrates", title: "Concentrates", list: concentrates, badge: "", href: "/product-category/concentrates" },
     { id: "edibles", title: "Edibles", list: edibles, badge: "", href: "/product-category/edibles" },
   ];
@@ -140,6 +142,19 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
 
         {/* Hero Banner Carousel */}
         <StoreHeroCarousel />
+
+        {/* Homepage H1 and facts, directly under the banner (no "Read more") */}
+        <section className="about">
+          <h1>{HOME_H1}</h1>
+          {HOME_PARAGRAPHS.map((p) => (
+            <p key={p}>{p}</p>
+          ))}
+          <ul className="factchips">
+            {HOME_FACT_CHIPS.map((c) => (
+              <li key={c}>{c}</li>
+            ))}
+          </ul>
+        </section>
 
         {/* Order mode (Delivery vs Pickup). Hidden on desktop by client CSS (>= 1100px) */}
         <div className="orderbtns">
@@ -211,43 +226,9 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
             ))}
         </div>
 
-        {/* About & FAQ */}
-        <div className="dinfo">
-          <section className="about">
-            {/* The homepage H1 (client site: About section heading, nothing visible above the banner) */}
-            <h1>Washington DC&apos;s Trusted Cannabis Delivery</h1>
-            <p>
-              Torch delivers top-shelf <Link href="/flowers">cannabis flower</Link>,{" "}
-              <Link href="/product-category/pre-rolls">pre-rolls</Link>,{" "}
-              <Link href="/product-category/disposables">disposable vapes</Link>, concentrates and{" "}
-              <Link href="/product-category/edibles">edibles</Link> anywhere in Washington, DC, usually the
-              same day. Order online or by phone, or choose curbside pickup at our Downtown location on G St
-              NW.
-            </p>
-            <div id="about-more" hidden={!showFullLegalText}>
-              <p>
-                Adults 21 and older in DC can legally possess cannabis. Our team helps first-timers and
-                longtime enthusiasts alike find the right strain, format and dose, with knowledgeable staff a
-                phone call away.
-              </p>
-              <p style={{ marginTop: 12 }}>
-                We serve Downtown, Adams Morgan, Dupont Circle, Capitol Hill, Navy Yard, Shaw, Georgetown and
-                every neighborhood in between. Every order is packed discreetly and handed over only after a
-                21+ ID check.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowFullLegalText(!showFullLegalText)}
-              className="linkbtn"
-              aria-controls="about-more"
-              aria-expanded={showFullLegalText}
-            >
-              {showFullLegalText ? "Show less" : "Read more"}
-            </button>
-          </section>
-
-          <StoreFaqSection faqs={HOME_FAQS} />
+        {/* FAQ (desktop: info column), same as the client site's dinfo--faq */}
+        <div className="dinfo dinfo--faq">
+          <FaqSection title="Frequently Asked Questions" items={HOME_FAQ} />
         </div>
       </main>
 

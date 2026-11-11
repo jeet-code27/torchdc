@@ -8,12 +8,14 @@ import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopFlowerTiers, FLOWER_TIERS } from "./shop-flower-tiers";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { ShopProductCard, ShopProduct } from "./shop-product-card";
+import { CATEGORY_FAQ, CATEGORY_INTRO, CATEGORY_LABEL, FaqSection } from "@/lib/category-content";
 
 const CATEGORY_PILLS = [
   { slug: "all", label: "All" },
   { slug: "flowers", label: "Flower" },
   { slug: "pre-rolls", label: "Pre-rolls" },
   { slug: "disposables", label: "Disposables" },
+  { slug: "cartridges", label: "Cartridges" },
   { slug: "concentrates", label: "Concentrates" },
   { slug: "edibles", label: "Edibles" },
 ];
@@ -89,6 +91,8 @@ export function ShopCatalog({
     : CATEGORY_PILLS.find((c) => c.slug === tab)?.label || "Products";
 
   // Client cards: flame on best sellers (except in New Arrivals), NEW badge only in New Arrivals
+  const catCopy = !searchQuery.trim() && !isBest && !isNew && tab !== "all" && tab !== "flowers";
+
   const cardProduct = (p: ShopProduct): ShopProduct =>
     isNew
       ? { ...p, badge: p.isNewArrival ? "New" : undefined }
@@ -102,7 +106,7 @@ export function ShopCatalog({
     const url =
       slug === "all"
         ? "/shop"
-        : ["pre-rolls", "disposables", "concentrates", "edibles"].includes(slug)
+        : ["pre-rolls", "disposables", "cartridges", "concentrates", "edibles"].includes(slug)
         ? `/product-category/${slug}`
         : `/shop?category=${slug}`;
     window.history.replaceState(null, "", url);
@@ -184,12 +188,16 @@ export function ShopCatalog({
 
         <div className="pagehead">
           <div>
+            {/* Category label, intro and FAQ: only on that category's own tab, not during a search */}
+            {catCopy && CATEGORY_LABEL[tab] && <span className="eyebrow catlabel">{CATEGORY_LABEL[tab]}</span>}
             <h1>{title}</h1>
             <span className="muted">
               {filteredProducts.length} {filteredProducts.length === 1 ? "product" : "products"}
             </span>
           </div>
         </div>
+
+        {catCopy && CATEGORY_INTRO[tab] && <p className="catintro">{CATEGORY_INTRO[tab]}</p>}
 
         {tab === "all" && !searchQuery.trim() && (
           <Link className="tierlink" href="/flowers">
@@ -217,6 +225,10 @@ export function ShopCatalog({
             </div>
           )}
         </div>
+
+        {catCopy && CATEGORY_FAQ[tab] && (
+          <FaqSection title={CATEGORY_FAQ[tab].title} items={CATEGORY_FAQ[tab].items} headingId="cat-faq-h" />
+        )}
       </main>
 
       <ShopCartSidebar />

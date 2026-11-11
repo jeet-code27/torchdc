@@ -13,6 +13,7 @@ const MOBILE_LINKS = [
   { href: "/flowers", label: "Flower" },
   { href: "/product-category/pre-rolls", label: "Pre-rolls" },
   { href: "/product-category/disposables", label: "Disposables" },
+  { href: "/product-category/cartridges", label: "Cartridges" },
   { href: "/product-category/concentrates", label: "Concentrates" },
   { href: "/product-category/edibles", label: "Edibles" },
   { href: "/deals", label: "Deals" },

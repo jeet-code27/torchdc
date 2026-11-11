@@ -545,6 +545,24 @@ export default function CartPage() {
                         <span>Please pick an address there.</span>
                       </div>
                     )}
+                    {/* Maryland / Virginia fee notice (client site, Nov 10); DC shows nothing */}
+                    {quote && !tooFar && !otherState && Boolean(quote.fee) && (
+                      <div className="feebox">
+                        <span className="feebox__ic">
+                          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M1 6h13v10H1zM14 9h4l4 4v3h-8z" />
+                            <circle cx="6" cy="18" r="2" />
+                            <circle cx="18" cy="18" r="2" />
+                          </svg>
+                        </span>
+                        <span>
+                          <b>{money(quote.fee || 0)} Delivery Fee</b>
+                          Your {place?.state === "MD" ? "Maryland" : place?.state === "VA" ? "Virginia" : place?.state} address is{" "}
+                          {quote.band === "outer" ? "farther out from the Beltway" : "inside or near the Beltway"}, so {money(quote.fee || 0)} is
+                          added to your total.
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <p className="meetnote">
                     {PIN}

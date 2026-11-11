@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LOCATION_PAGES, LOCATION_PAGE_BY_SLUG } from "@/lib/location-pages";
-import { LocationPageView } from "@/components/storefront/location-page-view";
+import { ContentPageView } from "@/components/storefront/content-page-view";
 import { getShopProducts } from "@/lib/get-shop-products";
 import { getPublishedPost } from "@/lib/blog";
 import { BlogPostView } from "@/components/storefront/blog-post-view";
@@ -78,7 +78,7 @@ export default async function AreaPage({ params }: AreaPageProps) {
       {page.jsonLd.map((data, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(data) }} />
       ))}
-      <LocationPageView html={page.body} railProducts={railProducts} />
+      <ContentPageView html={page.body} railProducts={railProducts} />
     </main>
   );
 }

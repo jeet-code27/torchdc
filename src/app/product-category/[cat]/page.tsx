@@ -5,6 +5,8 @@ import { getShopProducts } from "@/lib/get-shop-products";
 import { connectToDatabase } from "@/lib/db";
 import { Category } from "@/models/Category";
 import { itemSeo } from "@/lib/seo-settings";
+import { CATEGORY_FAQ, faqPageLd } from "@/lib/category-content";
+import { jsonLd } from "@/lib/business-schema";
 
 interface CategoryPageProps {
   params: Promise<{ cat: string }>;
@@ -23,6 +25,10 @@ const CATEGORY_SEO: Record<string, { title: string; description: string }> = {
     title: "Disposable Vape Delivery in DC | Torch Cannabis Delivery",
     description:
       "Disposable vapes in 1G and 2G, delivered free across Washington, DC. Order online, pay cash on delivery. 21+ only.",
+  },
+  cartridges: {
+    title: "Vape Cartridge Delivery in DC | Torch Cannabis Delivery",
+    description: "Vape cartridges delivered free across Washington, DC. Order online, pay cash on delivery. 21+ only.",
   },
   concentrates: {
     title: "Cannabis Concentrates Delivery in DC | Torch Cannabis Delivery",
@@ -68,5 +74,12 @@ export default async function ProductCategoryPage({ params }: CategoryPageProps)
   const { cat } = await params;
   if (!CATEGORY_SEO[cat]) notFound();
   const products = await getShopProducts();
-  return <ShopCatalog key={cat} initialProducts={products} initialCategory={cat} />;
+  const faq = CATEGORY_FAQ[cat];
+  return (
+    <>
+      {/* FAQ schema in the server HTML (client site, Nov 10) */}
+      {faq && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(faqPageLd(faq.items)) }} />}
+      <ShopCatalog key={cat} initialProducts={products} initialCategory={cat} />
+    </>
+  );
 }

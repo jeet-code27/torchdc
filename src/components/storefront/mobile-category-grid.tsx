@@ -23,6 +23,12 @@ const CATEGORIES = [
     image: "/assets/img/disposable.webp",
   },
   {
+    name: "Cartridges",
+    slug: "cartridges",
+    href: "/product-category/cartridges",
+    image: "/assets/img/cartridge.webp",
+  },
+  {
     name: "Concentrates",
     slug: "concentrates",
     href: "/product-category/concentrates",
@@ -33,12 +39,6 @@ const CATEGORIES = [
     slug: "edibles",
     href: "/product-category/edibles",
     image: "/assets/img/edible.webp",
-  },
-  {
-    name: "Deals",
-    slug: "deals",
-    href: "/deals",
-    image: "/assets/img/deals-tile.webp",
   },
 ];
 

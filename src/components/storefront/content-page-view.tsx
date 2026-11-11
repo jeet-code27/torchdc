@@ -6,17 +6,17 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/context/cart-context";
 import { ShopProduct, ShopProductCard } from "./shop-product-card";
 
-interface LocationPageViewProps {
+interface ContentPageViewProps {
   html: string;
   /** Products for the "Popular in [area]" rail */
   railProducts?: ShopProduct[];
 }
 
 /**
- * A neighborhood / hub / hotel page from the client site: its HTML as written, with the product rail
+ * A content page from the client site (neighborhood, hub, hotel, FAQ, About, Terms, Privacy): its HTML as written, with the product rail
  * filled in, and links that move within the app (Delivery / Pickup buttons set the order mode).
  */
-export function LocationPageView({ html, railProducts = [] }: LocationPageViewProps) {
+export function ContentPageView({ html, railProducts = [] }: ContentPageViewProps) {
   const router = useRouter();
   const { setFulfillment } = useCart();
   const ref = React.useRef<HTMLDivElement>(null);

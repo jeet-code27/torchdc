@@ -16,6 +16,7 @@ export const STORE_CATEGORIES: CategoryOption[] = [
   { slug: "flowers", name: "Flower" },
   { slug: "pre-rolls", name: "Pre-rolls" },
   { slug: "disposables", name: "Disposables" },
+  { slug: "cartridges", name: "Cartridges" },
   { slug: "concentrates", name: "Concentrates" },
   { slug: "edibles", name: "Edibles" },
   { slug: "deals", name: "Deals", isDeals: true },

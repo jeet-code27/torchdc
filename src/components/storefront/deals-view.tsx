@@ -7,6 +7,11 @@ import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { FlowerTier, DEALS, WEIGHTS, inWakeWindow } from "@/lib/deals";
 
+/** Deals page copy and price table from the client site (deals.html, Nov 10), word for word */
+const DEALS_SUMMARY = "The best weed deals in DC, every day. Looking for cheap weed? Midshelf ounces start at $100, and our bundle deals save you more on half ounces and ounces. Deals apply automatically in your cart, with delivery across DC, Maryland and Virginia.";
+const DEALS_UPDATED = "Last updated: October 25, 2026";
+const DEALS_TABLE_HTML = "<div class=\"tablewrap\"><table class=\"dealtable\"><caption class=\"sr-only\">Torch flower deals by tier</caption><thead><tr><th scope=\"col\">Deal</th><th scope=\"col\">Midshelf</th><th scope=\"col\">Topshelf</th><th scope=\"col\">Exotic</th><th scope=\"col\">When</th></tr></thead><tbody><tr><th scope=\"row\">Bundle Deal<small>Half ounces, mix any strains in a tier</small></th><td>2 for $130<br>3 for $190<br>4 for $250</td><td>2 for $180<br>3 for $270<br>4 for $340</td><td>2 for $250<br>3 for $360<br>4 for $480</td><td>7AM to 11PM daily</td></tr><tr><th scope=\"row\">Stack &amp; Save<small>Flower by the ounce</small></th><td>2 oz for $180<br>3 oz for $260<br>4 oz for $340</td><td>2 oz for $260<br>3 oz for $360<br>4 oz for $440</td><td>2 oz for $400<br>3 oz for $570<br>4 oz for $750</td><td>7AM to 11PM daily</td></tr><tr><th scope=\"row\">Half-Pound Haul<small>8 oz</small></th><td>$640</td><td>$840</td><td>$1320</td><td>7AM to 11PM daily</td></tr><tr><th scope=\"row\">Wake &amp; Bake<small>One half ounce, limit 1 per customer per day</small></th><td>$60</td><td>$80</td><td>$120</td><td>9AM to 12PM daily</td></tr></tbody></table></div>";
+
 interface TierNoteInfo {
   key: FlowerTier;
   label: string;
@@ -82,8 +87,12 @@ export function DealsView() {
 
       <main className="shell__main">
         <section className="dealhead">
-          <h1>Daily Deals</h1>
+          <h1>Daily Cannabis Deals</h1>
+          <p className="dealsum">{DEALS_SUMMARY}</p>
+          <span className="updated">{DEALS_UPDATED}</span>
         </section>
+        {/* All three tiers in a real HTML table (client site, Oct 25 content update) */}
+        <div dangerouslySetInnerHTML={{ __html: DEALS_TABLE_HTML }} />
         <div className="seglab">
           <span>3 tiers, same deals</span>
           <small>Pick your flower level</small>

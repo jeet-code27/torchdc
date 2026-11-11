@@ -7,6 +7,7 @@ import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { ShopProduct } from "./shop-product-card";
 import { normalizeTier, FlowerTier } from "@/lib/deals";
+import { CATEGORY_INTRO, FLOWER_FAQ, FaqSection, TIER_TEXT } from "@/lib/category-content";
 
 interface FlowersViewProps {
   initialProducts: ShopProduct[];
@@ -85,14 +86,15 @@ export function FlowersView({
         {/* Main Center Content */}
         <main className="shell__main">
           {/* Flower Hero Banner */}
-          <section className="phero">
+          {/* Client site, Nov 9: intro wraps around the jar on phones; text left, jar right on desktop */}
+          <section className="phero phero--wrap">
             <div>
-              <span className="eyebrow">HAND-PICKED · SAME-DAY DELIVERY</span>
+              <span className="eyebrow">EXPERTLY CURATED</span>
               <h1>Cannabis Flower</h1>
-              <span className="muted">Three tiers, one standard of quality.</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/assets/img/flower.webp" alt="" />
+              <p className="catintro">{CATEGORY_INTRO.flowers}</p>
             </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/img/flower.webp" alt="" />
           </section>
 
           {/* 3 Tier Buttons */}
@@ -109,7 +111,7 @@ export function FlowersView({
             >
               <span className="tier__l">
                 <span className="tier__n">Midshelf</span>
-                <span className="tier__d">Quality picks, priced for value</span>
+                <span className="tier__d">{TIER_TEXT.Midshelf}</span>
               </span>
               <span className="tier__c">
                 {midshelfStrains.length} {midshelfStrains.length === 1 ? "strain" : "strains"}
@@ -128,7 +130,7 @@ export function FlowersView({
             >
               <span className="tier__l">
                 <span className="tier__n">Topshelf</span>
-                <span className="tier__d">Our core lineup of classics</span>
+                <span className="tier__d">{TIER_TEXT.Topshelf}</span>
               </span>
               <span className="tier__c">
                 {topshelfStrains.length} {topshelfStrains.length === 1 ? "strain" : "strains"}
@@ -147,7 +149,7 @@ export function FlowersView({
             >
               <span className="tier__l">
                 <span className="tier__n">Exotic</span>
-                <span className="tier__d">Small-batch, hard-to-find strains</span>
+                <span className="tier__d">{TIER_TEXT.Exotic}</span>
               </span>
               <span className="tier__c">
                 {privateReserveStrains.length} {privateReserveStrains.length === 1 ? "strain" : "strains"}
@@ -208,6 +210,8 @@ export function FlowersView({
               </div>
             )}
           </div>
+
+          <FaqSection title="Flower FAQ" items={FLOWER_FAQ} headingId="flower-faq-h" />
         </main>
 
         {/* Right Sticky Cart Sidebar */}

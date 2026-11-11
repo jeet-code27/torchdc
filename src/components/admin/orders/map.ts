@@ -1,4 +1,5 @@
 import type { AdminOrder, OrderStatus } from './types';
+import { normalizeTier } from '@/lib/deals';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -30,6 +31,7 @@ export function toAdminOrder(raw: any): AdminOrder {
       price: Number(i.price) || 0,
       weight: i.weight || undefined,
       category: i.category || undefined,
+      tier: normalizeTier(i.tier || "") || undefined,
     })),
     subtotal: Number(raw.subtotal) || 0,
     discountAmount: Number(raw.discountAmount) || 0,

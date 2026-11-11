@@ -76,7 +76,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 21+ is confirmed by the age gate on entry and the ID check at the door (Oct 24: no checkbox at checkout)
+    // 21+: the age gate on entry, then ID verified by text before the order is confirmed (no checkbox at checkout)
 
     await connectToDatabase();
 

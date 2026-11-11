@@ -2,7 +2,7 @@
 export function DeliverySteps() {
   return (
     <section className="steps" aria-labelledby="steps-h">
-      <h2 id="steps-h">Delivery in 3 easy steps</h2>
+      <h2 id="steps-h">Delivery in 3 Easy Steps</h2>
       <div className="step">
         <div className="step__rail">
           <span className="step__icon" style={{ background: "#85AD85" }}>

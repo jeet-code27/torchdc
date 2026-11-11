@@ -101,7 +101,8 @@ export function buildCopyText(order: AdminOrder) {
     order.customer.name,
     order.customer.phone || '',
     addressLine(order),
-    ...order.items.map((i) => `${i.quantity}x ${i.name}${i.weight ? ` (${i.weight})` : ''}`),
+    // Owner's format (Nov 9): "[ Topshelf ]  Blue Dream (Hybrid) 7g x 1"; tier on flower lines only
+    ...order.items.map((i) => `${i.tier ? `[ ${i.tier} ]  ` : ''}${i.name}${i.weight ? ` ${i.weight}` : ''} x ${i.quantity}`),
     money(order.total),
   ];
   if (order.changeFor) lines.push(`Needs change for $${order.changeFor}`);

@@ -21,6 +21,9 @@ import sys
 
 SRC = sys.argv[1] if len(sys.argv) > 1 else os.path.join("client-reference-new", "torch-site")
 OUT = os.path.join("src", "content", "location-pages.json")
+# FAQ, About, Terms and Privacy: plain content pages from the same zip
+STATIC_OUT = os.path.join("src", "content", "static-pages.json")
+STATIC_PAGES = {"cannabis-faq-dc.html": "faq", "about-us.html": "about", "terms-conditions.html": "terms", "privacy-policy.html": "privacy"}
 # Names and links only, small enough for the footer, phone menu and homepage tabs (browser code)
 GROUPS_OUT = os.path.join("src", "content", "location-groups.json")
 
@@ -126,6 +129,14 @@ def main():
         json.dump({"pages": pages}, f, ensure_ascii=False, indent=1)
     with open(GROUPS_OUT, "w", encoding="utf-8", newline="\n") as f:
         json.dump(groups, f, ensure_ascii=False, indent=1)
+    statics = {}
+    for fname, key in STATIC_PAGES.items():
+        rec = page_record(fname, "static")
+        rec["slug"] = key
+        rec["name"] = rec["h1"]
+        statics[key] = rec
+    with open(STATIC_OUT, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(statics, f, ensure_ascii=False, indent=1)
     kinds = {}
     for p in pages:
         kinds[p["kind"]] = kinds.get(p["kind"], 0) + 1
