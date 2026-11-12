@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DealsView } from "@/components/storefront/deals-view";
-import { pageMetadata } from "@/lib/seo-settings";
+import { pageMetadata, pageH1 } from "@/lib/seo-settings";
 
 // Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
 export async function generateMetadata(): Promise<Metadata> {
@@ -9,6 +9,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const revalidate = 60;
 
-export default function DealsPage() {
-  return <DealsView />;
+export default async function DealsPage() {
+  return <DealsView h1={await pageH1("deals")} />;
 }

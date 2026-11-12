@@ -1,5 +1,8 @@
 "use client";
 
+import { siteCanonical } from "@/lib/canonical";
+import { CATEGORY_PAGE_SLUGS, mergeCategoryCopy, type CategoryCopy } from "@/lib/category-content";
+import { CategoryPageCard, categoryCopyPayload } from "@/components/admin/categories/category-page-card";
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -50,6 +53,7 @@ interface CategoryData {
     metaRobotsIndex: boolean;
     useCustom?: boolean;
   };
+  page?: Partial<CategoryCopy>;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -100,6 +104,8 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
   const [canonicalUrl, setCanonicalUrl] = React.useState("");
   const [metaRobotsIndex, setMetaRobotsIndex] = React.useState(true);
   const [useCustomSeo, setUseCustomSeo] = React.useState(false);
+  // Text on the category's page (label, H1, intro, FAQ); null until loaded
+  const [pageCopy, setPageCopy] = React.useState<CategoryCopy | null>(null);
 
   // Timestamps
   const [createdAt, setCreatedAt] = React.useState<string>("");
@@ -149,11 +155,12 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
               setFocusKeyword(cat.seo.focusKeyword || "");
               setMetaTitle(cat.seo.metaTitle || "");
               setMetaDescription(cat.seo.metaDescription || "");
-              setCanonicalUrl(cat.seo.canonicalUrl || "");
+              setCanonicalUrl(siteCanonical(cat.seo.canonicalUrl) || (cat.slug ? `https://torchdc.co/product-category/${cat.slug}` : ""));
               setMetaRobotsIndex(cat.seo.metaRobotsIndex ?? true);
               setUseCustomSeo(Boolean(cat.seo.useCustom));
             }
 
+            setPageCopy(mergeCategoryCopy(cat.slug, cat.page));
             if (cat.createdAt) setCreatedAt(cat.createdAt);
             if (cat.updatedAt) setUpdatedAt(cat.updatedAt);
           } else {
@@ -184,7 +191,7 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
         setFocusKeyword(`${val} Washington DC`);
       }
       if (!canonicalUrl || initialMode === "create") {
-        setCanonicalUrl(`https://torchdc.co/category/${generated}`);
+        setCanonicalUrl(`https://torchdc.co/product-category/${generated}`);
       }
     }
   };
@@ -282,10 +289,11 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
           metaDescription.trim() ||
           `Shop premium ${name} in Washington DC at Torch Dispensary. Fast local weed delivery.`,
         focusKeyword: focusKeyword.trim() || `${name} Washington DC`,
-        canonicalUrl: canonicalUrl.trim() || `https://torchdc.co/category/${slug}`,
+        canonicalUrl: canonicalUrl.trim() || `https://torchdc.co/product-category/${slug}`,
         metaRobotsIndex,
         useCustom: useCustomSeo,
       },
+      ...(pageCopy && hasPageCopy ? { page: categoryCopyPayload(slug, pageCopy) } : {}),
     };
 
     try {
@@ -320,6 +328,8 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
       setIsSaving(false);
     }
   };
+
+  const hasPageCopy = (CATEGORY_PAGE_SLUGS as readonly string[]).includes(slug);
 
   if (isLoading) {
     return (
@@ -397,8 +407,8 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
 
       {seoOnly && (
         <div className="rounded-xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Your account can change the <strong>Search Engine Optimization (SEO)</strong> section only. Changes to anything
-          else on this page are not saved.
+          Your account can change the <strong>Search Engine Optimization (SEO)</strong> section and the category page text
+          only. Changes to anything else on this page are not saved.
         </div>
       )}
 
@@ -495,11 +505,14 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
                 <label className="block text-xs font-semibold text-foreground uppercase tracking-wider mb-1.5">
                   Category Description
                 </label>
+                <p className="text-[11px] text-muted-foreground mb-1.5">
+                  Not shown on the website. The text on the category page is edited under &quot;Category page text&quot;.
+                </p>
                 <textarea
                   rows={4}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe this category for buyers and search engines..."
+                  placeholder="Internal note (not shown on the website)..."
                   className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition resize-y"
                 />
               </div>
@@ -672,7 +685,7 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
                   type="url"
                   value={canonicalUrl}
                   onChange={(e) => setCanonicalUrl(e.target.value)}
-                  placeholder={`https://torchdc.co/category/${slug}`}
+                  placeholder={`https://torchdc.co/product-category/${slug}`}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
                 />
                 <p className="text-[11px] text-muted-foreground mt-1">
@@ -706,6 +719,9 @@ export function CategoryForm({ categoryId, initialMode }: CategoryFormProps) {
               </div>
             </div>
           </div>
+
+          {/* Category page text (only the categories that have their own page) */}
+          {hasPageCopy && pageCopy && <CategoryPageCard slug={slug} value={pageCopy} onChange={setPageCopy} />}
         </div>
 
         {/* Right Sidebar Column: Image, Visibility & Metadata (4 Cols) */}

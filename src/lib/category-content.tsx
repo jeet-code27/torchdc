@@ -110,3 +110,44 @@ export function FaqSection({ title, items, id = "faq", headingId = "faq-h" }: { 
     </section>
   );
 }
+
+/** Category pages with their own copy (label, H1, intro, FAQ), editable on Admin › Categories */
+export const CATEGORY_PAGE_SLUGS = ["flowers", "pre-rolls", "disposables", "cartridges", "concentrates", "edibles"] as const;
+
+export type CategoryCopy = { label: string; h1: string; intro: string; faqTitle: string; faq: Faq[] };
+
+const CATEGORY_H1: Record<string, string> = {
+  flowers: "Cannabis Flower",
+  "pre-rolls": "Pre-rolls",
+  disposables: "Disposables",
+  cartridges: "Cartridges",
+  concentrates: "Concentrates",
+  edibles: "Edibles",
+};
+
+/** The client's built-in copy for a category page (what the page shows when nothing is set in the admin) */
+export function defaultCategoryCopy(slug: string): CategoryCopy {
+  if (slug === "flowers") {
+    return { label: "EXPERTLY CURATED", h1: CATEGORY_H1.flowers, intro: CATEGORY_INTRO.flowers, faqTitle: "Flower FAQ", faq: FLOWER_FAQ };
+  }
+  return {
+    label: CATEGORY_LABEL[slug] || "",
+    h1: CATEGORY_H1[slug] || "",
+    intro: CATEGORY_INTRO[slug] || "",
+    faqTitle: CATEGORY_FAQ[slug]?.title || "",
+    faq: CATEGORY_FAQ[slug]?.items || [],
+  };
+}
+
+/** Saved copy over the built-in copy: each empty field keeps the built-in text */
+export function mergeCategoryCopy(slug: string, saved?: Partial<CategoryCopy> | null): CategoryCopy {
+  const d = defaultCategoryCopy(slug);
+  const faq = (saved?.faq || []).filter((f) => f.q?.trim() && f.a?.trim());
+  return {
+    label: saved?.label?.trim() || d.label,
+    h1: saved?.h1?.trim() || d.h1,
+    intro: saved?.intro?.trim() || d.intro,
+    faqTitle: saved?.faqTitle?.trim() || d.faqTitle,
+    faq: faq.length ? faq : d.faq,
+  };
+}

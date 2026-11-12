@@ -111,7 +111,7 @@ export async function POST() {
             metaTitle: `Buy ${parentName} in Washington DC | TORCH Dispensary`,
             metaDescription: `Shop premium ${parentName} in Washington DC at Torch Dispensary. Lab-tested quality, same-day local cannabis delivery and dispensary pickup.`,
             focusKeyword: `${parentName} Washington DC`,
-            canonicalUrl: `https://torchdc.com/category/${slug}`,
+            canonicalUrl: `https://torchdc.co/product-category/${slug}`,
             metaRobotsIndex: true,
           },
         });
@@ -138,7 +138,7 @@ export async function POST() {
             metaTitle: `${childName} (${parentName}) in Washington DC | TORCH Dispensary`,
             metaDescription: `Discover fresh ${childName} strains under ${parentName} in Washington DC at Torch Dispensary. Fast, discreet delivery across DC.`,
             focusKeyword: `${childName} strain DC`,
-            canonicalUrl: `https://torchdc.com/category/${slug}`,
+            canonicalUrl: `https://torchdc.co/product-category/${slug}`,
             metaRobotsIndex: true,
           },
         });

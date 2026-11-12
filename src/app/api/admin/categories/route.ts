@@ -1,3 +1,5 @@
+import { cleanCategoryPage } from "@/lib/category-page";
+import { storedCanonical } from "@/lib/canonical";
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { getCurrentUser, requirePermission } from "@/lib/permissions";
@@ -91,7 +93,7 @@ export async function POST(req: NextRequest) {
         data.seo?.metaDescription?.trim() ||
         `Shop premium ${data.name} in Washington DC at Torch Dispensary. Fast local weed delivery and store pickup available.`,
       focusKeyword: data.seo?.focusKeyword?.trim() || `${data.name} Washington DC`,
-      canonicalUrl: data.seo?.canonicalUrl?.trim() || `https://torchdc.com/category/${data.slug}`,
+      canonicalUrl: storedCanonical(data.seo?.canonicalUrl, `/product-category/${data.slug}`),
       metaRobotsIndex: data.seo?.metaRobotsIndex ?? true,
       useCustom: data.seo?.useCustom ?? false,
     };
@@ -100,6 +102,7 @@ export async function POST(req: NextRequest) {
       ...data,
       parentId: data.parentId || null,
       seo: seoPayload,
+      page: cleanCategoryPage(body?.page) ?? undefined,
     });
 
     const populated = await Category.findById(newCategory._id)

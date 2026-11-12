@@ -25,12 +25,13 @@ export const STATIC_PAGES: Record<string, string> = {
 // All neighborhood pages (DC, Maryland, Virginia)
 const AREA_SLUGS = [...ALL_LOCATION_SLUGS];
 
-export function pageKey(pathname: string): string | null {
+export function pageKey(pathname: string, extraAreaSlugs: string[] = []): string | null {
   const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
   if (STATIC_PAGES[path]) return STATIC_PAGES[path];
   if (path.startsWith("/product-category/")) return "shop";
   if (path.startsWith("/product/")) return "product";
-  if (AREA_SLUGS.includes(path.replace(/^\//, ""))) return "area";
+  const slug = path.replace(/^\//, "");
+  if (AREA_SLUGS.includes(slug) || extraAreaSlugs.includes(slug)) return "area";
   return null;
 }
 
@@ -38,6 +39,8 @@ export function pageKey(pathname: string): string | null {
  * Inline script that sets body[data-page] before the first paint, so page-specific CSS (for example
  * hiding the mobile Best Sellers rail on desktop) applies immediately instead of after hydration.
  */
-export function pageKeyInlineScript(): string {
-  return `(function(){try{var S=${JSON.stringify(STATIC_PAGES)},A=${JSON.stringify(AREA_SLUGS)};var p=location.pathname;if(p.length>1)p=p.replace(/\\/+$/,"");var k=S[p]||(p.indexOf("/product-category/")===0?"shop":p.indexOf("/product/")===0?"product":A.indexOf(p.slice(1))>-1?"area":null);if(k)document.body.setAttribute("data-page",k);}catch(e){}})();`;
+export function pageKeyInlineScript(extraAreaSlugs: string[] = []): string {
+  // "<" escaped so a slug can never close the script tag
+  const areas = JSON.stringify([...AREA_SLUGS, ...extraAreaSlugs]).replace(/</g, "\\u003c");
+  return `(function(){try{var S=${JSON.stringify(STATIC_PAGES)},A=${areas};var p=location.pathname;if(p.length>1)p=p.replace(/\\/+$/,"");var k=S[p]||(p.indexOf("/product-category/")===0?"shop":p.indexOf("/product/")===0?"product":A.indexOf(p.slice(1))>-1?"area":null);if(k)document.body.setAttribute("data-page",k);}catch(e){}})();`;
 }

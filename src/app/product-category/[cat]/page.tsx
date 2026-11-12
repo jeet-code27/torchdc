@@ -5,7 +5,8 @@ import { getShopProducts } from "@/lib/get-shop-products";
 import { connectToDatabase } from "@/lib/db";
 import { Category } from "@/models/Category";
 import { itemSeo } from "@/lib/seo-settings";
-import { CATEGORY_FAQ, faqPageLd } from "@/lib/category-content";
+import { faqPageLd } from "@/lib/category-content";
+import { getCategoryCopy } from "@/lib/category-page";
 import { jsonLd } from "@/lib/business-schema";
 
 interface CategoryPageProps {
@@ -73,13 +74,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function ProductCategoryPage({ params }: CategoryPageProps) {
   const { cat } = await params;
   if (!CATEGORY_SEO[cat]) notFound();
-  const products = await getShopProducts();
-  const faq = CATEGORY_FAQ[cat];
+  const [products, copy] = await Promise.all([getShopProducts(), getCategoryCopy(cat)]);
   return (
     <>
-      {/* FAQ schema in the server HTML (client site, Nov 10) */}
-      {faq && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(faqPageLd(faq.items)) }} />}
-      <ShopCatalog key={cat} initialProducts={products} initialCategory={cat} />
+      {/* FAQ schema in the server HTML, from the questions on the page (Admin › Categories or built-in) */}
+      {copy.faq.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(faqPageLd(copy.faq)) }} />
+      )}
+      <ShopCatalog key={cat} initialProducts={products} initialCategory={cat} copy={copy} />
     </>
   );
 }

@@ -10,20 +10,25 @@ import { OrderMinimumSheet } from "./order-minimum";
 import { CheckoutOffer } from "./checkout-offer";
 import { pageKey } from "@/lib/page-key";
 import { LOCAL_BUSINESS_LD, jsonLd } from "@/lib/business-schema";
+import { AreaGroupsProvider, type ExtraArea } from "./area-groups";
 
 interface StorefrontShellProps {
   children: React.ReactNode;
+  /** Neighborhood pages made on Admin › Pages (footer, menu and homepage lists) */
+  extraAreas?: ExtraArea[];
 }
 
-export function StorefrontShell({ children }: StorefrontShellProps) {
+const NO_EXTRA: ExtraArea[] = [];
+
+export function StorefrontShell({ children, extraAreas = NO_EXTRA }: StorefrontShellProps) {
   const pathname = usePathname();
 
   // body[data-page] values match the client site; its CSS has page-specific rules keyed on them
   React.useEffect(() => {
-    const page = pageKey(pathname || "/");
+    const page = pageKey(pathname || "/", extraAreas.map((a) => a.slug));
     if (page) document.body.setAttribute("data-page", page);
     else document.body.removeAttribute("data-page");
-  }, [pathname]);
+  }, [pathname, extraAreas]);
 
   const isExcluded = pathname?.startsWith("/admin");
 
@@ -33,6 +38,7 @@ export function StorefrontShell({ children }: StorefrontShellProps) {
 
   return (
     // Plain block layout like the client site (a flex column would stop margins collapsing into the footer gap)
+    <AreaGroupsProvider extra={extraAreas}>
     <div className="storefront">
       {/* Sitewide business schema (one per page) */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(LOCAL_BUSINESS_LD) }} />
@@ -60,5 +66,6 @@ export function StorefrontShell({ children }: StorefrontShellProps) {
       {/* 7. "Want $10 Off Your Order?" cart pop-up */}
       <CheckoutOffer />
     </div>
+    </AreaGroupsProvider>
   );
 }

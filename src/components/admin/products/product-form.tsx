@@ -1,5 +1,6 @@
 "use client";
 
+import { siteCanonical } from "@/lib/canonical";
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -212,7 +213,7 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
               setFocusKeyword(prod.seo.focusKeyword || "");
               setMetaTitle(prod.seo.metaTitle || "");
               setMetaDescription(prod.seo.metaDescription || "");
-              setCanonicalUrl(prod.seo.canonicalUrl || "");
+              setCanonicalUrl(siteCanonical(prod.seo.canonicalUrl) || (prod.slug ? `https://torchdc.co/product/${prod.slug}` : ""));
               setMetaRobotsIndex(prod.seo.metaRobotsIndex ?? true);
               setUseCustomSeo(Boolean(prod.seo.useCustom));
             }
@@ -285,7 +286,7 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
           const newImg: ProductImage = {
             url: json.data.url,
             publicId: json.data.publicId,
-            altText: `${name || "Product"} | TORCH DC`,
+            altText: name || "",
             isPrimary: images.length === 0,
           };
           setImages([...images, newImg]);
@@ -521,8 +522,8 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
 
       {seoOnly && (
         <div className="rounded-xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Your account can change the <strong>Search Engine Optimization (SEO)</strong> section only. Changes to anything
-          else on this page are not saved.
+          Your account can change the <strong>Search Engine Optimization (SEO)</strong> section and the image alt text only.
+          Changes to anything else on this page are not saved.
         </div>
       )}
 
@@ -1105,8 +1106,8 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
             {/* Gallery Grid */}
             <div className="grid grid-cols-2 gap-3">
               {images.map((img, idx) => (
+                <div key={idx} className="space-y-1.5">
                 <div
-                  key={idx}
                   className="relative group rounded-lg overflow-hidden border border-border bg-muted/30 aspect-square flex items-center justify-center"
                 >
                   <Image
@@ -1140,6 +1141,18 @@ export function ProductForm({ productId, initialMode }: ProductFormProps) {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
+                </div>
+                <input
+                  type="text"
+                  maxLength={200}
+                  aria-label={`Alt text for image ${idx + 1}`}
+                  placeholder="Alt text (what the photo shows)"
+                  value={img.altText || ""}
+                  onChange={(e) =>
+                    setImages((cur) => cur.map((im, i) => (i === idx ? { ...im, altText: e.target.value } : im)))
+                  }
+                  className="w-full px-2 py-1.5 text-[11px] rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
                 </div>
               ))}
 

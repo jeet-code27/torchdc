@@ -10,7 +10,7 @@ import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { ShopProduct, ShopProductCard } from "./shop-product-card";
 import { StoreHeroCarousel } from "./store-hero-carousel";
 import { FaqSection } from "@/lib/category-content";
-import { HOME_FACT_CHIPS, HOME_FAQ, HOME_H1, HOME_PARAGRAPHS } from "@/lib/home-content";
+import { DEFAULT_HOME_COPY, type HomeCopy } from "@/lib/home-content";
 import { MobileCategoryGrid } from "./mobile-category-grid";
 import { DeliverySteps } from "./delivery-steps";
 import { HomeNeighborhoodTabs } from "./location-lists";
@@ -18,12 +18,14 @@ import { HomeNeighborhoodTabs } from "./location-lists";
 
 interface HomeStorefrontViewProps {
   products: ShopProduct[];
+  /** H1 (Admin › SEO), intro, fact chips and FAQ (Admin › Pages) */
+  copy?: HomeCopy;
 }
 
 const withBadge = (p: ShopProduct, badge: string): ShopProduct =>
   badge && !p.badge ? { ...p, badge } : p;
 
-export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
+export function HomeStorefrontView({ products, copy = DEFAULT_HOME_COPY }: HomeStorefrontViewProps) {
   const router = useRouter();
   const { fulfillment, setFulfillment } = useCart();
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -145,15 +147,16 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
 
         {/* Homepage H1 and facts, directly under the banner (no "Read more") */}
         <section className="about">
-          <h1>{HOME_H1}</h1>
-          {HOME_PARAGRAPHS.map((p) => (
-            <p key={p}>{p}</p>
-          ))}
-          <ul className="factchips">
-            {HOME_FACT_CHIPS.map((c) => (
-              <li key={c}>{c}</li>
-            ))}
-          </ul>
+          <h1>{copy.h1}</h1>
+          {/* Paragraphs as HTML (links allowed); display: contents keeps them direct children for the client CSS */}
+          <div style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: copy.introHtml }} />
+          {copy.chips.length > 0 && (
+            <ul className="factchips">
+              {copy.chips.map((c) => (
+                <li key={c}>{c}</li>
+              ))}
+            </ul>
+          )}
         </section>
 
         {/* Order mode (Delivery vs Pickup). Hidden on desktop by client CSS (>= 1100px) */}
@@ -228,7 +231,7 @@ export function HomeStorefrontView({ products }: HomeStorefrontViewProps) {
 
         {/* FAQ (desktop: info column), same as the client site's dinfo--faq */}
         <div className="dinfo dinfo--faq">
-          <FaqSection title="Frequently Asked Questions" items={HOME_FAQ} />
+          <FaqSection title="Frequently Asked Questions" items={copy.faq} />
         </div>
       </main>
 

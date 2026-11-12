@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublishedPosts, formatPostDate, blogImage, type BlogListItem } from "@/lib/blog";
-import { pageMetadata } from "@/lib/seo-settings";
+import { pageMetadata, pageH1 } from "@/lib/seo-settings";
 
 // Title and description: built-in default (src/lib/seo-pages.ts) or the one set on Admin › SEO
 export async function generateMetadata(): Promise<Metadata> {
@@ -12,6 +12,7 @@ export const revalidate = 3600;
 
 /** Header markup kept 1:1 with client-reference/blog.html; posts live at the site root like on WordPress. */
 export default async function BlogPage() {
+  const h1 = await pageH1("blog");
   let posts: BlogListItem[] = [];
   try {
     posts = await getPublishedPosts();
@@ -24,7 +25,7 @@ export default async function BlogPage() {
       <div className="narrow">
         <section className="dealhead">
           <span className="eyebrow">THE TORCH BLOG</span>
-          <h1>Blog</h1>
+          <h1>{h1 || "Blog"}</h1>
           <span className="muted">Guides to DC cannabis, strains and neighborhoods.</span>
         </section>
         <div className="bloglist">

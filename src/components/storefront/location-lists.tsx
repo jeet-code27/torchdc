@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { LOCATION_GROUPS, LOCATION_STATES, MORE_AREAS_HREF, type LocationState } from "@/lib/location-groups";
+import { LOCATION_STATES, MORE_AREAS_HREF, type LocationState } from "@/lib/location-groups";
+import { useAreaGroups } from "./area-groups";
 
 /**
  * Neighborhood lists grouped by state (client site, Nov 8): homepage tabs, footer and phone menu.
@@ -25,6 +26,7 @@ const Chevron = () => (
 /** Homepage "We Deliver to Your Neighborhood": Washington, DC / Maryland / Virginia tabs */
 export function HomeNeighborhoodTabs() {
   const [tab, setTab] = React.useState<LocationState>("DC");
+  const LOCATION_GROUPS = useAreaGroups();
   return (
     <section className="hoods" aria-labelledby="hoods-h">
       <div className="sec__head">
@@ -64,6 +66,7 @@ export function HomeNeighborhoodTabs() {
 
 /** Footer: three collapsed sections with a count */
 export function FooterNeighborhoods() {
+  const LOCATION_GROUPS = useAreaGroups();
   return (
     <div className="fgrps">
       {LOCATION_STATES.map((s) => (
@@ -92,6 +95,7 @@ export function FooterNeighborhoods() {
 
 /** Phone menu: Neighborhoods accordion with a collapsed section per state */
 export function MenuNeighborhoods({ onNavigate }: { onNavigate?: () => void }) {
+  const LOCATION_GROUPS = useAreaGroups();
   return (
     <details className="mnav__acc">
       <summary>

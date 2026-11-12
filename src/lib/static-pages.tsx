@@ -1,6 +1,9 @@
 import data from "@/content/static-pages.json";
 import { ContentPageView } from "@/components/storefront/content-page-view";
 import { jsonLd } from "@/lib/business-schema";
+import { pageH1 } from "@/lib/seo-settings";
+import { pageBody, schemaForBody } from "@/lib/site-pages";
+import { withH1 } from "@/lib/page-html";
 import type { LocationPage } from "@/lib/location-pages";
 
 /**
@@ -10,15 +13,21 @@ import type { LocationPage } from "@/lib/location-pages";
 export type StaticPageKey = "faq" | "about" | "terms" | "privacy";
 export const STATIC_PAGES = data as Record<StaticPageKey, LocationPage>;
 
-/** The page body plus its own schema (FAQ, breadcrumbs); the business schema comes from the layout */
-export function StaticContentPage({ pageKey }: { pageKey: StaticPageKey }) {
+/**
+ * The page body plus its own schema (FAQ, breadcrumbs); the business schema comes from the layout.
+ * Body from Admin › Pages when edited there, H1 from Admin › SEO when set.
+ */
+export async function StaticContentPage({ pageKey }: { pageKey: StaticPageKey }) {
   const page = STATIC_PAGES[pageKey];
+  const [saved, h1] = await Promise.all([pageBody(pageKey, page.body), pageH1(pageKey)]);
+  const body = withH1(saved, h1);
+  const schema = saved === page.body ? page.jsonLd : schemaForBody(page.jsonLd, saved);
   return (
     <main>
-      {page.jsonLd.map((d, i) => (
+      {schema.map((d, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(d) }} />
       ))}
-      <ContentPageView html={page.body} />
+      <ContentPageView html={body} />
     </main>
   );
 }

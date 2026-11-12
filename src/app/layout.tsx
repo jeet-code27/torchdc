@@ -8,6 +8,7 @@ import { StoreAgeGate } from "@/components/storefront/store-age-gate";
 import { StorefrontShell } from "@/components/storefront/storefront-shell";
 import { pageKeyInlineScript } from "@/lib/page-key";
 import { getSeoSettings } from "@/lib/seo-settings";
+import { customAreaPages } from "@/lib/site-pages";
 
 import { SessionProvider } from "@/components/auth/session-provider";
 
@@ -71,11 +72,15 @@ export const viewport: Viewport = {
   themeColor: "#5A805B",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Neighborhood pages made on Admin › Pages join the footer, menu and homepage lists
+  const extraAreas = (await customAreaPages())
+    .filter((p) => p.state)
+    .map((p) => ({ slug: p.slug, name: p.name, state: p.state as "DC" | "MD" | "VA" }));
   return (
     <html lang="en" suppressHydrationWarning className={jost.variable}>
       <head>
@@ -91,7 +96,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {/* Sets body[data-page] before first paint (page-specific CSS from the client site) */}
-        <script dangerouslySetInnerHTML={{ __html: pageKeyInlineScript() }} />
+        <script dangerouslySetInnerHTML={{ __html: pageKeyInlineScript(extraAreas.map((a) => a.slug)) }} />
         <SessionProvider>
           <ThemeProvider
             attribute="class"
@@ -103,7 +108,7 @@ export default function RootLayout({
             <CartProvider>
               {/* Immediate 21+ Age Gate Modal */}
               <StoreAgeGate />
-              <StorefrontShell>{children}</StorefrontShell>
+              <StorefrontShell extraAreas={extraAreas}>{children}</StorefrontShell>
             </CartProvider>
           </ThemeProvider>
         </SessionProvider>

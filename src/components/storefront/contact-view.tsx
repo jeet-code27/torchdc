@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 
 /** Contact page, generated from client-reference-new/torch-site-2026-10-22/torch-site/contact-us.html (markup kept 1:1 with the client site). */
-export function ContactView() {
+export function ContactView({ h1 = "" }: { h1?: string }) {
   // Same as the client site: the form opens the email app with the message filled in
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,7 +22,7 @@ export function ContactView() {
       <div className="narrow">
         <section className="dealhead">
           <span className="eyebrow">WE&apos;RE HERE TO HELP</span>
-          <h1>Contact Us</h1>
+          <h1>{h1 || "Contact Us"}</h1>
           <span className="muted">
             Questions about an order, a strain or delivery? Reach us any way you like.
           </span>

@@ -4,6 +4,7 @@ import { Product } from "@/models/Product";
 import { Blog } from "@/models/Blog";
 import { LOCATION_PAGES } from "@/lib/location-pages";
 import { noindexPaths } from "@/lib/seo-settings";
+import { customAreaPages } from "@/lib/site-pages";
 
 const SITE = "https://torchdc.co";
 
@@ -34,6 +35,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
+    // New neighborhood pages made on Admin › Pages
+    ...(await customAreaPages()).map((a) => ({
+      url: `${SITE}/${a.slug}`,
+      lastModified: a.updatedAt ? new Date(a.updatedAt) : undefined,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
   ];
 
   // Pages switched to "hide from search" on Admin › SEO stay out of the sitemap
@@ -44,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     await connectToDatabase();
     const [products, posts] = await Promise.all([
       Product.find({ isActive: true, "seo.metaRobotsIndex": { $ne: false } }).select("slug updatedAt").lean(),
-      Blog.find({ isPublished: true }).select("slug updatedAt").lean(),
+      Blog.find({ isPublished: true, "seo.noindex": { $ne: true } }).select("slug updatedAt").lean(),
     ]);
     return [
       ...visible,

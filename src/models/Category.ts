@@ -15,6 +15,16 @@ export interface ICategorySEO {
   useCustom?: boolean;
 }
 
+/** Copy on the category's page (empty fields: the client's built-in copy) */
+export interface ICategoryPage {
+  label?: string;
+  h1?: string;
+  /** HTML, links allowed */
+  intro?: string;
+  faqTitle?: string;
+  faq?: { q: string; a: string }[];
+}
+
 export interface ICategory extends Document {
   name: string;
   slug: string;
@@ -25,6 +35,7 @@ export interface ICategory extends Document {
   isActive: boolean;
   wooId?: number | string;
   seo: ICategorySEO;
+  page?: ICategoryPage;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -81,6 +92,13 @@ const CategorySchema = new Schema<ICategory>(
       metaRobotsIndex: { type: Boolean, default: true },
       // Use metaTitle / metaDescription on the website (off: the automatic title and description)
       useCustom: { type: Boolean, default: false },
+    },
+    page: {
+      label: { type: String, default: "" },
+      h1: { type: String, default: "" },
+      intro: { type: String, default: "" },
+      faqTitle: { type: String, default: "" },
+      faq: { type: [{ q: String, a: String, _id: false }], default: [] },
     },
   },
   {

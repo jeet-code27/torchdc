@@ -1,3 +1,6 @@
+import { cleanCategoryPage } from "@/lib/category-page";
+import { revalidatePath } from "next/cache";
+import { storedCanonical } from "@/lib/canonical";
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/permissions";
@@ -102,6 +105,10 @@ export async function PUT(
       );
     }
 
+    // Page copy (label, H1, intro, FAQ): SEO accounts may edit it too
+    const pageCopy = cleanCategoryPage(body.page);
+    if (pageCopy) category.page = pageCopy;
+
     // Role Enforcement: If user only has categories.seo permission, only update SEO fields
     if (canEditSeoOnly) {
       if (body.seo) {
@@ -109,14 +116,17 @@ export async function PUT(
           metaTitle: body.seo.metaTitle || category.seo.metaTitle,
           metaDescription: body.seo.metaDescription || category.seo.metaDescription,
           focusKeyword: body.seo.focusKeyword || category.seo.focusKeyword,
-          canonicalUrl: body.seo.canonicalUrl || category.seo.canonicalUrl,
+          canonicalUrl: storedCanonical(body.seo.canonicalUrl || category.seo.canonicalUrl, `/product-category/${category.slug}`),
           metaRobotsIndex:
             body.seo.metaRobotsIndex !== undefined
               ? body.seo.metaRobotsIndex
               : category.seo.metaRobotsIndex,
           useCustom: typeof body.seo.useCustom === "boolean" ? body.seo.useCustom : category.seo.useCustom,
         };
+      }
+      if (body.seo || pageCopy) {
         await category.save();
+        revalidateCategoryPages(category.slug);
       }
 
       return NextResponse.json({
@@ -187,12 +197,13 @@ export async function PUT(
         data.seo.metaDescription ||
         `Shop premium ${data.name} in Washington DC at Torch Dispensary. Fast local cannabis delivery.`,
       focusKeyword: data.seo.focusKeyword || `${data.name} Washington DC`,
-      canonicalUrl: data.seo.canonicalUrl || `https://torchdc.com/category/${data.slug}`,
+      canonicalUrl: storedCanonical(data.seo.canonicalUrl, `/product-category/${data.slug}`),
       metaRobotsIndex: data.seo.metaRobotsIndex ?? true,
       useCustom: data.seo.useCustom ?? category.seo?.useCustom ?? false,
     };
 
     await category.save();
+    revalidateCategoryPages(category.slug);
 
     const updated = await Category.findById(id)
       .populate("parentId", "name slug")
@@ -270,5 +281,15 @@ export async function DELETE(
       { success: false, error: "Internal server error deleting category" },
       { status: 500 }
     );
+  }
+}
+
+/** The category's page (and /flowers) shows the new copy on the next visit */
+function revalidateCategoryPages(slug: string) {
+  try {
+    if (slug === "flowers") revalidatePath("/flowers");
+    else revalidatePath(`/product-category/${slug}`);
+  } catch {
+    // outside a request (tests): nothing to refresh
   }
 }

@@ -7,16 +7,19 @@ import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { ShopProduct } from "./shop-product-card";
 import { normalizeTier, FlowerTier } from "@/lib/deals";
-import { CATEGORY_INTRO, FLOWER_FAQ, FaqSection, TIER_TEXT } from "@/lib/category-content";
+import { FaqSection, TIER_TEXT, defaultCategoryCopy, type CategoryCopy } from "@/lib/category-content";
 
 interface FlowersViewProps {
   initialProducts: ShopProduct[];
   initialTier?: string;
+  /** Page text from Admin › Categories (Flowers) and the H1 from Admin › SEO */
+  copy?: CategoryCopy;
 }
 
 export function FlowersView({
   initialProducts,
   initialTier = "Topshelf",
+  copy = defaultCategoryCopy("flowers"),
 }: FlowersViewProps) {
   // normalizeTier also maps old "?tier=Private Reserve" links to Exotic, like the client site
   const [selectedTier, setSelectedTier] = React.useState<FlowerTier>(normalizeTier(initialTier) || "Topshelf");
@@ -89,11 +92,11 @@ export function FlowersView({
           {/* Client site, Nov 9: intro wraps around the jar on phones; text left, jar right on desktop */}
           <section className="phero phero--wrap">
             <div>
-              <span className="eyebrow">EXPERTLY CURATED</span>
-              <h1>Cannabis Flower</h1>
+              {copy.label && <span className="eyebrow">{copy.label}</span>}
+              <h1>{copy.h1}</h1>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/assets/img/flower.webp" alt="" />
-              <p className="catintro">{CATEGORY_INTRO.flowers}</p>
+              {copy.intro && <p className="catintro" dangerouslySetInnerHTML={{ __html: copy.intro }} />}
             </div>
           </section>
 
@@ -211,7 +214,7 @@ export function FlowersView({
             )}
           </div>
 
-          <FaqSection title="Flower FAQ" items={FLOWER_FAQ} headingId="flower-faq-h" />
+          {copy.faq.length > 0 && <FaqSection title={copy.faqTitle} items={copy.faq} headingId="flower-faq-h" />}
         </main>
 
         {/* Right Sticky Cart Sidebar */}

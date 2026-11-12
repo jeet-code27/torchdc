@@ -3,10 +3,13 @@ import { unstable_cache } from "next/cache";
 import { connectToDatabase } from "@/lib/db";
 import { SeoSettings } from "@/models/SeoSettings";
 import { SEO_PAGE_BY_KEY } from "@/lib/seo-pages";
+import { siteCanonical } from "@/lib/canonical";
+
+export { siteCanonical };
 
 export const SEO_SETTINGS_TAG = "seo-settings";
 
-export type PageSeoOverride = { title?: string; description?: string; noindex?: boolean };
+export type PageSeoOverride = { title?: string; description?: string; noindex?: boolean; canonical?: string; h1?: string };
 export type SeoSettingsData = {
   googleVerification: string;
   bingVerification: string;
@@ -48,13 +51,21 @@ export async function pageMetadata(key: string, extra: Metadata = {}): Promise<M
   const override = (await getSeoSettings()).pages[key] || {};
   const title = override.title?.trim() || page?.title || "";
   const description = override.description?.trim() || page?.description || "";
+  // Canonical: set on Admin › SEO, else the one the page passes, else the page's own URL
+  const canonical = siteCanonical(override.canonical) || extra.alternates?.canonical || page?.path;
   return {
     ...extra,
+    ...(canonical ? { alternates: { ...(extra.alternates || {}), canonical } } : {}),
     title: { absolute: title },
     description,
     openGraph: { ...(extra.openGraph || {}), title, description },
     ...(override.noindex ? { robots: { index: false, follow: true } } : {}),
   };
+}
+
+/** H1 set on Admin › SEO for a page ("" when not set: the page keeps its own heading). */
+export async function pageH1(key: string): Promise<string> {
+  return (await getSeoSettings()).pages[key]?.h1?.trim() || "";
 }
 
 /** Page keys hidden from search, for the sitemap. */
@@ -88,7 +99,7 @@ export function itemSeo(seo: ItemSeo) {
   return {
     title: custom ? seo?.metaTitle?.trim() || "" : "",
     description: custom ? seo?.metaDescription?.trim() || "" : "",
-    canonical: custom && /^(\/|https:\/\/(www\.)?torchdc\.co\/)/.test(canonical) ? canonical : "",
+    canonical: custom ? siteCanonical(canonical) : "",
     noindex: seo?.metaRobotsIndex === false,
   };
 }

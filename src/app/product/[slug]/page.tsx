@@ -318,8 +318,14 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     "@type": "Product",
     name: productDoc.name,
     image: productData.images?.[0]?.url || "https://torchdc.co/assets/img/og.jpg",
+    url: `https://torchdc.co/product/${productDoc.slug}`,
     description: productDoc.shortDescription || productDoc.name,
-    brand: { "@type": "Brand", name: "Torch" },
+    // Brand field from the admin (else Torch); flower tier and category as product properties
+    brand: { "@type": "Brand", name: productDoc.brand?.trim() || "Torch" },
+    category: mainCat.name,
+    ...(tier
+      ? { additionalProperty: [{ "@type": "PropertyValue", name: "Tier", value: tier }] }
+      : {}),
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: "USD",
@@ -331,7 +337,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd).replace(/</g, "\\u003c") }} />
       <ProductDetailView product={productData} />
     </>
   );

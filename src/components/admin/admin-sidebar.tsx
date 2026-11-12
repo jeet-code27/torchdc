@@ -14,6 +14,7 @@ import {
   Users,
   Award,
   FileText,
+  Files,
   Globe,
   ShieldCheck,
   History,
@@ -108,6 +109,13 @@ const navItems: NavEntry[] = [
     title: "SEO",
     href: "/admin/seo",
     icon: Globe,
+    permission: "seo.view",
+  },
+  {
+    // Page text and new neighborhood pages (same access as SEO)
+    title: "Pages",
+    href: "/admin/pages",
+    icon: Files,
     permission: "seo.view",
   },
   {

@@ -1,13 +1,14 @@
 import { LOCATION_PAGES } from "@/lib/location-pages";
 import staticPages from "@/content/static-pages.json";
+import { HOME_H1 } from "@/lib/home-content";
 
 /**
  * Pages whose search title / description can be changed on Admin › SEO.
  * title/description here are the built-in defaults (used when nothing is set in the admin).
  */
-export type SeoPage = { key: string; path: string; label: string; group: string; title: string; description: string };
+export type SeoPage = { key: string; path: string; label: string; group: string; title: string; description: string; h1: string };
 
-const MAIN: SeoPage[] = [
+const MAIN: Omit<SeoPage, "h1">[] = [
   {
     key: "home",
     path: "/",
@@ -108,16 +109,25 @@ const AREAS: SeoPage[] = LOCATION_PAGES.map((p) => ({
   group: p.kind === "area" && p.state ? GROUP_OF[p.state] : "Hotel & DC quadrant pages",
   title: p.title,
   description: p.description,
+  h1: p.h1,
 }));
 
-// FAQ, About, Terms, Privacy: the client's titles and descriptions (Nov 10 zip)
-const STATIC = staticPages as Record<string, { title: string; description: string }>;
-for (const p of MAIN) {
-  if (STATIC[p.key]) {
-    p.title = STATIC[p.key].title;
-    p.description = STATIC[p.key].description;
-  }
-}
+// FAQ, About, Terms, Privacy: the client's titles, descriptions and headings (Nov 10 zip)
+const STATIC = staticPages as Record<string, { title: string; description: string; h1: string }>;
+// Headings of the other main pages, as the pages show them
+const MAIN_H1: Record<string, string> = {
+  home: HOME_H1,
+  shop: "Shop All",
+  flowers: "Cannabis Flower",
+  deals: "Daily Cannabis Deals",
+  contact: "Contact Us",
+  blog: "Blog",
+};
+const MAIN_PAGES: SeoPage[] = MAIN.map((p) =>
+  STATIC[p.key]
+    ? { ...p, title: STATIC[p.key].title, description: STATIC[p.key].description, h1: STATIC[p.key].h1 }
+    : { ...p, h1: MAIN_H1[p.key] || "" }
+);
 
-export const SEO_PAGES: SeoPage[] = [...MAIN, ...AREAS];
+export const SEO_PAGES: SeoPage[] = [...MAIN_PAGES, ...AREAS];
 export const SEO_PAGE_BY_KEY: Record<string, SeoPage> = Object.fromEntries(SEO_PAGES.map((p) => [p.key, p]));

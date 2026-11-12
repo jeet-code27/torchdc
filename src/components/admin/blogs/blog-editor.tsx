@@ -13,13 +13,14 @@ interface BlogForm {
   excerpt: string;
   content: string;
   coverImage: string;
+  coverImageAlt: string;
   author: string;
   category: string;
   tags: string;
   readTimeMinutes: number;
   isPublished: boolean;
   featured: boolean;
-  seo: { metaTitle: string; metaDescription: string; focusKeyword: string };
+  seo: { metaTitle: string; metaDescription: string; focusKeyword: string; canonicalUrl: string; noindex: boolean };
 }
 
 const EMPTY: BlogForm = {
@@ -28,13 +29,14 @@ const EMPTY: BlogForm = {
   excerpt: "",
   content: "",
   coverImage: "",
+  coverImageAlt: "",
   author: "Torch Team",
   category: "Cannabis Education",
   tags: "",
   readTimeMinutes: 4,
   isPublished: false,
   featured: false,
-  seo: { metaTitle: "", metaDescription: "", focusKeyword: "" },
+  seo: { metaTitle: "", metaDescription: "", focusKeyword: "", canonicalUrl: "", noindex: false },
 };
 
 const CATEGORIES = ["Cannabis Education", "Cannabis", "Strain Spotlight", "DC Culture & Lifestyle", "Product Reviews"];
@@ -108,6 +110,7 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
           excerpt: b.excerpt || "",
           content: b.content || "",
           coverImage: b.coverImage || "",
+          coverImageAlt: b.coverImageAlt || "",
           author: b.author || "Torch Team",
           category: b.category || "Cannabis Education",
           tags: Array.isArray(b.tags) ? b.tags.join(", ") : "",
@@ -118,6 +121,8 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
             metaTitle: b.seo?.metaTitle || "",
             metaDescription: b.seo?.metaDescription || "",
             focusKeyword: b.seo?.focusKeyword || "",
+            canonicalUrl: b.seo?.canonicalUrl || "",
+            noindex: Boolean(b.seo?.noindex),
           },
         });
         setSavedSlug(b.isPublished ? b.slug : "");
@@ -131,7 +136,7 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
 
   const set = <K extends keyof BlogForm>(key: K, value: BlogForm[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
-  const setSeo = (key: keyof BlogForm["seo"], value: string) =>
+  const setSeo = <K extends keyof BlogForm["seo"]>(key: K, value: BlogForm["seo"][K]) =>
     setForm((prev) => ({ ...prev, seo: { ...prev.seo, [key]: value } }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -371,6 +376,18 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
               />
               Featured
             </label>
+            <label className="flex items-start gap-2 text-sm text-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.seo.noindex}
+                onChange={(e) => setSeo("noindex", e.target.checked)}
+                className="accent-[#5A805B] w-4 h-4 mt-0.5"
+              />
+              <span>
+                Hide from Google
+                <span className="block text-[11px] text-muted-foreground">noindex, left out of the sitemap. The post stays on the website.</span>
+              </span>
+            </label>
           </section>
 
           <section className="rounded-xl border border-border bg-card p-4 space-y-3">
@@ -407,6 +424,18 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
               className={inputCls}
             />
             <p className="text-[11px] text-muted-foreground">Best size: 1200 × 630 px. Big photos are shrunk automatically.</p>
+            <div className="space-y-1.5">
+              <label className={labelCls}>Image alt text</label>
+              <input
+                type="text"
+                maxLength={200}
+                placeholder={form.title || "Describe the image"}
+                value={form.coverImageAlt}
+                onChange={(e) => set("coverImageAlt", e.target.value)}
+                className={inputCls}
+              />
+              <p className="text-[11px] text-muted-foreground">What the picture shows, for Google Images and screen readers. Empty: the post title.</p>
+            </div>
           </section>
 
           <section className="rounded-xl border border-border bg-card p-4 space-y-3">
@@ -479,6 +508,17 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
                 onChange={(e) => setSeo("focusKeyword", e.target.value)}
                 className={inputCls}
               />
+            </div>
+            <div className="space-y-1.5">
+              <label className={labelCls}>Canonical URL</label>
+              <input
+                type="text"
+                value={form.seo.canonicalUrl}
+                placeholder={`https://torchdc.co/${form.slug}`}
+                onChange={(e) => setSeo("canonicalUrl", e.target.value)}
+                className={inputCls}
+              />
+              <p className="text-[11px] text-muted-foreground">Leave empty to use the post&apos;s own URL. Only torchdc.co links are used.</p>
             </div>
             <div className="rounded-lg border border-border bg-background p-3 space-y-0.5">
               <p className="text-[11px] text-muted-foreground">torchdc.co/{form.slug}</p>

@@ -30,7 +30,7 @@ export function BlogPostView({ post }: { post: BlogPostData }) {
         </section>
         {post.coverImage && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img className="postcover" src={blogImage(post.coverImage, "c_limit,w_1200,f_auto,q_auto")} alt={post.title} />
+          <img className="postcover" src={blogImage(post.coverImage, "c_limit,w_1200,f_auto,q_auto")} alt={post.coverImageAlt || post.title} />
         )}
         <article className="prose postbody" dangerouslySetInnerHTML={{ __html: post.content }} />
         <p className="postback">

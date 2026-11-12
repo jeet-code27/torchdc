@@ -8,12 +8,13 @@ export interface BlogPostData {
   excerpt: string;
   content: string;
   coverImage: string;
+  coverImageAlt: string;
   author: string;
   category: string;
   readTimeMinutes: number;
   publishedAt: string | null;
   updatedAt: string | null;
-  seo: { metaTitle?: string; metaDescription?: string; canonicalUrl?: string };
+  seo: { metaTitle?: string; metaDescription?: string; canonicalUrl?: string; noindex?: boolean };
 }
 
 export interface BlogListItem {
@@ -38,6 +39,7 @@ export const getPublishedPost = cache(async (slug: string): Promise<BlogPostData
     excerpt: post.excerpt || "",
     content: post.content,
     coverImage: post.coverImage || "",
+    coverImageAlt: post.coverImageAlt || "",
     author: post.author,
     category: post.category || "",
     readTimeMinutes: post.readTimeMinutes,

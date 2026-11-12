@@ -1,3 +1,4 @@
+import { siteCanonical } from "@/lib/seo-settings";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
@@ -62,6 +63,7 @@ export async function POST(req: NextRequest) {
       excerpt,
       content,
       coverImage,
+      coverImageAlt,
       author,
       category,
       tags,
@@ -93,6 +95,7 @@ export async function POST(req: NextRequest) {
       excerpt: excerpt || "",
       content,
       coverImage: coverImage || "",
+      coverImageAlt: String(coverImageAlt || "").trim().slice(0, 200),
       author: author || "Torch Team",
       category: category || "Cannabis Education",
       tags: Array.isArray(tags) ? tags : typeof tags === "string" ? tags.split(",").map((t: string) => t.trim()).filter(Boolean) : [],
@@ -104,6 +107,8 @@ export async function POST(req: NextRequest) {
         metaTitle: seo?.metaTitle?.trim() || "",
         metaDescription: seo?.metaDescription?.trim() || "",
         focusKeyword: seo?.focusKeyword?.trim() || "",
+        canonicalUrl: siteCanonical(seo?.canonicalUrl),
+        noindex: seo?.noindex === true,
       },
     });
     revalidatePath(`/${blog.slug}`);

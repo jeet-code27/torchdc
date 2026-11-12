@@ -73,3 +73,10 @@ export const HOME_FAQ: Faq[] = [
   },
   { q: "How much weed can you have in DC?", a: "Adults 21+ can have up to 2 ounces of weed in DC." },
 ];
+
+/** The intro under the banner as HTML (what Admin › Pages starts from) */
+export const HOME_INTRO_HTML = HOME_PARAGRAPHS.map((p) => `<p>${p}</p>`).join("\n");
+
+/** Homepage copy as the page shows it: saved on Admin › Pages, else the client's */
+export type HomeCopy = { h1: string; introHtml: string; chips: string[]; faq: Faq[] };
+export const DEFAULT_HOME_COPY: HomeCopy = { h1: HOME_H1, introHtml: HOME_INTRO_HTML, chips: HOME_FACT_CHIPS, faq: HOME_FAQ };

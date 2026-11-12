@@ -1,3 +1,4 @@
+import { storedCanonical } from "@/lib/canonical";
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/permissions";
@@ -151,9 +152,7 @@ export async function POST(req: NextRequest) {
         data.seo?.metaDescription?.trim() ||
         `Shop ${data.name} in Washington DC at Torch Dispensary. Premium quality flower, discreet same-day weed delivery, and pickup.`,
       focusKeyword: data.seo?.focusKeyword?.trim() || `${data.name} DC`,
-      canonicalUrl:
-        data.seo?.canonicalUrl?.trim() ||
-        `https://torchdc.com/product/${data.slug}`,
+      canonicalUrl: storedCanonical(data.seo?.canonicalUrl, `/product/${data.slug}`),
       metaRobotsIndex: data.seo?.metaRobotsIndex ?? true,
       useCustom: data.seo?.useCustom ?? false,
     };

@@ -532,6 +532,9 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
   }, [product.description, isEdible, isVape, isPreRoll, isMushroom]);
 
   // Primary image
+  // Alt text set on the product's image in the admin, else the product name
+  const primaryAlt =
+    (product.images?.find((img) => img.isPrimary) || product.images?.[0])?.altText?.trim() || product.name;
   const primaryImage =
     product.images?.find((img) => img?.isPrimary && img?.url)?.url ||
     product.images?.[0]?.url ||
@@ -580,7 +583,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={primaryImage}
-              alt={product.name}
+              alt={primaryAlt}
             />
             <span className="pdp__tags">
               {tierTag && (

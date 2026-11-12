@@ -5,6 +5,10 @@ export interface IPageSeo {
   title?: string;
   description?: string;
   noindex?: boolean;
+  /** Canonical URL (empty: the page's own URL) */
+  canonical?: string;
+  /** Page heading (empty: the page's built-in H1) */
+  h1?: string;
 }
 
 export interface ISeoSettings extends Document {
@@ -25,6 +29,8 @@ const PageSeoSchema = new Schema<IPageSeo>(
     title: { type: String, default: "" },
     description: { type: String, default: "" },
     noindex: { type: Boolean, default: false },
+    canonical: { type: String, default: "" },
+    h1: { type: String, default: "" },
   },
   { _id: false }
 );

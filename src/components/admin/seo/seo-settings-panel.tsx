@@ -5,8 +5,16 @@ import toast from "react-hot-toast";
 import { ExternalLink, Save, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type PageEntry = { key: string; path: string; label: string; group: string; title: string; description: string };
-type Override = { title?: string; description?: string; noindex?: boolean };
+type PageEntry = { key: string; path: string; label: string; group: string; title: string; description: string; h1: string };
+type Override = { title?: string; description?: string; noindex?: boolean; canonical?: string; h1?: string };
+
+const SITE = "https://torchdc.co";
+/** The page's own URL, the canonical it uses when nothing is set */
+const ownUrl = (p: PageEntry) => `${SITE}${p.path === "/" ? "" : p.path}`;
+/** Built-in values, the ones each field falls back to */
+const builtIn = (p: PageEntry) => ({ title: p.title, description: p.description, h1: p.h1, canonical: ownUrl(p) });
+type TextField = "title" | "description" | "h1" | "canonical";
+const TEXT_FIELDS: TextField[] = ["title", "description", "h1", "canonical"];
 type Settings = { googleVerification: string; bingVerification: string; defaultShareImage: string; pages: Record<string, Override> };
 
 const inputCls =
@@ -25,7 +33,17 @@ function effectiveDrafts(list: PageEntry[], saved: Record<string, Override>): Re
   return Object.fromEntries(
     list.map((p) => {
       const s = saved[p.key] || {};
-      return [p.key, { title: s.title || p.title, description: s.description || p.description, noindex: Boolean(s.noindex) }];
+      const b = builtIn(p);
+      return [
+        p.key,
+        {
+          title: s.title || b.title,
+          description: s.description || b.description,
+          h1: s.h1 || b.h1,
+          canonical: s.canonical || b.canonical,
+          noindex: Boolean(s.noindex),
+        },
+      ];
     })
   );
 }
@@ -143,8 +161,9 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
           <div>
             <h3 className="text-base font-bold text-foreground">Page titles &amp; descriptions</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Each field shows the title and description the page uses right now. Edit and save to change them. Products and
-              categories are edited on their own pages, and blog posts in the blog editor.
+              Each field shows what the page uses right now: title, description, H1 and canonical URL. Edit and save to change
+              them; an empty canonical means the page&apos;s own URL. Products and categories are edited on their own pages, blog
+              posts in the blog editor, and page text on Admin › Pages.
             </p>
           </div>
           <input
@@ -163,20 +182,21 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
               .map((p) => {
                 const d = drafts[p.key] || {};
                 const saved = settings.pages[p.key] || {};
-                const liveTitle = saved.title || p.title;
-                const liveDesc = saved.description || p.description;
+                const b = builtIn(p);
                 const dirty =
-                  (d.title ?? "") !== liveTitle || (d.description ?? "") !== liveDesc || Boolean(d.noindex) !== Boolean(saved.noindex);
+                  TEXT_FIELDS.some((k) => (d[k] ?? "") !== (saved[k] || b[k])) || Boolean(d.noindex) !== Boolean(saved.noindex);
                 // Text equal to the built-in text is saved as "nothing set", so the page keeps the built-in version
-                const payload = {
-                  title: (d.title || "").trim() === p.title ? "" : (d.title || "").trim(),
-                  description: (d.description || "").trim() === p.description ? "" : (d.description || "").trim(),
-                  noindex: Boolean(d.noindex),
-                };
-                const custom = Boolean(saved.title || saved.description || saved.noindex);
+                const payload: Override = { noindex: Boolean(d.noindex) };
+                for (const k of TEXT_FIELDS) {
+                  const v = (d[k] || "").trim();
+                  payload[k] = v === b[k] ? "" : v;
+                }
+                const custom = Boolean(saved.title || saved.description || saved.noindex || saved.h1 || saved.canonical);
                 const set = (patch: Override) => setDrafts((cur) => ({ ...cur, [p.key]: { ...cur[p.key], ...patch } }));
                 const title = d.title || "";
                 const desc = d.description || "";
+                const h1 = d.h1 || "";
+                const canonical = d.canonical || "";
                 return (
                   <div key={p.key} className="p-4 rounded-xl border border-border bg-card space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -217,6 +237,24 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
                         onChange={(e) => set({ description: e.target.value })}
                       />
                     </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <label className="block space-y-1">
+                        <span className="flex justify-between text-xs font-semibold text-foreground">
+                          H1 (main heading on the page) <Counter value={h1} max={70} />
+                        </span>
+                        <input className={inputCls} disabled={!canEdit} placeholder={p.h1} value={h1} onChange={(e) => set({ h1: e.target.value })} />
+                      </label>
+                      <label className="block space-y-1">
+                        <span className="text-xs font-semibold text-foreground">Canonical URL</span>
+                        <input
+                          className={`${inputCls} font-mono text-xs`}
+                          disabled={!canEdit}
+                          placeholder={ownUrl(p)}
+                          value={canonical}
+                          onChange={(e) => set({ canonical: e.target.value })}
+                        />
+                      </label>
+                    </div>
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
                         <input
@@ -238,7 +276,11 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
                               className="text-xs"
                               disabled={savingKey === p.key}
                               onClick={() =>
-                                save(p.key, { pages: { [p.key]: { title: "", description: "", noindex: false } } }, `${p.label}: back to built-in text`)
+                                save(
+                                  p.key,
+                                  { pages: { [p.key]: { title: "", description: "", h1: "", canonical: "", noindex: false } } },
+                                  `${p.label}: back to built-in text`
+                                )
                               }
                             >
                               <RotateCcw className="w-3.5 h-3.5 mr-1" /> Reset
@@ -251,6 +293,7 @@ export function SeoSettingsPanel({ canEdit }: { canEdit: boolean }) {
                             onClick={() => {
                               if (!payload.title && !(d.title || "").trim()) return toast.error("Title can't be empty");
                               if (!payload.description && !(d.description || "").trim()) return toast.error("Description can't be empty");
+                              if (!payload.h1 && !h1.trim()) return toast.error("H1 can't be empty");
                               save(p.key, { pages: { [p.key]: payload } }, `${p.label} saved`);
                             }}
                             className="bg-[#5A805B] hover:bg-[#4a6b4b] text-white text-xs"

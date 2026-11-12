@@ -5,7 +5,7 @@ import { requirePermission } from "@/lib/permissions";
 import { SeoSettings } from "@/models/SeoSettings";
 import { ActivityLog } from "@/models/ActivityLog";
 import { SEO_PAGES, SEO_PAGE_BY_KEY } from "@/lib/seo-pages";
-import { SEO_SETTINGS_TAG, cleanVerification } from "@/lib/seo-settings";
+import { SEO_SETTINGS_TAG, cleanVerification, siteCanonical } from "@/lib/seo-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +35,7 @@ export async function GET() {
 
 const clip = (v: unknown, max: number) => String(v ?? "").trim().slice(0, max);
 
-// PATCH /api/admin/seo/settings - { googleVerification?, bingVerification?, defaultShareImage?, pages?: { [key]: {title, description, noindex} } }
+// PATCH /api/admin/seo/settings - { googleVerification?, bingVerification?, defaultShareImage?, pages?: { [key]: {title, description, noindex, canonical, h1} } }
 export async function PATCH(req: NextRequest) {
   const perm = await requirePermission("seo.manage");
   if (!perm.authorized) return perm.response;
@@ -55,7 +55,21 @@ export async function PATCH(req: NextRequest) {
     if (body.pages && typeof body.pages === "object") {
       for (const [key, v] of Object.entries(body.pages as Record<string, Record<string, unknown>>)) {
         if (!SEO_PAGE_BY_KEY[key]) continue;
-        set[`pages.${key}`] = { title: clip(v?.title, 120), description: clip(v?.description, 320), noindex: v?.noindex === true };
+        const canonicalIn = clip(v?.canonical, 500);
+        const canonical = siteCanonical(canonicalIn);
+        if (canonicalIn && !canonical) {
+          return NextResponse.json(
+            { success: false, error: "Canonical URL must be a torchdc.co link or a /path" },
+            { status: 400 }
+          );
+        }
+        set[`pages.${key}`] = {
+          title: clip(v?.title, 120),
+          description: clip(v?.description, 320),
+          noindex: v?.noindex === true,
+          canonical,
+          h1: clip(v?.h1, 150),
+        };
         changedPages.push(SEO_PAGE_BY_KEY[key].label);
       }
     }

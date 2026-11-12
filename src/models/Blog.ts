@@ -5,6 +5,8 @@ export interface IBlogSEO {
   metaDescription?: string;
   focusKeyword?: string;
   canonicalUrl?: string;
+  /** Hide from Google: noindex tag, left out of the sitemap (the post stays on the website) */
+  noindex?: boolean;
 }
 
 export interface IBlog extends Document {
@@ -13,6 +15,7 @@ export interface IBlog extends Document {
   excerpt?: string;
   content: string;
   coverImage?: string;
+  coverImageAlt?: string;
   author: string;
   category?: string;
   tags: string[];
@@ -32,6 +35,7 @@ const BlogSchema = new Schema<IBlog>(
     excerpt: { type: String, default: "" },
     content: { type: String, required: true },
     coverImage: { type: String, default: "" },
+    coverImageAlt: { type: String, default: "" },
     author: { type: String, default: "Torch Team" },
     category: { type: String, default: "Cannabis Education" },
     tags: [{ type: String }],
@@ -44,6 +48,7 @@ const BlogSchema = new Schema<IBlog>(
       metaDescription: { type: String },
       focusKeyword: { type: String },
       canonicalUrl: { type: String },
+      noindex: { type: Boolean, default: false },
     },
   },
   {

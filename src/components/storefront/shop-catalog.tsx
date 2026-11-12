@@ -8,7 +8,7 @@ import { ShopCartSidebar } from "./shop-cart-sidebar";
 import { ShopFlowerTiers, FLOWER_TIERS } from "./shop-flower-tiers";
 import { ShopStickyCartBar } from "./shop-sticky-cart-bar";
 import { ShopProductCard, ShopProduct } from "./shop-product-card";
-import { CATEGORY_FAQ, CATEGORY_INTRO, CATEGORY_LABEL, FaqSection } from "@/lib/category-content";
+import { FaqSection, defaultCategoryCopy, type CategoryCopy } from "@/lib/category-content";
 
 const CATEGORY_PILLS = [
   { slug: "all", label: "All" },
@@ -24,6 +24,10 @@ interface ShopCatalogProps {
   initialProducts?: ShopProduct[];
   initialCategory?: string;
   initialQuery?: string;
+  /** Category page text from Admin › Categories, for initialCategory */
+  copy?: CategoryCopy;
+  /** Shop All heading from Admin › SEO */
+  allH1?: string;
 }
 
 /** Shop page, built on the client reference markup (shop.html + shopPage() in site.js). */
@@ -31,6 +35,8 @@ export function ShopCatalog({
   initialProducts = [],
   initialCategory,
   initialQuery = "",
+  copy,
+  allH1,
 }: ShopCatalogProps) {
   const { fulfillment, setFulfillment } = useCart();
   const products = initialProducts;
@@ -85,13 +91,15 @@ export function ShopCatalog({
     : isNew
     ? "New Arrivals"
     : tab === "all"
-    ? "Shop All"
+    ? allH1 || "Shop All"
     : isFlowers
     ? `${FLOWER_TIERS.find((t) => t.slug === activeTier)?.name || "Topshelf"} Flower`
     : CATEGORY_PILLS.find((c) => c.slug === tab)?.label || "Products";
 
   // Client cards: flame on best sellers (except in New Arrivals), NEW badge only in New Arrivals
   const catCopy = !searchQuery.trim() && !isBest && !isNew && tab !== "all" && tab !== "flowers";
+  // Saved copy for the page's own category; the built-in copy when another tab is picked
+  const cc = copy && tab === initial ? copy : defaultCategoryCopy(tab);
 
   const cardProduct = (p: ShopProduct): ShopProduct =>
     isNew
@@ -189,15 +197,15 @@ export function ShopCatalog({
         <div className="pagehead">
           <div>
             {/* Category label, intro and FAQ: only on that category's own tab, not during a search */}
-            {catCopy && CATEGORY_LABEL[tab] && <span className="eyebrow catlabel">{CATEGORY_LABEL[tab]}</span>}
-            <h1>{title}</h1>
+            {catCopy && cc.label && <span className="eyebrow catlabel">{cc.label}</span>}
+            <h1>{catCopy && cc.h1 ? cc.h1 : title}</h1>
             <span className="muted">
               {filteredProducts.length} {filteredProducts.length === 1 ? "product" : "products"}
             </span>
           </div>
         </div>
 
-        {catCopy && CATEGORY_INTRO[tab] && <p className="catintro">{CATEGORY_INTRO[tab]}</p>}
+        {catCopy && cc.intro && <p className="catintro" dangerouslySetInnerHTML={{ __html: cc.intro }} />}
 
         {tab === "all" && !searchQuery.trim() && (
           <Link className="tierlink" href="/flowers">
@@ -226,9 +234,7 @@ export function ShopCatalog({
           )}
         </div>
 
-        {catCopy && CATEGORY_FAQ[tab] && (
-          <FaqSection title={CATEGORY_FAQ[tab].title} items={CATEGORY_FAQ[tab].items} headingId="cat-faq-h" />
-        )}
+        {catCopy && cc.faq.length > 0 && <FaqSection title={cc.faqTitle} items={cc.faq} headingId="cat-faq-h" />}
       </main>
 
       <ShopCartSidebar />

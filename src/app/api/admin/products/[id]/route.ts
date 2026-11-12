@@ -1,3 +1,4 @@
+import { storedCanonical } from "@/lib/canonical";
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/permissions";
@@ -109,15 +110,30 @@ export async function PUT(
           metaTitle: body.seo.metaTitle || product.seo.metaTitle,
           metaDescription: body.seo.metaDescription || product.seo.metaDescription,
           focusKeyword: body.seo.focusKeyword || product.seo.focusKeyword,
-          canonicalUrl: body.seo.canonicalUrl || product.seo.canonicalUrl,
+          canonicalUrl: storedCanonical(body.seo.canonicalUrl || product.seo.canonicalUrl, `/product/${product.slug}`),
           metaRobotsIndex:
             body.seo.metaRobotsIndex !== undefined
               ? body.seo.metaRobotsIndex
               : product.seo.metaRobotsIndex,
           useCustom: typeof body.seo.useCustom === "boolean" ? body.seo.useCustom : product.seo.useCustom,
         };
-        await product.save();
       }
+      // Image alt text is SEO too: only the alt text of images already on the product changes
+      let altChanged = false;
+      if (Array.isArray(body.images)) {
+        const altByUrl = new Map<string, string>();
+        for (const im of body.images as { url?: unknown; altText?: unknown }[]) {
+          if (typeof im?.url === "string") altByUrl.set(im.url, String(im.altText ?? "").trim().slice(0, 200));
+        }
+        for (const im of product.images) {
+          const alt = altByUrl.get(im.url);
+          if (alt !== undefined && alt !== (im.altText || "")) {
+            im.altText = alt;
+            altChanged = true;
+          }
+        }
+      }
+      if (body.seo || altChanged) await product.save();
 
       const updated = await Product.findById(id)
         .populate("categoryIds", "name slug")
@@ -196,7 +212,7 @@ export async function PUT(
         data.seo.metaDescription ||
         `Shop premium ${data.name} in Washington DC at Torch Dispensary. Fast local cannabis delivery.`,
       focusKeyword: data.seo.focusKeyword || `${data.name} DC`,
-      canonicalUrl: data.seo.canonicalUrl || `https://torchdc.com/product/${data.slug}`,
+      canonicalUrl: storedCanonical(data.seo.canonicalUrl, `/product/${data.slug}`),
       metaRobotsIndex: data.seo.metaRobotsIndex ?? true,
       useCustom: data.seo.useCustom ?? product.seo?.useCustom ?? false,
     };

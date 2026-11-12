@@ -1,3 +1,4 @@
+import { siteCanonical } from "@/lib/seo-settings";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
@@ -52,6 +53,7 @@ export async function PUT(
     if (body.excerpt !== undefined) blog.excerpt = body.excerpt;
     if (body.content !== undefined) blog.content = body.content;
     if (body.coverImage !== undefined) blog.coverImage = body.coverImage;
+    if (body.coverImageAlt !== undefined) blog.coverImageAlt = String(body.coverImageAlt || "").trim().slice(0, 200);
     if (body.author !== undefined) blog.author = body.author;
     if (body.category !== undefined) blog.category = body.category;
     if (body.readTimeMinutes !== undefined) blog.readTimeMinutes = Number(body.readTimeMinutes) || 3;
@@ -61,7 +63,8 @@ export async function PUT(
         metaTitle: body.seo?.metaTitle?.trim() || "",
         metaDescription: body.seo?.metaDescription?.trim() || "",
         focusKeyword: body.seo?.focusKeyword?.trim() || "",
-        canonicalUrl: blog.seo?.canonicalUrl || "",
+        canonicalUrl: siteCanonical(body.seo?.canonicalUrl !== undefined ? body.seo.canonicalUrl : blog.seo?.canonicalUrl),
+        noindex: body.seo?.noindex === true,
       };
     }
 

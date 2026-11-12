@@ -36,7 +36,7 @@ const TIER_META: Record<FlowerTier, TierNoteInfo> = {
   },
 };
 
-export function DealsView() {
+export function DealsView({ h1 = "" }: { h1?: string }) {
   const [selectedTier, setSelectedTier] = React.useState<FlowerTier>("Midshelf");
   // DC-time Wake & Bake window, read after mount so server and client HTML match
   const [wakeOn, setWakeOn] = React.useState(false);
@@ -87,7 +87,7 @@ export function DealsView() {
 
       <main className="shell__main">
         <section className="dealhead">
-          <h1>Daily Cannabis Deals</h1>
+          <h1>{h1 || "Daily Cannabis Deals"}</h1>
           <p className="dealsum">{DEALS_SUMMARY}</p>
           <span className="updated">{DEALS_UPDATED}</span>
         </section>
