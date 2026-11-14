@@ -1,4 +1,5 @@
 import { siteCanonical } from "@/lib/seo-settings";
+import { SHOP_LINKS } from "@/lib/blog-links";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
@@ -64,6 +65,8 @@ export async function POST(req: NextRequest) {
       content,
       coverImage,
       coverImageAlt,
+      quickAnswer,
+      shopLinks,
       author,
       category,
       tags,
@@ -96,6 +99,8 @@ export async function POST(req: NextRequest) {
       content,
       coverImage: coverImage || "",
       coverImageAlt: String(coverImageAlt || "").trim().slice(0, 200),
+      quickAnswer: String(quickAnswer || "").trim().slice(0, 600),
+      shopLinks: SHOP_LINKS.includes(shopLinks) ? shopLinks : "",
       author: author || "Torch Team",
       category: category || "Cannabis Education",
       tags: Array.isArray(tags) ? tags : typeof tags === "string" ? tags.split(",").map((t: string) => t.trim()).filter(Boolean) : [],

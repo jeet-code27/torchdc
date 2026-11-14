@@ -9,6 +9,8 @@ export interface BlogPostData {
   content: string;
   coverImage: string;
   coverImageAlt: string;
+  quickAnswer: string;
+  shopLinks: string;
   author: string;
   category: string;
   readTimeMinutes: number;
@@ -40,6 +42,8 @@ export const getPublishedPost = cache(async (slug: string): Promise<BlogPostData
     content: post.content,
     coverImage: post.coverImage || "",
     coverImageAlt: post.coverImageAlt || "",
+    quickAnswer: post.quickAnswer || "",
+    shopLinks: post.shopLinks || "",
     author: post.author,
     category: post.category || "",
     readTimeMinutes: post.readTimeMinutes,

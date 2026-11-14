@@ -14,6 +14,8 @@ interface BlogForm {
   content: string;
   coverImage: string;
   coverImageAlt: string;
+  quickAnswer: string;
+  shopLinks: string;
   author: string;
   category: string;
   tags: string;
@@ -30,6 +32,8 @@ const EMPTY: BlogForm = {
   content: "",
   coverImage: "",
   coverImageAlt: "",
+  quickAnswer: "",
+  shopLinks: "",
   author: "Torch Team",
   category: "Cannabis Education",
   tags: "",
@@ -111,6 +115,8 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
           content: b.content || "",
           coverImage: b.coverImage || "",
           coverImageAlt: b.coverImageAlt || "",
+          quickAnswer: b.quickAnswer || "",
+          shopLinks: b.shopLinks || "",
           author: b.author || "Torch Team",
           category: b.category || "Cannabis Education",
           tags: Array.isArray(b.tags) ? b.tags.join(", ") : "",
@@ -435,6 +441,37 @@ export function BlogEditor({ blogId }: { blogId?: string }) {
                 className={inputCls}
               />
               <p className="text-[11px] text-muted-foreground">What the picture shows, for Google Images and screen readers. Empty: the post title.</p>
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-border bg-card p-4 space-y-3">
+            <h2 className="text-sm font-bold text-foreground">Quick answer &amp; shop links</h2>
+            <div className="space-y-1.5">
+              <label className={labelCls}>Quick answer (under the title)</label>
+              <textarea
+                rows={4}
+                maxLength={600}
+                value={form.quickAnswer}
+                placeholder="1 to 2 sentences that answer the post title directly"
+                onChange={(e) => set("quickAnswer", e.target.value)}
+                className={inputCls}
+              />
+              <p className="text-[11px] text-muted-foreground">Shown in a green box under the title. Empty: no box.</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className={labelCls}>&quot;Order now&quot; links at the end</label>
+              <select value={form.shopLinks} onChange={(e) => set("shopLinks", e.target.value)} className={inputCls}>
+                <option value="">Pick from the title</option>
+                <option value="all">Flower, Pre-rolls, Disposables, Edibles</option>
+                <option value="flowers">Flower</option>
+                <option value="pre-rolls">Pre-rolls</option>
+                <option value="disposables">Disposables</option>
+                <option value="cartridges">Cartridges</option>
+                <option value="concentrates">Concentrates</option>
+                <option value="edibles">Edibles</option>
+                <option value="none">No category links</option>
+              </select>
+              <p className="text-[11px] text-muted-foreground">A &quot;Same-day delivery in DC&quot; link is always added after them.</p>
             </div>
           </section>
 

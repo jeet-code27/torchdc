@@ -1154,6 +1154,13 @@ a.btn-wide.btn-wide--ghost {
 .postbody .wp-block-table { overflow-x: auto; }
 .postbody table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .postbody th, .postbody td { padding: 8px 10px; border: 1px solid var(--line-2); text-align: left; vertical-align: top; }
+/* Blog posts: "Quick answer" panel under the H1 and "Order now" links at the end (content spec 8) */
+.quickans { margin: 16px 0 0; padding: 14px 16px; border-radius: 18px; background: var(--mint); border: 1.5px solid #CFE3CF; }
+.quickans__k { display: block; font-size: 12px; font-weight: 800; letter-spacing: 0.6px; color: var(--green-dark); margin-bottom: 4px; }
+.quickans p { margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink); }
+.postshop { margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--line-2); font-size: 15px; line-height: 1.7; }
+.postshop a { color: var(--green-dark); font-weight: 700; }
+.postshop__sep { color: var(--muted); }
 .postback { margin: 24px 0 8px; }
 .postback a { color: var(--green-dark); font-weight: 700; text-decoration: none; }
 @media (min-width: 900px) {

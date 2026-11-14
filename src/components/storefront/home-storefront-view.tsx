@@ -25,6 +25,8 @@ interface HomeStorefrontViewProps {
 const withBadge = (p: ShopProduct, badge: string): ShopProduct =>
   badge && !p.badge ? { ...p, badge } : p;
 
+const noopSubscribe = () => () => {};
+
 export function HomeStorefrontView({ products, copy = DEFAULT_HOME_COPY }: HomeStorefrontViewProps) {
   const router = useRouter();
   const { fulfillment, setFulfillment } = useCart();
@@ -96,6 +98,12 @@ export function HomeStorefrontView({ products, copy = DEFAULT_HOME_COPY }: HomeS
     return list.length > 0 ? list.slice(0, 6) : products.slice(3, 9);
   }, [products]);
 
+
+  const isBrowser = React.useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false
+  );
 
   // Desktop sections, same order as the client site: Best Sellers, New Arrivals, then each category
   const desktopSections = [
@@ -213,7 +221,9 @@ export function HomeStorefrontView({ products, copy = DEFAULT_HOME_COPY }: HomeS
         {/* Desktop sections (shown >= 1100px by client CSS), ids match the left menu */}
         <div className="dsecs">
           {desktopSections
-            .filter((sec) => sec.list.length > 0)
+            // Best Sellers / New Arrivals are already in the page as the phone rails above; their desktop copies
+            // are added in the browser, like the client site, so each heading is in the page source once (spec 1.6)
+            .filter((sec) => sec.list.length > 0 && (isBrowser || (sec.id !== "best" && sec.id !== "new")))
             .map((sec) => (
               <section key={sec.id} className="dsec" id={sec.id}>
                 <div className="sec__head">

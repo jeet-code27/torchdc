@@ -49,13 +49,13 @@ const ICONS = {
 export function OrderConfirmation({ order }: { order: PlacedOrder }) {
   const del = order.isDelivery;
   const steps: [React.ReactNode, string, string][] = [
-    [ICONS.id, "We'll Reach Out to Verify Your Age", "Someone from our team will contact you shortly. Have your ID ready."],
+    [ICONS.id, "We'll Reach Out to Verify Your Age", "Someone from our team will text you. Reply with a photo of your ID and a quick selfie."],
     [
       ICONS.clock,
       del ? "Delivery in 30 to 90 Minutes" : "Ready for Curbside Pickup",
       del
-        ? "After we confirm your order, your driver usually arrives in 30 to 90 minutes, depending on traffic."
-        : "Once your order is confirmed, we'll text you when it's ready at 1000 G St NW.",
+        ? "After your ID is verified, your driver usually arrives in 30 to 90 minutes, depending on traffic."
+        : "Once your ID is verified, we'll text you when it's ready at 1000 G St NW.",
     ],
   ];
   if (del) {

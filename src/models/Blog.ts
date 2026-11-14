@@ -16,6 +16,10 @@ export interface IBlog extends Document {
   content: string;
   coverImage?: string;
   coverImageAlt?: string;
+  /** 1 to 2 sentences under the H1 that answer the title directly (content spec 8.2) */
+  quickAnswer?: string;
+  /** Category for the "Order now" links at the end: a category slug, "all", "none" or "" (picked from the title) */
+  shopLinks?: string;
   author: string;
   category?: string;
   tags: string[];
@@ -36,6 +40,8 @@ const BlogSchema = new Schema<IBlog>(
     content: { type: String, required: true },
     coverImage: { type: String, default: "" },
     coverImageAlt: { type: String, default: "" },
+    quickAnswer: { type: String, default: "" },
+    shopLinks: { type: String, default: "" },
     author: { type: String, default: "Torch Team" },
     category: { type: String, default: "Cannabis Education" },
     tags: [{ type: String }],
